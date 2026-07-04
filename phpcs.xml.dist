@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<ruleset name="Blitz &amp; Donner Forms">
+	<description>WordPress Coding Standards für Blitz &amp; Donner Forms.</description>
+
+	<file>.</file>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<arg value="sp"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+
+	<config name="minimum_wp_version" value="6.6"/>
+	<config name="testVersion" value="7.4-"/>
+
+	<rule ref="WordPress">
+		<!-- Direkte Tabellenzugriffe sind Kern des Plugins (eigene Tabellen). -->
+		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery"/>
+		<exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching"/>
+		<!-- Kennung bdf_/BDF_ ist Produktentscheid (Konzept 04.07.2026, verbindlich ab Commit 1). -->
+		<exclude name="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed"/>
+		<!-- Hook- und Ketten-Signaturen führen Parameter, die einzelne Stufen nicht nutzen. -->
+		<exclude name="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+		<!-- Eigene Ablage: is_writable-Check gehört zur Storage-Diagnose. -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_is_writable"/>
+		<!-- Datei-Streaming im Download/Export braucht Low-Level-Funktionen. -->
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_fwrite"/>
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_fclose"/>
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents"/>
+		<exclude name="WordPress.WP.AlternativeFunctions.file_system_operations_readfile"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="blitz-donner-forms"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="bdf"/>
+				<element value="BDF"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>
