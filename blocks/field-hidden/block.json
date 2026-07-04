@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "bdfrms/field-hidden",
+    "version": "2.0.0",
+    "title": "Verstecktes Feld",
+    "category": "bdfrms-fields",
+    "icon": {
+        "src": "editor-code"
+    },
+    "description": "Technischer Wert (nicht sichtbar).",
+    "textdomain": "blitz-donner-forms",
+    "attributes": {
+        "label": {
+            "type": "string",
+            "default": ""
+        },
+        "name": {
+            "type": "string",
+            "default": ""
+        },
+        "nameClientId": {
+            "type": "string",
+            "default": ""
+        },
+        "hiddenValue": {
+            "type": "string",
+            "default": ""
+        },
+        "lockedValue": {
+            "type": "boolean",
+            "default": false
+        },
+        "sensitive": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "supports": {
+        "html": false
+    },
+    "usesContext": [
+        "bdfrms/formId",
+        "bdfrms/appearanceMode",
+        "bdfrms/colorLabel",
+        "bdfrms/colorText",
+        "bdfrms/colorPlaceholder",
+        "bdfrms/colorFieldBg",
+        "bdfrms/colorBorder",
+        "bdfrms/colorFocus",
+        "bdfrms/colorButtonBg",
+        "bdfrms/colorButtonText",
+        "bdfrms/darkColorLabel",
+        "bdfrms/darkColorText",
+        "bdfrms/darkColorPlaceholder",
+        "bdfrms/darkColorFieldBg",
+        "bdfrms/darkColorBorder",
+        "bdfrms/darkColorFocus",
+        "bdfrms/darkColorButtonBg",
+        "bdfrms/darkColorButtonText",
+        "bdfrms/colorFormShell",
+        "bdfrms/darkColorFormShell"
+    ],
+    "editorScript": "bdfrms-editor",
+    "example": {
+        "attributes": {
+            "name": "sb_hidden",
+            "hiddenValue": "stylebook"
+        }
+    },
+    "ancestor": [
+        "bdfrms/form"
+    ]
+}

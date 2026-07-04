@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,10 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.2.0 =
+* Ported the proven form engine from the predecessor plugin: form and field blocks (bdfrms/*), server-side schema validation, defence chain (nonce, HMAC token, honeypot, rate limit, Friendly Captcha), email notification, appearance system, draft saving, file uploads with protected storage, submissions backend with labels, file downloads, CSV export and per-submission ZIP download.
+* Documented add-on hook surface finalised (docs/hooks.md).
 
 = 0.1.0 =
 * Initial skeleton: activation, database tables, capability model, Friendly Captcha integration, settings cards, submissions list/detail, CSV export, documented add-on hook surface.

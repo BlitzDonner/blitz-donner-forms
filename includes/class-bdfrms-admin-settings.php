@@ -28,7 +28,7 @@ class BDFRMS_Admin_Settings {
 	 */
 	public static function boot() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
-		add_action( 'admin_post_bdf_save_settings', array( __CLASS__, 'handle_save' ) );
+		add_action( 'admin_post_bdfrms_save_settings', array( __CLASS__, 'handle_save' ) );
 	}
 
 	/**
@@ -145,7 +145,7 @@ class BDFRMS_Admin_Settings {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'      => self::PAGE_SLUG,
+					'page'         => self::PAGE_SLUG,
 					'bdfrms_saved' => '1',
 				),
 				admin_url( 'admin.php' )
@@ -186,6 +186,14 @@ class BDFRMS_Admin_Settings {
 				</td>
 			</tr>
 		</table>
+		<details style="margin-top:12px;">
+			<summary><?php esc_html_e( 'Textbaustein für die Datenschutzerklärung (kopierbar)', 'blitz-donner-forms' ); ?></summary>
+			<textarea readonly rows="10" style="width:100%;margin-top:8px;" onclick="this.select();"><?php echo esc_textarea( BDFRMS_Captcha::privacy_text_snippet() ); ?></textarea>
+		</details>
+		<details style="margin-top:8px;">
+			<summary><?php esc_html_e( 'Interessenabwägung (LIA) als interne Vorlage (kopierbar)', 'blitz-donner-forms' ); ?></summary>
+			<textarea readonly rows="10" style="width:100%;margin-top:8px;" onclick="this.select();"><?php echo esc_textarea( BDFRMS_Captcha::lia_text_snippet() ); ?></textarea>
+		</details>
 		<?php
 	}
 

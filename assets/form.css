@@ -1,0 +1,984 @@
+/**
+ * Gutenberg Formbuilder – Formular-Optik (Frontend + Editor-Canvas, pixelidentisch).
+ *
+ * Vier Modi (data-bdfrms-appearance):
+ *   - theme       : KEIN Plugin-Stil. Formular erbt komplett vom Website-Theme.
+ *                   Keine Tokens, kein Reset, keine Karte, keine Feld-Skins.
+ *   - light/dark/auto : vollstaendig isolierte, Apple-artige Stile. Das Plugin
+ *                   stylt alles selbst. auto = light + prefers-color-scheme: dark.
+ *
+ * Isolation (beide Richtungen):
+ *   1. Kein Einfluss VON aussen: harter Reset (all: revert) auf alle Formular-
+ *      Elemente unter dem gescopeten Wrapper, danach explizite Neusetzung. Die
+ *      Durchsetzung gegen ungelayertes Theme-CSS traegt die Spezifitaet der
+ *      Attribut-Selektoren PLUS gezieltes !important auf darstellungskritische
+ *      Eigenschaften. @layer dient nur der internen Organisation.
+ *   2. Kein Einfluss NACH aussen: alle Selektoren strikt unter .bdfrms-form-wrapper.
+ *      Editor-Chrome (Block-Inserter etc.) liegt ausschliesslich in bdfrms-editor.css.
+ *
+ * Custom-Color-Overrides (Inline-Variablen aus PHP, z. B. --bdfrms-light-text):
+ *   Die Modus-Tokens lesen diese Variablen als ersten Fallback. Setzt der Nutzer
+ *   eine eigene Farbe, gewinnt sie automatisch; sonst greift der Apple-Default.
+ */
+
+/* ============================================================== *
+ * theme: bewusst NICHTS. Nur strukturelle, theme-neutrale Regeln.
+ * ============================================================== */
+
+/* Honeypot bleibt in jedem Modus technisch unsichtbar (kein sichtbares Skin). */
+.bdfrms-form-wrapper .bdfrms-hp-field {
+	position: absolute;
+	left: -9999px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* Erfolgsbereich (Frontend nach erfolgreichem Absenden ohne Folgeseite) –
+   reine Layout-Abstaende, modusunabhaengig, kein Farb-Skin. */
+.bdfrms-form-wrapper .bdfrms-form-success-output {
+	max-width: 100%;
+}
+
+.bdfrms-form-wrapper .bdfrms-form-success-panel {
+	margin-block: 0 1.25rem;
+}
+
+.bdfrms-form-wrapper .bdfrms-form-success-panel:last-child {
+	margin-bottom: 0;
+}
+
+/* ============================================================== *
+ * Token-Layer: Paletten pro Modus.
+ * theme bekommt KEINE Tokens und faellt damit komplett durch.
+ * ============================================================== */
+@layer bdfrms-tokens {
+
+	/* Gemeinsame, modusunabhaengige Tokens (nur fuer light/dark/auto). */
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"],
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"],
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] {
+		--bdfrms-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+		--bdfrms-body-size: 1.0625rem; /* 17px */
+		--bdfrms-line: 1.5;
+		--bdfrms-radius: 10px;
+		--bdfrms-radius-card: 16px;
+		--bdfrms-stack-gap: 1.25rem;
+		--bdfrms-label-gap: 0.4rem;
+		--bdfrms-field-pad: 0.7rem 0.9rem;
+		--bdfrms-card-pad: 1.75rem;
+		--bdfrms-control-size: 1.125rem; /* 18px Checkbox/Radio */
+		--bdfrms-transition: 0.15s ease;
+	}
+
+	/* Hell – Custom-Overrides (Inline) als Fallback vor dem Apple-Default. */
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] {
+		color-scheme: light;
+		--bdfrms-card: var(--bdfrms-light-form-shell, #ffffff);
+		--bdfrms-text: var(--bdfrms-light-text, #1d1d1f);
+		--bdfrms-label: var(--bdfrms-light-label, #6e6e73);
+		--bdfrms-placeholder: var(--bdfrms-light-placeholder, #86868b);
+		--bdfrms-field-bg: var(--bdfrms-light-bg, #ffffff);
+		--bdfrms-border: var(--bdfrms-light-border, #d2d2d7);
+		--bdfrms-accent: var(--bdfrms-light-border-focus, #0071e3);
+		--bdfrms-on-accent: var(--bdfrms-light-submit-text, #ffffff);
+		--bdfrms-button-bg: var(--bdfrms-light-submit-bg, var(--bdfrms-accent));
+		--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+		--bdfrms-success-bg: #e7f6ec;
+		--bdfrms-success-border: #34c759;
+		--bdfrms-success-text: #1d1d1f;
+		--bdfrms-error-bg: #fdeceb;
+		--bdfrms-error-border: #ff3b30;
+		--bdfrms-error-text: #1d1d1f;
+		--bdfrms-track: #d2d2d7;
+	}
+
+	/* Dunkel. */
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] {
+		color-scheme: dark;
+		--bdfrms-card: var(--bdfrms-dark-form-shell, #1c1c1e);
+		--bdfrms-text: var(--bdfrms-dark-text, #f5f5f7);
+		--bdfrms-label: var(--bdfrms-dark-label, #aeaeb2);
+		--bdfrms-placeholder: var(--bdfrms-dark-placeholder, #8e8e93);
+		--bdfrms-field-bg: var(--bdfrms-dark-bg, #2c2c2e);
+		--bdfrms-border: var(--bdfrms-dark-border, #48484a);
+		--bdfrms-accent: var(--bdfrms-dark-border-focus, #0a84ff);
+		--bdfrms-on-accent: var(--bdfrms-dark-submit-text, #ffffff);
+		--bdfrms-button-bg: var(--bdfrms-dark-submit-bg, var(--bdfrms-accent));
+		--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+		--bdfrms-success-bg: #14321f;
+		--bdfrms-success-border: #30d158;
+		--bdfrms-success-text: #f5f5f7;
+		--bdfrms-error-bg: #3a1715;
+		--bdfrms-error-border: #ff453a;
+		--bdfrms-error-text: #f5f5f7;
+		--bdfrms-track: #48484a;
+	}
+
+	/* Auto = Hell-Werte, schaltet per System auf Dunkel. */
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] {
+		color-scheme: light dark;
+		--bdfrms-card: var(--bdfrms-light-form-shell, #ffffff);
+		--bdfrms-text: var(--bdfrms-light-text, #1d1d1f);
+		--bdfrms-label: var(--bdfrms-light-label, #6e6e73);
+		--bdfrms-placeholder: var(--bdfrms-light-placeholder, #86868b);
+		--bdfrms-field-bg: var(--bdfrms-light-bg, #ffffff);
+		--bdfrms-border: var(--bdfrms-light-border, #d2d2d7);
+		--bdfrms-accent: var(--bdfrms-light-border-focus, #0071e3);
+		--bdfrms-on-accent: var(--bdfrms-light-submit-text, #ffffff);
+		--bdfrms-button-bg: var(--bdfrms-light-submit-bg, var(--bdfrms-accent));
+		--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+		--bdfrms-success-bg: #e7f6ec;
+		--bdfrms-success-border: #34c759;
+		--bdfrms-success-text: #1d1d1f;
+		--bdfrms-error-bg: #fdeceb;
+		--bdfrms-error-border: #ff3b30;
+		--bdfrms-error-text: #1d1d1f;
+		--bdfrms-track: #d2d2d7;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] {
+			--bdfrms-card: var(--bdfrms-dark-form-shell, #1c1c1e);
+			--bdfrms-text: var(--bdfrms-dark-text, #f5f5f7);
+			--bdfrms-label: var(--bdfrms-dark-label, #aeaeb2);
+			--bdfrms-placeholder: var(--bdfrms-dark-placeholder, #8e8e93);
+			--bdfrms-field-bg: var(--bdfrms-dark-bg, #2c2c2e);
+			--bdfrms-border: var(--bdfrms-dark-border, #48484a);
+			--bdfrms-accent: var(--bdfrms-dark-border-focus, #0a84ff);
+			--bdfrms-on-accent: var(--bdfrms-dark-submit-text, #ffffff);
+			--bdfrms-button-bg: var(--bdfrms-dark-submit-bg, var(--bdfrms-accent));
+			--bdfrms-success-bg: #14321f;
+			--bdfrms-success-border: #30d158;
+			--bdfrms-success-text: #f5f5f7;
+			--bdfrms-error-bg: #3a1715;
+			--bdfrms-error-border: #ff453a;
+			--bdfrms-error-text: #f5f5f7;
+			--bdfrms-track: #48484a;
+		}
+	}
+}
+
+/* ============================================================== *
+ * Reset: harter Reset gegen Theme-Erbe (nur light/dark/auto).
+ * all: revert verwirft Theme-Autor-Stile und faellt auf den Browser-Default
+ * zurueck; danach erzwingen die Komponenten-Regeln die Apple-Optik mit
+ * Spezifitaet + !important (schlaegt auch !important-Theme-Regeln).
+ * Bewusst UNgelayert, damit revert nicht nur eine Layer-Ebene zurueckspringt.
+ * ============================================================== */
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] input,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] select,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] textarea,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] button,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] label,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] legend,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] fieldset,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] output,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] input,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] select,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] textarea,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] button,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] label,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] legend,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] fieldset,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] output,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] input,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] select,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] textarea,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] button,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] label,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] legend,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] fieldset,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] output,
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field {
+		all: revert;
+		box-sizing: border-box;
+	}
+
+/* ============================================================== *
+ * Komponenten: Apple-Optik fuer light/dark/auto.
+ * Selektoren bewusst hochspezifisch (Wrapper-Attribut + Element) und
+ * darstellungskritische Eigenschaften mit !important, damit aggressive,
+ * UNgelayerte Theme-Regeln nicht durchschlagen.
+ * ============================================================== */
+
+/* Karte / Wrapper. Gilt fuer alle drei aktiven Modi. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] {
+	box-sizing: border-box !important;
+	max-width: 32rem;
+	margin-inline: auto;
+	padding: var(--bdfrms-card-pad) !important;
+	border: 1px solid var(--bdfrms-border) !important;
+	border-radius: var(--bdfrms-radius-card) !important;
+	background: var(--bdfrms-card) !important;
+	color: var(--bdfrms-text) !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: var(--bdfrms-body-size) !important;
+	line-height: var(--bdfrms-line) !important;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] *,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] *::before,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] *::after,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] *,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] *::before,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] *::after,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] *,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] *::before,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] *::after {
+	box-sizing: border-box;
+}
+
+/* Formular + Feld-Stack. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-form,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-form,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-form {
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 100%;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-form-fields,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-form-fields,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-form-fields {
+	display: block !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+/* Einzelnes Feld (Container). */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: stretch !important;
+	gap: var(--bdfrms-label-gap) !important;
+	margin: 0 0 var(--bdfrms-stack-gap) !important;
+	padding: 0 !important;
+	border: 0 !important;
+	width: 100% !important;
+	min-width: 0;
+	position: relative !important;
+}
+
+/* Letztes Feld (Submit) braucht unten keinen Stack-Abstand – Karten-Padding genügt. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit {
+	margin-bottom: 0 !important;
+}
+
+/* Label / Legend. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field > legend,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field > legend,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field > legend {
+	display: block !important;
+	margin: 0 0 var(--bdfrms-label-gap) !important;
+	padding: 0 !important;
+	float: none !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.9375rem !important;
+	font-weight: 500 !important;
+	line-height: 1.3 !important;
+	color: var(--bdfrms-label) !important;
+}
+
+/* Legend braucht im fieldset keinen Bottom-Gap doppelt (radio nutzt .bdfrms-radio-options-Abstand). */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field > legend,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field > legend,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field > legend {
+	width: 100%;
+}
+
+/* ---- Text-artige Eingaben + Textarea + Select ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="text"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="email"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="tel"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="url"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="number"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="date"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="time"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="datetime-local"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field textarea,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field select,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="text"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="email"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="tel"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="url"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="number"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="date"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="time"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="datetime-local"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field textarea,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field select,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="text"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="email"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="tel"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="url"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="number"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="date"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="time"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="datetime-local"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field textarea,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field select {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	box-sizing: border-box !important;
+	display: block !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 !important;
+	padding: var(--bdfrms-field-pad) !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: var(--bdfrms-body-size) !important;
+	line-height: var(--bdfrms-line) !important;
+	color: var(--bdfrms-text) !important;
+	background-color: var(--bdfrms-field-bg) !important;
+	background-image: none !important;
+	border: 1px solid var(--bdfrms-border) !important;
+	border-radius: var(--bdfrms-radius) !important;
+	box-shadow: none !important;
+	outline: none !important;
+	transition: border-color var(--bdfrms-transition), box-shadow var(--bdfrms-transition) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field textarea,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field textarea,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field textarea {
+	min-height: 6.5rem !important;
+	resize: vertical !important;
+}
+
+/* Platzhalter. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input::placeholder,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field textarea::placeholder,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input::placeholder,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field textarea::placeholder,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input::placeholder,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field textarea::placeholder {
+	color: var(--bdfrms-placeholder) !important;
+	opacity: 1 !important;
+}
+
+/* Fokus: kein Layout-Shift – Akzent-Rahmen + weicher Ring. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field textarea:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field select:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field textarea:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field select:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field textarea:focus,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field select:focus {
+	border-color: var(--bdfrms-accent) !important;
+	box-shadow: var(--bdfrms-focus-ring) !important;
+	outline: none !important;
+}
+
+/* ---- Select: eigener Dropdown-Pfeil (inline SVG, keine externe Datei) ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field select,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field select,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field select {
+	padding-inline-end: 2.5rem !important;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2386868b' d='M1.41 0 6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E") !important;
+	background-repeat: no-repeat !important;
+	background-position: right 0.9rem center !important;
+	background-size: 12px 8px !important;
+	cursor: pointer;
+}
+
+/* ---- Checkbox / Radio: selbst gezeichnet ---- */
+/* Reihe (Checkbox-Feld + jede Radio-Zeile): Control links, Text rechts. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-checkbox > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-radio-row,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-checkbox > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-radio-row,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-checkbox > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-radio-row {
+	display: flex !important;
+	align-items: flex-start !important;
+	gap: 0.55rem !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: var(--bdfrms-body-size) !important;
+	font-weight: 400 !important;
+	line-height: var(--bdfrms-line) !important;
+	color: var(--bdfrms-text) !important;
+	cursor: pointer;
+}
+
+/* Checkbox-Feld: Container nicht als Stack mit Label-Gap behandeln. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-checkbox,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-checkbox,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-checkbox {
+	gap: 0 !important;
+}
+
+/* Radio-Optionsliste. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-radio-options,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-radio-options,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-radio-options {
+	display: flex !important;
+	flex-direction: column !important;
+	gap: 0.6rem !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-radio-options--row,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-radio-options--row,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-radio-options--row {
+	flex-direction: row !important;
+	flex-wrap: wrap !important;
+	gap: 1.25rem !important;
+}
+
+/* Die Option-Labels innerhalb einer Radio-Zeile NICHT als Block-Label stylen. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-radio-row > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-radio-row > label,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-radio-row > label {
+	margin: 0 !important;
+	font-size: var(--bdfrms-body-size) !important;
+	font-weight: 400 !important;
+	color: var(--bdfrms-text) !important;
+}
+
+/* Das eigentliche Kaestchen/der Kreis. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="checkbox"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="radio"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="checkbox"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="radio"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="checkbox"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="radio"] {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	flex: 0 0 auto !important;
+	width: var(--bdfrms-control-size) !important;
+	height: var(--bdfrms-control-size) !important;
+	margin: 0.2rem 0 0 0 !important;
+	padding: 0 !important;
+	background-color: var(--bdfrms-field-bg) !important;
+	border: 1px solid var(--bdfrms-border) !important;
+	box-shadow: none !important;
+	outline: none !important;
+	cursor: pointer;
+	transition: border-color var(--bdfrms-transition), background-color var(--bdfrms-transition), box-shadow var(--bdfrms-transition) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="checkbox"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="checkbox"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="checkbox"] {
+	border-radius: 5px !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="radio"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="radio"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="radio"] {
+	border-radius: 50% !important;
+}
+
+/* Checked: Akzentfuellung. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="checkbox"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="radio"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="checkbox"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="radio"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="checkbox"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="radio"]:checked {
+	background-color: var(--bdfrms-accent) !important;
+	border-color: var(--bdfrms-accent) !important;
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+}
+
+/* Haekchen fuer Checkbox. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="checkbox"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="checkbox"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="checkbox"]:checked {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 5.2 4.3 8.5 11 1.5'/%3E%3C/svg%3E") !important;
+	background-size: 11px 9px !important;
+}
+
+/* Punkt fuer Radio. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="radio"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="radio"]:checked,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="radio"]:checked {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='4' cy='4' r='4' fill='%23ffffff'/%3E%3C/svg%3E") !important;
+	background-size: 7px 7px !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="checkbox"]:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="radio"]:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="checkbox"]:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="radio"]:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="checkbox"]:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="radio"]:focus-visible {
+	box-shadow: var(--bdfrms-focus-ring) !important;
+}
+
+/* ---- Range: schlanker Track + runder Daumen in Akzent ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-range-row,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-range-row,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-range-row {
+	display: flex !important;
+	align-items: center !important;
+	gap: 0.9rem !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="range"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="range"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="range"] {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	flex: 1 1 auto !important;
+	width: 100% !important;
+	height: 4px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: var(--bdfrms-track) !important;
+	border: 0 !important;
+	border-radius: 2px !important;
+	outline: none !important;
+	cursor: pointer;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="range"]::-webkit-slider-thumb,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="range"]::-webkit-slider-thumb,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--bdfrms-accent);
+	border: 2px solid #ffffff;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+	cursor: pointer;
+	margin-top: -8px;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="range"]::-moz-range-thumb,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="range"]::-moz-range-thumb,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="range"]::-moz-range-thumb {
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--bdfrms-accent);
+	border: 2px solid #ffffff;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+	cursor: pointer;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="range"]::-moz-range-track,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="range"]::-moz-range-track,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="range"]::-moz-range-track {
+	height: 4px;
+	background: var(--bdfrms-track);
+	border-radius: 2px;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-range-value,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-range-value,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-range-value {
+	flex: 0 0 auto !important;
+	min-width: 2.5rem !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.9375rem !important;
+	font-variant-numeric: tabular-nums;
+	color: var(--bdfrms-label) !important;
+	text-align: end !important;
+}
+
+/* ---- Datei-Upload: dezenter, konsistenter Bereich ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="file"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="file"],
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="file"] {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	box-sizing: border-box !important;
+	display: block !important;
+	width: 100% !important;
+	margin: 0 !important;
+	padding: 0.6rem 0.75rem !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.9375rem !important;
+	color: var(--bdfrms-text) !important;
+	background-color: var(--bdfrms-field-bg) !important;
+	border: 1px dashed var(--bdfrms-border) !important;
+	border-radius: var(--bdfrms-radius) !important;
+	cursor: pointer;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input[type="file"]::file-selector-button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input[type="file"]::file-selector-button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input[type="file"]::file-selector-button {
+	margin-inline-end: 0.75rem !important;
+	padding: 0.35rem 0.8rem !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.875rem !important;
+	font-weight: 500 !important;
+	color: var(--bdfrms-on-accent) !important;
+	-webkit-text-fill-color: var(--bdfrms-on-accent) !important;
+	background: var(--bdfrms-button-bg) !important;
+	border: 0 !important;
+	border-radius: 8px !important;
+	cursor: pointer !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-help,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-help,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-help {
+	display: block !important;
+	margin: 0.35rem 0 0 !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.8125rem !important;
+	line-height: 1.4 !important;
+	color: var(--bdfrms-label) !important;
+}
+
+/* ---- Submit-Button ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit {
+	gap: 0 !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit .wp-block-button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit .wp-block-button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit .wp-block-button {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit button {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	display: inline-block !important;
+	width: auto !important;
+	margin: 0 !important;
+	padding: 0.7rem 1.5rem !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: var(--bdfrms-body-size) !important;
+	font-weight: 600 !important;
+	line-height: 1.2 !important;
+	text-decoration: none !important;
+	color: var(--bdfrms-on-accent) !important;
+	background: var(--bdfrms-button-bg) !important;
+	border: 0 !important;
+	border-radius: var(--bdfrms-radius) !important;
+	box-shadow: none !important;
+	outline: none !important;
+	cursor: pointer;
+	transition: filter var(--bdfrms-transition), box-shadow var(--bdfrms-transition) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit button:hover,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit button:hover,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit button:hover {
+	filter: brightness(0.95) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit button:active,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit button:active,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit button:active {
+	filter: brightness(0.9) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit button:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit button:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-submit button:focus-visible {
+	box-shadow: var(--bdfrms-focus-ring) !important;
+}
+
+/* ---- "Vertraulich"-Pille ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-pill,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-pill,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-pill {
+	position: absolute !important;
+	top: 0 !important;
+	right: 0 !important;
+	margin: 0 !important;
+	padding: 0.125rem 0.5rem !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.75rem !important;
+	font-weight: 500 !important;
+	line-height: 1.4 !important;
+	color: var(--bdfrms-label) !important;
+	background: color-mix(in srgb, var(--bdfrms-accent) 12%, transparent) !important;
+	border: 1px solid color-mix(in srgb, var(--bdfrms-accent) 30%, transparent) !important;
+	border-radius: 999px !important;
+}
+
+/* ---- Statusmeldungen (Notice) ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-notice,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-notice,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-notice {
+	margin: 0 0 var(--bdfrms-stack-gap) !important;
+	padding: 0.875rem 1rem !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: var(--bdfrms-body-size) !important;
+	line-height: 1.4 !important;
+	color: var(--bdfrms-text) !important;
+	background: var(--bdfrms-field-bg) !important;
+	border: 1px solid var(--bdfrms-border) !important;
+	border-radius: var(--bdfrms-radius) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-notice-success,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-notice-success,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-notice-success {
+	color: var(--bdfrms-success-text) !important;
+	background: var(--bdfrms-success-bg) !important;
+	border-color: var(--bdfrms-success-border) !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-notice-error,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-notice-error,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-notice-error {
+	color: var(--bdfrms-error-text) !important;
+	background: var(--bdfrms-error-bg) !important;
+	border-color: var(--bdfrms-error-border) !important;
+}
+
+/* ---- Entwurf loeschen (Zeile) ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-draft-tools,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-draft-tools,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-draft-tools {
+	margin: 0 0 var(--bdfrms-stack-gap) !important;
+	padding: 0 !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-draft-reset-button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-draft-reset-button,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-draft-reset-button {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	margin: 0 !important;
+	padding: 0.25rem 0 !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.8125rem !important;
+	font-weight: 500 !important;
+	color: var(--bdfrms-accent) !important;
+	background: transparent !important;
+	border: 0 !important;
+	text-decoration: underline !important;
+	text-underline-offset: 0.2em !important;
+	cursor: pointer;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-draft-reset-button:hover,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-draft-reset-button:hover,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-draft-reset-button:hover {
+	opacity: 0.85;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-draft-reset-button:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-draft-reset-button:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-draft-reset-button:focus-visible {
+	outline: 2px solid var(--bdfrms-accent) !important;
+	outline-offset: 2px !important;
+	border-radius: 4px !important;
+}
+
+/* ---- Pflichtfeld-Sternchen ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-required,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-required,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-required {
+	color: var(--bdfrms-accent) !important;
+	margin-inline-start: 0.15em;
+}
+
+/* ---- Datei-Entfernen-Button ---- */
+/* Datei-Meta-Zeile: Hinweis links, Entfernen rechtsbündig in derselben Zeile. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-file-meta,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-file-meta,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-file-meta {
+	display: flex !important;
+	align-items: baseline !important;
+	justify-content: space-between !important;
+	gap: 1rem !important;
+	margin: 0.35rem 0 0 !important;
+}
+
+/* Hinweis innerhalb der Meta-Zeile: kein eigener Top-Abstand (Container traegt ihn). */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-file-meta .bdfrms-help,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-file-meta .bdfrms-help,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-file-meta .bdfrms-help {
+	margin: 0 !important;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-file-clear,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-file-clear,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-file-clear {
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	flex: 0 0 auto !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	font-family: var(--bdfrms-font) !important;
+	font-size: 0.8125rem !important;
+	color: var(--bdfrms-accent) !important;
+	background: transparent !important;
+	border: 0 !important;
+	white-space: nowrap !important;
+	text-decoration: underline !important;
+	text-underline-offset: 0.2em !important;
+	cursor: pointer;
+}
+
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-file-clear:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-file-clear:focus-visible,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-file-clear:focus-visible {
+	outline: 2px solid var(--bdfrms-accent) !important;
+	outline-offset: 2px !important;
+	border-radius: 4px !important;
+}
+
+.bdfrms-file-clear[hidden] {
+	display: none !important;
+}
+
+/* ---- Editor-Vorschau: deaktivierte Felder nicht ausgrauen ---- */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field input:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field select:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field textarea:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field input:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field select:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field textarea:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field input:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field select:disabled,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field textarea:disabled {
+	opacity: 1 !important;
+	-webkit-text-fill-color: var(--bdfrms-text) !important;
+}
+
+/* ---- Spam-Schutz (CAPTCHA): Widget-Zeile vor dem Absenden ---- */
+.bdfrms-captcha-row {
+	margin: 1rem 0 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+}
+
+.bdfrms-captcha-row .bdfrms-captcha-label {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--bdfrms-label, inherit);
+}
+
+.bdfrms-captcha-row .frc-captcha {
+	max-width: 100%;
+}
+
+.bdfrms-captcha-row .bdfrms-captcha-hint {
+	margin: 0;
+	font-size: 0.8rem;
+	line-height: 1.4;
+	opacity: 0.8;
+	color: var(--bdfrms-text, inherit);
+}
+
+/* ============================================================== *
+ * Submit-Overlay (Doppelklick-Schutz + Verschlüsselungs-Animation)
+ * ============================================================== */
+
+.bdfrms-form-wrapper .bdfrms-submit-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 100;
+	background-color: var(--bdfrms-card, rgba(255, 255, 255, 0.92));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: inherit;
+}
+
+.bdfrms-form-wrapper .bdfrms-submit-overlay__content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.5rem 2rem;
+	max-width: 20rem;
+	width: 100%;
+}
+
+.bdfrms-form-wrapper .bdfrms-submit-overlay__cipher {
+	font-family: monospace;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--bdfrms-text, #1d1d1f);
+	letter-spacing: 0.05em;
+	min-height: 1.4em;
+	text-align: center;
+	word-break: break-all;
+}
+
+/* Fortschrittsbalken-Schiene */
+.bdfrms-form-wrapper .bdfrms-submit-overlay__bar-track {
+	width: 100%;
+	height: 4px;
+	background-color: var(--bdfrms-border, #d2d2d7);
+	border-radius: var(--bdfrms-radius, 4px);
+	overflow: hidden;
+}
+
+/* Fortschrittsbalken: fährt auf ~85 %, dann pulsiert er */
+.bdfrms-form-wrapper .bdfrms-submit-overlay__bar {
+	height: 100%;
+	background-color: var(--bdfrms-accent, #0071e3);
+	border-radius: var(--bdfrms-radius, 4px);
+	width: 0%;
+	animation:
+		bdfrms-bar-fill 4s ease-out forwards,
+		bdfrms-bar-pulse 1.5s ease-in-out 4s infinite;
+}
+
+@keyframes bdfrms-bar-fill {
+	from { width: 0%; }
+	to   { width: 85%; }
+}
+
+@keyframes bdfrms-bar-pulse {
+	0%   { width: 80%; }
+	50%  { width: 90%; }
+	100% { width: 80%; }
+}
+
+.bdfrms-form-wrapper .bdfrms-submit-overlay__message {
+	margin: 0;
+	font-size: var(--bdfrms-body-size, 1rem);
+	color: var(--bdfrms-label, #6e6e73);
+	text-align: center;
+	line-height: 1.5;
+}
+
+/* Theme-Modus: Dark-Fallback für neutrale Werte */
+@media (prefers-color-scheme: dark) {
+	.bdfrms-form-wrapper[data-bdfrms-appearance="theme"] .bdfrms-submit-overlay {
+		background-color: rgba(28, 28, 30, 0.92);
+	}
+	.bdfrms-form-wrapper[data-bdfrms-appearance="theme"] .bdfrms-submit-overlay__cipher {
+		color: #f5f5f7;
+	}
+	.bdfrms-form-wrapper[data-bdfrms-appearance="theme"] .bdfrms-submit-overlay__bar-track {
+		background-color: #3a3a3c;
+	}
+	.bdfrms-form-wrapper[data-bdfrms-appearance="theme"] .bdfrms-submit-overlay__message {
+		color: #aeaeb2;
+	}
+}

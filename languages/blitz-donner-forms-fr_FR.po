@@ -1,0 +1,449 @@
+# French (France) translation for Gutenberg Formbuilder
+msgid ""
+msgstr ""
+"Project-Id-Version: Gutenberg Formbuilder 2.0.7\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-10 12:00+0000\n"
+"PO-Revision-Date: 2026-05-10 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Danke! Das Formular wurde erfolgreich gesendet."
+msgstr "Merci ! Le formulaire a bien été envoyé."
+
+msgid "Ungültige Formularanfrage."
+msgstr "Requête de formulaire invalide."
+
+msgid "Sicherheitsprüfung fehlgeschlagen. Bitte Seite neu laden und erneut absenden."
+msgstr "La vérification de sécurité a échoué. Veuillez recharger la page et renvoyer le formulaire."
+
+msgid "Sitzung abgelaufen. Bitte Seite neu laden und erneut absenden."
+msgstr "Session expirée. Veuillez recharger la page et renvoyer le formulaire."
+
+msgid "Die Anfrage wurde als Spam erkannt."
+msgstr "La requête a été identifiée comme indésirable (spam)."
+
+msgid "Zu viele Anfragen. Bitte warte kurz und versuche es erneut."
+msgstr "Trop de requêtes. Veuillez patienter un instant et réessayer."
+
+msgid "Formularschema nicht gefunden."
+msgstr "Schéma du formulaire introuvable."
+
+msgid "Doppelte technische Feldnamen im Formular. Bitte eines der betroffenen Felder duplizieren oder Label bzw. Platzhalter anpassen."
+msgstr "Noms de champs techniques en double dans le formulaire. Veuillez dupliquer l’un des champs concernés ou modifier le libellé ou le texte indicatif."
+
+msgid "Das Formular wurde nicht übermittelt. Bitte prüfe die Hinweise und sende erneut."
+msgstr "Le formulaire n’a pas été envoyé. Veuillez vérifier les messages et renvoyer le formulaire."
+
+msgid "Eine hochgeladene Datei wurde abgelehnt. Das Formular wurde in diesem Fall nicht übermittelt; es wurde kein neuer Eintrag gespeichert."
+msgstr "Un fichier téléversé a été refusé. Dans ce cas, le formulaire n’a pas été envoyé ; aucune nouvelle entrée n’a été enregistrée."
+
+msgid "Speichern fehlgeschlagen. Bitte versuche es erneut."
+msgstr "L’enregistrement a échoué. Veuillez réessayer."
+
+msgid "Die Anfrage konnte nicht verarbeitet werden."
+msgstr "La requête n’a pas pu être traitée."
+
+msgid "Verschlüsselung ist auf diesem Server nicht eingerichtet. Bitte den Administrator kontaktieren."
+msgstr "Le chiffrement n’est pas configuré sur ce serveur. Veuillez contacter l’administrateur."
+
+msgid "Eine hochgeladene Datei wurde vom Virenscanner als schädlich erkannt."
+msgstr "Un fichier téléversé a été détecté comme malveillant par l’antivirus."
+
+msgid "Die Datei wurde nicht übernommen (nicht gespeichert) und zählt nicht zur Einsendung. Nach dem Neuladen der Seite ist die Auswahl im Datei-Feld leer — bitte wähle bei Bedarf eine zulässige Datei erneut. Das gesamte Formular wurde nicht übermittelt; es wurde kein neuer Eintrag gespeichert."
+msgstr "Le fichier n’a pas été accepté (non enregistré) et ne compte pas dans l’envoi. Après rechargement de la page, le champ fichier est vide — veuillez sélectionner à nouveau un fichier autorisé si nécessaire. L’intégralité du formulaire n’a pas été envoyée ; aucune nouvelle entrée n’a été enregistrée."
+
+msgid "Neues Formular (%1$s) auf Beitrag %2$d"
+msgstr "Nouveau formulaire (%1$s) sur l’article %2$d"
+
+msgid "Ungültiges verstecktes Feld."
+msgstr "Champ masqué invalide."
+
+msgid "Bitte fülle das Feld \"%s\" aus."
+msgstr "Veuillez remplir le champ « %s »."
+
+msgid "Bitte bestätige \"%s\"."
+msgstr "Veuillez confirmer « %s »."
+
+msgid "Das Feld \"%s\" enthält keine gültige E-Mail-Adresse."
+msgstr "Le champ « %s » ne contient pas d’adresse e-mail valide."
+
+msgid "Das Feld \"%s\" enthält keine gültige URL."
+msgstr "Le champ « %s » ne contient pas d’URL valide."
+
+msgid "Das Feld \"%s\" muss eine Zahl sein."
+msgstr "Le champ « %s » doit être un nombre."
+
+msgid "Zahl zu klein."
+msgstr "Nombre trop petit."
+
+msgid "Zahl zu gross."
+msgstr "Nombre trop grand."
+
+msgid "Ungültiges Datum."
+msgstr "Date invalide."
+
+msgid "Ungültige Uhrzeit."
+msgstr "Heure invalide."
+
+msgid "Ungültiges Datum/Uhrzeit."
+msgstr "Date/heure invalide."
+
+msgid "Das Feld \"%s\" enthält eine ungültige Telefonnummer."
+msgstr "Le champ « %s » contient un numéro de téléphone invalide."
+
+msgid "Ungültige Auswahl."
+msgstr "Sélection invalide."
+
+msgid "Eingabe zu lang."
+msgstr "Saisie trop longue."
+
+msgid "Bitte wähle eine Datei für \"%s\"."
+msgstr "Veuillez choisir un fichier pour « %s »."
+
+msgid "Mehrfach-Uploads sind nicht erlaubt."
+msgstr "Les envois multiples de fichiers ne sont pas autorisés."
+
+msgid "Datei-Upload fehlgeschlagen."
+msgstr "Échec du téléversement du fichier."
+
+msgid "Datei ist zu gross."
+msgstr "Le fichier est trop volumineux."
+
+msgid "Diese Datei wurde vom Virenscanner als schädlich erkannt."
+msgstr "Ce fichier a été détecté comme malveillant par l’antivirus."
+
+msgid "Virenscan derzeit nicht verfügbar; Upload wird verweigert."
+msgstr "Analyse antivirus momentanément indisponible ; le téléversement a été refusé."
+
+msgid "Ungültiger Datei-Upload."
+msgstr "Téléversement de fichier invalide."
+
+msgid "Ungültiger Dateiname."
+msgstr "Nom de fichier invalide."
+
+msgid "Dieser Dateityp ist nicht erlaubt."
+msgstr "Ce type de fichier n’est pas autorisé."
+
+msgid "Dateien ohne Endung sind nicht erlaubt."
+msgstr "Les fichiers sans extension ne sont pas autorisés."
+
+msgid "Dateityp konnte nicht verifiziert werden."
+msgstr "Le type de fichier n’a pas pu être vérifié."
+
+msgid "Dateiinhalt passt nicht zur Endung."
+msgstr "Le contenu du fichier ne correspond pas à l’extension."
+
+msgid "Dateityp ist für dieses Feld nicht erlaubt."
+msgstr "Ce type de fichier n’est pas autorisé pour ce champ."
+
+msgid "Datei-Uploads sind aktuell blockiert: Die Option \"Pflicht für Datei-Uploads\" ist aktiv, aber kein ClamAV-Scanner eingerichtet. Lösung: in \"Sicherheit & Einstellungen\" entweder ClamAV korrekt konfigurieren ODER die Pflicht-Option deaktivieren."
+msgstr "Les téléversements de fichiers sont bloqués : l’option « Obligatoire pour les téléversements » est activée, mais aucun scanner ClamAV n’est configuré. Solution : sous « Sécurité et paramètres », configurez correctement ClamAV OU désactivez l’option obligatoire."
+
+msgid "Verschlüsselung nicht konfiguriert."
+msgstr "Chiffrement non configuré."
+
+msgid "Kein gültiger Upload."
+msgstr "Téléversement invalide."
+
+msgid "Storage-Verzeichnis konnte nicht angelegt werden."
+msgstr "Le répertoire de stockage n’a pas pu être créé."
+
+msgid "Datei konnte nicht gelesen werden."
+msgstr "Le fichier n’a pas pu être lu."
+
+msgid "Verschlüsselung fehlgeschlagen."
+msgstr "Échec du chiffrement."
+
+msgid "Storage-Unterordner konnte nicht angelegt werden."
+msgstr "Le sous-dossier de stockage n’a pas pu être créé."
+
+msgid "Storage-Schreibfehler."
+msgstr "Erreur d’écriture du stockage."
+
+msgid "Datei-Metadaten konnten nicht gespeichert werden."
+msgstr "Les métadonnées du fichier n’ont pas pu être enregistrées."
+
+msgid "Datei nicht gefunden."
+msgstr "Fichier introuvable."
+
+msgid "Verschlüsselung nicht verfügbar."
+msgstr "Chiffrement indisponible."
+
+msgid "Schlüssel konnte nicht entwrappt werden."
+msgstr "La clé n’a pas pu être déballée (unwrap)."
+
+msgid "Datei nicht im Storage gefunden."
+msgstr "Fichier introuvable dans le stockage."
+
+msgid "Datei konnte nicht entschlüsselt werden (Tag-Mismatch)."
+msgstr "Le fichier n’a pas pu être déchiffré (incohérence d’authentification)."
+
+msgid "Beim Absenden ist ein Fehler aufgetreten."
+msgstr "Une erreur s’est produite lors de l’envoi du formulaire."
+
+msgid "Entwurf löschen"
+msgstr "Effacer le brouillon"
+
+msgid "Voreingestellter Wert (optional)"
+msgstr "Valeur par défaut (facultatif)"
+
+msgid "Leer lassen für keinen Startwert. Format: JJJJ-MM-TT, z. B. 2026-05-10."
+msgstr "Laisser vide pour aucune valeur initiale. Format : AAAA-MM-JJ, p. ex. 2026-05-10."
+
+msgid "Leer lassen für keinen Startwert. Format: HH:MM (24 Stunden), z. B. 09:30."
+msgstr "Laisser vide pour aucune valeur initiale. Format : HH:MM (24 h), p. ex. 09:30."
+
+msgid "Leer lassen für keinen Startwert. Format: JJJJ-MM-TTTHH:MM (lokal), z. B. 2026-05-10T14:00."
+msgstr "Laisser vide pour aucune valeur initiale. Format : AAAA-MM-JJTHH:MM (local), p. ex. 2026-05-10T14:00."
+
+msgid "Rückmeldung"
+msgstr "Confirmation"
+
+msgid "Rückmeldungsfelder"
+msgstr "Champs de confirmation"
+
+# --- CAPTCHA-Integration (v2.7.0) ---
+
+msgid "Spam-Schutz"
+msgstr "Protection anti-spam"
+
+msgid "Bitte den Spam-Schutz abschliessen, bevor du das Formular absendest."
+msgstr "Veuillez terminer la protection anti-spam avant d’envoyer le formulaire."
+
+msgid "Spam-Schutz mit Friendly Captcha\n\nZum Schutz unserer Formulare vor automatisiertem Missbrauch setzen wir den Dienst Friendly Captcha (Friendly Captcha GmbH, Deutschland) ein. Das Verfahren beruht auf einem rechnerischen Nachweis (Proof-of-Work) im Browser. Es verwendet keine Cookies, erstellt keinen Geraete-Fingerabdruck und verfolgt das Nutzungsverhalten nicht. Zur Durchfuehrung der Pruefung wird die IP-Adresse innerhalb der EU verarbeitet; eine Uebermittlung in Drittlaender findet nicht statt. Mit dem Anbieter besteht ein Auftragsverarbeitungsvertrag. Rechtsgrundlage ist unser berechtigtes Interesse an der Abwehr von Spam (Art. 6 Abs. 1 lit. f DSGVO bzw. die entsprechende Bestimmung des revidierten Schweizer Datenschutzgesetzes)."
+msgstr "Protection anti-spam avec Friendly Captcha\n\nPour protéger nos formulaires contre les abus automatisés, nous utilisons le service Friendly Captcha (Friendly Captcha GmbH, Allemagne). La méthode repose sur une preuve de travail (proof of work) calculée dans le navigateur. Elle n’utilise aucun cookie, ne crée aucune empreinte d’appareil et ne suit pas le comportement d’utilisation. Pour réaliser la vérification, l’adresse IP est traitée au sein de l’UE ; aucun transfert vers des pays tiers n’a lieu. Un contrat de sous-traitance est conclu avec le prestataire. La base juridique est notre intérêt légitime à repousser le spam (art. 6, par. 1, let. f RGPD ou la disposition correspondante de la loi suisse révisée sur la protection des données)."
+
+msgid "CAPTCHA-Einstellungen gespeichert."
+msgstr "Réglages CAPTCHA enregistrés."
+
+msgid "Spam-Schutz (CAPTCHA) – Friendly Captcha"
+msgstr "Protection anti-spam (CAPTCHA) – Friendly Captcha"
+
+msgid "CAPTCHA ist aktiv, aber unvollständig konfiguriert – es wird vorerst kein Widget angezeigt. Bitte Site-Key und API-Key eintragen."
+msgstr "Le CAPTCHA est actif mais incomplètement configuré – aucun widget n’est affiché pour l’instant. Veuillez saisir la clé de site et la clé d’API."
+
+msgid "CAPTCHA aktiv (global)"
+msgstr "CAPTCHA actif (global)"
+
+msgid "Steuert, ob auf Formularen ein CAPTCHA erscheinen kann. Pro Formular zusätzlich im Block überschreibbar."
+msgstr "Détermine si un CAPTCHA peut apparaître sur les formulaires. Peut en plus être remplacé par formulaire dans le bloc."
+
+msgid "Anbieter"
+msgstr "Fournisseur"
+
+msgid "Friendly Captcha"
+msgstr "Friendly Captcha"
+
+msgid "(EU, Proof-of-Work, kein Drittlandtransfer)"
+msgstr "(UE, preuve de travail, pas de transfert vers un pays tiers)"
+
+msgid "Site-Key"
+msgstr "Clé de site"
+
+msgid "API-Key (Secret)"
+msgstr "Clé d’API (secret)"
+
+msgid "Erzwingung"
+msgstr "Application"
+
+msgid "Mit Ausnahme bei Serverausfall"
+msgstr "Avec exception en cas de panne du serveur"
+
+msgid "Das Formular verlangt ein bestandenes Captcha. Nur wenn Friendly Captcha einmal nicht erreichbar ist, lässt sich das Formular trotzdem absenden – damit eine seltene Störung beim Dienst Ihre Formulare nicht blockiert."
+msgstr "Le formulaire exige un captcha réussi. Ce n’est que si Friendly Captcha est momentanément injoignable que le formulaire peut tout de même être envoyé – afin qu’une panne rare du service ne bloque pas vos formulaires."
+
+msgid "Streng"
+msgstr "Strict"
+
+msgid "Ohne bestandenes Captcha wird nicht abgesendet – auch dann nicht, wenn Friendly Captcha gerade gestört ist."
+msgstr "Sans captcha réussi, rien n’est envoyé – pas même lorsque Friendly Captcha est momentanément perturbé."
+
+msgid "CAPTCHA-Einstellungen speichern"
+msgstr "Enregistrer les réglages CAPTCHA"
+
+msgid "Datenschutz-Hinweis (Friendly Captcha)"
+msgstr "Note de confidentialité (Friendly Captcha)"
+
+msgid "IP-Verarbeitung in der EU, kein Drittlandtransfer"
+msgstr "Traitement de l’IP dans l’UE, pas de transfert vers un pays tiers"
+
+msgid "Kein Fingerprint, keine Cookies (Proof-of-Work)"
+msgstr "Pas d’empreinte, pas de cookies (preuve de travail)"
+
+msgid "AVV im Tarif enthalten"
+msgstr "Contrat de sous-traitance inclus dans l’offre"
+
+msgid "(unverbindliche Vorlage, keine Rechtsberatung)"
+msgstr "(modèle non contraignant, sans valeur de conseil juridique)"
+
+msgid "Der Spam-Schutz wurde nicht bestätigt. Bitte schliesse die Spam-Prüfung im Formular ab und sende erneut."
+msgstr "La protection anti-spam n’a pas été confirmée. Veuillez terminer la vérification anti-spam dans le formulaire et renvoyer."
+
+msgid "Der Spam-Schutz ist derzeit nicht verfügbar. Bitte versuche es in einigen Minuten erneut."
+msgstr "La protection anti-spam est actuellement indisponible. Veuillez réessayer dans quelques minutes."
+
+msgid "API-Key"
+msgstr "Clé d’API"
+
+msgid "Aktuell gesetzt – zum Ändern neuen Wert eintragen, sonst leer lassen."
+msgstr "Actuellement défini – saisissez une nouvelle valeur pour le modifier, sinon laissez vide."
+
+msgid "Wird serverseitig gehalten und nie an das Frontend ausgegeben. Aus Sicherheitsgründen leer dargestellt."
+msgstr "Conservé côté serveur et jamais transmis au front-end. Affiché vide pour des raisons de sécurité."
+
+msgid "Nein"
+msgstr "Non"
+
+msgid "Ja"
+msgstr "Oui"
+
+# E-neu: erweiterte Datenschutz-Bausteine (v2.7.0)
+msgid "Spam-Schutz durch Friendly Captcha\n\nWir setzen auf unseren Formularen den Dienst Friendly Captcha ein, einen Dienst der Friendly Captcha GmbH, Deutschland. [Firmenbezeichnung und Adresse]\n\nZweck. Friendly Captcha schützt unsere Formulare vor Spam und automatisiertem Missbrauch (etwa durch Bots).\n\nVerarbeitete Daten. Verarbeitet werden Ihre IP-Adresse sowie technische Angaben Ihres Geräts, die für den Berechnungsnachweis (Proof-of-Work) nötig sind. Friendly Captcha setzt dabei keine Cookies, nutzt kein Fingerprinting und kein Tracking.\n\nFunktionsweise. Statt Ihr Verhalten zu beobachten, lässt Friendly Captcha Ihren Browser im Hintergrund eine kleine Rechenaufgabe lösen (Proof-of-Work). Diese Aufgabe ist für Menschen unbemerkbar, für massenhaft automatisierte Anfragen aber aufwendig – so werden Bots ausgebremst, ohne dass Sie verfolgt werden.\n\nRechtsgrundlage. Die Verarbeitung stützt sich auf unser berechtigtes Interesse am Schutz unserer Formulare vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO; für die Schweiz Art. 31 revDSG).\n\nSpeicherort. Die Verarbeitung erfolgt auf Servern in der Europäischen Union. Eine Übermittlung in Drittländer findet nicht statt.\n\nAuftragsverarbeitung. Mit der Friendly Captcha GmbH besteht ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO (bzw. Art. 9 revDSG).\n\nSpeicherdauer. Die Daten werden nur zur Verifikation der Anfrage verarbeitet und nicht zur Profilbildung genutzt. [Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]\n\nWiderspruchsrecht. Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen diese auf berechtigtem Interesse beruhende Verarbeitung Widerspruch einzulegen (Art. 21 DSGVO).\n\nIhre Rechte. Ihnen stehen die Rechte auf Auskunft, Berichtigung und Löschung zu sowie ein Beschwerderecht bei der zuständigen Aufsichtsbehörde.\n\n(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "Protection anti-spam par Friendly Captcha\n\nSur nos formulaires, nous utilisons le service Friendly Captcha, un service de Friendly Captcha GmbH, Allemagne. [Veuillez compléter la raison sociale complète et l’adresse à partir de votre contrat de sous-traitance.]\n\nFinalité. Friendly Captcha protège nos formulaires contre le spam et les abus automatisés (par exemple par des bots).\n\nDonnées traitées. Nous traitons votre adresse IP ainsi que des informations techniques de votre appareil, nécessaires à la preuve de travail (proof of work). Friendly Captcha n’utilise ni cookies, ni empreinte numérique, ni suivi.\n\nFonctionnement. Au lieu d’observer votre comportement, Friendly Captcha fait résoudre à votre navigateur un petit calcul en arrière-plan (preuve de travail). Cette tâche est imperceptible pour les personnes, mais coûteuse pour les requêtes automatisées en masse – les bots sont ainsi freinés sans que vous soyez suivi.\n\nBase juridique. Le traitement repose sur notre intérêt légitime à protéger nos formulaires contre les abus (art. 6, par. 1, let. f RGPD ; pour la Suisse, art. 31 nLPD).\n\nLieu de stockage. Le traitement a lieu sur des serveurs situés dans l’Union européenne. Aucun transfert vers des pays tiers n’a lieu.\n\nSous-traitance. Un contrat de sous-traitance au sens de l’art. 28 RGPD (ou art. 9 nLPD) est conclu avec Friendly Captcha GmbH.\n\nDurée de conservation. Les données ne sont traitées que pour vérifier la requête et ne servent pas au profilage. [Veuillez indiquer la durée de conservation exacte d’après la documentation de Friendly Captcha.]\n\nDroit d’opposition. Vous avez le droit, pour des raisons tenant à votre situation particulière, de vous opposer à tout moment à ce traitement fondé sur l’intérêt légitime (art. 21 RGPD).\n\nVos droits. Vous disposez des droits d’accès, de rectification et d’effacement ainsi que du droit d’introduire une réclamation auprès de l’autorité de contrôle compétente.\n\n(Modèle non contraignant, sans valeur de conseil juridique. Veuillez l’adapter à votre situation concrète et, en cas de doute, le faire vérifier juridiquement.)"
+
+msgid "Interessenabwägung – Einsatz von Friendly Captcha\n\nInternes Dokument zur Dokumentation des berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO / Art. 31 revDSG).\n\n1. Zweck / berechtigtes Interesse\nWir schützen unsere Web-Formulare vor Spam und automatisiertem Missbrauch. Funktionierende Formulare ohne Bot-Flut sind die Grundlage für die Kommunikation mit unseren Besucherinnen und Besuchern.\n\n2. Erforderlichkeit / kein milderes Mittel\nReine serverseitige Massnahmen (Honeypot, Rate-Limit) fangen einfache Bots ab, aber nicht gezielten automatisierten Missbrauch. Ein Proof-of-Work-Captcha ohne Cookies und ohne Tracking ist das mildeste Mittel, das den Schutz spürbar erhöht, ohne das Verhalten der Besucher zu beobachten.\n\n3. Interessenabwägung\nDer Eingriff ist gering: Verarbeitet wird allein die IP-Adresse, es findet kein Profiling statt, die Verarbeitung erfolgt in der EU und nur kurz zur Verifikation. Besucherinnen und Besucher erwarten, dass Formulare gegen Spam geschützt sind. Dem geringen Eingriff steht ein legitimer Schutzbedarf gegenüber. Die Interessen der Betroffenen überwiegen nicht.\n\n4. Ergebnis\nDer Einsatz von Friendly Captcha auf berechtigtem Interesse ist zulässig.\nDatum: [TT.MM.JJJJ]\nVerantwortliche Person: [Name / Funktion]\n\n(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "Évaluation des intérêts légitimes (LIA) – utilisation de Friendly Captcha\n\nNote interne documentant l’intérêt légitime (art. 6, par. 1, let. f RGPD / art. 31 nLPD).\n\n1. Finalité / intérêt légitime\nNous protégeons nos formulaires web contre le spam et les abus automatisés. Des formulaires fonctionnels, sans flot de bots, sont la base de la communication avec nos visiteuses et visiteurs.\n\n2. Nécessité / pas de moyen plus modéré\nDes mesures purement côté serveur (pot de miel, limitation de débit) interceptent les bots simples, mais pas les abus automatisés ciblés. Un captcha à preuve de travail, sans cookies ni suivi, est le moyen le plus modéré qui renforce sensiblement la protection sans observer le comportement des visiteurs.\n\n3. Pondération des intérêts\nL’atteinte est faible : seule l’adresse IP est traitée, aucun profilage n’a lieu, le traitement se fait dans l’UE et seulement brièvement pour la vérification. Les visiteurs s’attendent à ce que les formulaires soient protégés contre le spam. À cette faible atteinte répond un besoin de protection légitime. Les intérêts des personnes concernées ne prévalent pas.\n\n4. Résultat\nL’utilisation de Friendly Captcha sur la base de l’intérêt légitime est admissible.\nDate : [JJ.MM.AAAA]\nPersonne responsable : [Nom / fonction]\n\n(Modèle non contraignant, sans valeur de conseil juridique. Veuillez l’adapter à votre situation concrète et, en cas de doute, le faire vérifier juridiquement.)"
+
+msgid "Was Sie zum Datenschutz wissen sollten"
+msgstr "Ce que vous devez savoir sur la protection des données"
+
+msgid "Die IP-Adresse wird nur in der EU verarbeitet, nichts geht ins Ausland."
+msgstr "L’adresse IP n’est traitée que dans l’UE, rien ne part à l’étranger."
+
+msgid "Kein Tracking: keine Cookies, kein Wiedererkennen des Geräts. Stattdessen löst Ihr Browser im Hintergrund eine kleine Rechenaufgabe («Proof-of-Work»). Das bremst Bots, ohne Sie zu beobachten."
+msgstr "Pas de suivi : pas de cookies, pas de reconnaissance de l’appareil (un calcul plutôt qu’une observation, « preuve de travail »)."
+
+msgid "Pflicht: Sie müssen mit Friendly Captcha einen Auftragsverarbeitungsvertrag (AVV) abschliessen. Diesen erhalten Sie direkt bei Friendly Captcha. Ohne AVV ist der Einsatz nicht rechtmässig."
+msgstr "Obligatoire : concluez un contrat de sous-traitance avec Friendly Captcha (le contrat qui régit le traitement effectué pour votre compte)."
+
+msgid "Im Normalbetrieb müssen Besucher nicht zustimmen (berechtigtes Interesse). Dafür muss Ihre Datenschutzerklärung den vollständigen Textbaustein unten enthalten."
+msgstr "En fonctionnement normal, les visiteurs n’ont pas à consentir (intérêt légitime). En contrepartie, votre politique de confidentialité doit contenir le texte type complet ci-dessous."
+
+msgid "Empfehlung: Halten Sie den internen Vermerk zur Rechtsgrundlage (Interessenabwägung) ausgefüllt bereit – als Nachweis bei einer Prüfung."
+msgstr "Recommandation : tenez prête la note interne sur la base juridique (pondération des intérêts), dûment remplie – comme preuve en cas de contrôle."
+
+msgid "Datenschutz-Hinweise und Textbausteine anzeigen"
+msgstr "Afficher les informations sur la protection des données et les modèles de texte"
+
+msgid "Textbaustein für Ihre Datenschutzerklärung (öffentlich) anzeigen"
+msgstr "Afficher le modèle pour la politique de confidentialité"
+
+msgid "Diesen Text kopieren Sie in Ihre öffentliche Datenschutzerklärung auf der Website."
+msgstr "Un texte type prêt à copier dans votre politique de confidentialité."
+
+msgid "Internes Dokument zur Rechtsgrundlage (Interessenabwägung) anzeigen"
+msgstr "Afficher la note interne sur la base juridique (pondération des intérêts)"
+
+msgid "Kurzes internes Dokument als Nachweis, warum der Spam-Schutz erlaubt ist. Bleibt bei Ihnen, nicht öffentlich."
+msgstr "Un court document interne attestant pourquoi la protection anti-spam est admise. Reste chez vous, non public."
+
+msgid "In die Zwischenablage kopieren"
+msgstr "Copier dans le presse-papiers"
+
+msgid "Kopiert!"
+msgstr "Copié !"
+
+msgid "Vor dem Einfügen ausfüllen:"
+msgstr "À compléter avant de coller :"
+
+msgid "Vor dem Veröffentlichen die beiden Platzhalter in eckigen Klammern ersetzen: «[Firmenbezeichnung und Adresse]» aus Ihrem Auftragsverarbeitungsvertrag, «[Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]» aus der Anbieter-Dokumentation."
+msgstr "Avant la publication, remplacez les deux espaces réservés entre crochets : «[raison sociale et adresse]» figurant dans votre contrat de sous-traitance, «[durée de conservation concrète issue de la documentation de Friendly Captcha]» tirée de la documentation du fournisseur."
+
+
+# Lizenz / Updates – Backend-Token (hinzugefügt 2026-06-21)
+msgid "Lizenz / Updates"
+msgstr "Licence / mises à jour"
+
+msgid "Mit einem gültigen Lizenz-Token bezieht das Plugin automatische Updates vom Server plugins.blitzdonner.ch. Ohne Token läuft das Plugin ganz normal weiter – es werden lediglich keine automatischen Updates angeboten (kein Abschalten, kein Funktionsverlust)."
+msgstr "Avec un jeton de licence valide, l’extension reçoit des mises à jour automatiques depuis le serveur plugins.blitzdonner.ch. Sans jeton, l’extension continue de fonctionner normalement – elle ne reçoit simplement aucune mise à jour automatique (rien n’est désactivé, aucune perte de fonction)."
+
+msgid "Lizenz-Token"
+msgstr "Jeton de licence"
+
+msgid "•••••••••• (gespeichert – leer lassen, um beizubehalten)"
+msgstr "•••••••••• (enregistré – laisser vide pour conserver)"
+
+msgid "per wp-config gesetzt"
+msgstr "défini via wp-config"
+
+msgid "Das Token ist per wp-config (Konstante BDFRMS_UPDATE_TOKEN) gesetzt und hat Vorrang."
+msgstr "Le jeton est défini via wp-config (constante BDFRMS_UPDATE_TOKEN) et a la priorité."
+
+msgid "Eingaben in diesem Feld werden ignoriert. Um das Token zu ändern, passe die Konstante in der wp-config.php an."
+msgstr "Les saisies dans ce champ sont ignorées. Pour modifier le jeton, ajustez la constante dans wp-config.php."
+
+msgid "Empfehlung: das Token stattdessen als Konstante BDFRMS_UPDATE_TOKEN in der wp-config.php setzen – das ist robuster und hat Vorrang."
+msgstr "Recommandation : définissez plutôt le jeton comme constante BDFRMS_UPDATE_TOKEN dans wp-config.php – c’est plus robuste et prioritaire."
+
+msgid "Lizenz-Token speichern"
+msgstr "Enregistrer le jeton de licence"
+
+msgid "Token testen"
+msgstr "Tester le jeton"
+
+msgid "Prüft das hinterlegte Token sofort gegen den Update-Server, unabhängig vom üblichen Update-Takt."
+msgstr "Vérifie immédiatement le jeton enregistré auprès du serveur de mises à jour, indépendamment de l’intervalle habituel."
+
+msgid "Token gültig – automatische Updates aktiv."
+msgstr "Jeton valide – mises à jour automatiques actives."
+
+msgid "Installiert: Version %1$s. Auf dem Server verfügbar: Version %2$s."
+msgstr "Installé : version %1$s. Disponible sur le serveur : version %2$s."
+
+msgid "Installierte Version: %s. Aktuell – kein Update verfügbar."
+msgstr "Version installée : %s. À jour – aucune mise à jour disponible."
+
+msgid "Token per wp-config gesetzt (Vorrang)."
+msgstr "Jeton défini via wp-config (priorité)."
+
+msgid "Das Token stammt aus der Konstante BDFRMS_UPDATE_TOKEN. Eingaben im Backend werden ignoriert."
+msgstr "Le jeton provient de la constante BDFRMS_UPDATE_TOKEN. Les saisies dans l’administration sont ignorées."
+
+msgid "Token abgelaufen oder ungültig – keine Updates."
+msgstr "Jeton expiré ou invalide – aucune mise à jour."
+
+msgid "Der Server hat das Token abgelehnt. Das Plugin funktioniert weiterhin normal, es werden nur keine Updates angeboten."
+msgstr "Le serveur a refusé le jeton. L’extension continue de fonctionner normalement, seules les mises à jour ne sont pas proposées."
+
+msgid "Update-Server nicht erreichbar."
+msgstr "Serveur de mises à jour injoignable."
+
+msgid "Der Server konnte gerade nicht erreicht werden. Das ist meist vorübergehend – später erneut «Token testen»."
+msgstr "Le serveur n’a pas pu être joint pour le moment. C’est généralement temporaire – réessayez «Tester le jeton» plus tard."
+
+msgid "Kein Token hinterlegt."
+msgstr "Aucun jeton enregistré."
+
+msgid "Trage unten ein Lizenz-Token ein, um automatische Updates zu aktivieren. Ohne Token läuft das Plugin normal weiter."
+msgstr "Saisissez ci-dessous un jeton de licence pour activer les mises à jour automatiques. Sans jeton, l’extension continue de fonctionner normalement."
+
+msgid "Lizenz-Token wird per wp-config gesetzt (Vorrang). Eingaben im Backend werden ignoriert."
+msgstr "Le jeton de licence est défini via wp-config (priorité). Les saisies dans l’administration sont ignorées."
+
+msgid "Update-Client nicht verfügbar."
+msgstr "Client de mise à jour indisponible."
+
+msgid "Lizenz-Token gespeichert."
+msgstr "Jeton de licence enregistré."
+
+msgid "Token testen: Token gültig – automatische Updates aktiv."
+msgstr "Tester le jeton : jeton valide – mises à jour automatiques actives."
+
+msgid "Token testen: Token per wp-config gesetzt (Vorrang)."
+msgstr "Tester le jeton : jeton défini via wp-config (priorité)."
+
+msgid "Token testen: Token abgelaufen oder ungültig – keine Updates."
+msgstr "Tester le jeton : jeton expiré ou invalide – aucune mise à jour."
+
+msgid "Token testen: Update-Server nicht erreichbar – bitte später erneut versuchen."
+msgstr "Tester le jeton : serveur de mises à jour injoignable – veuillez réessayer plus tard."
+
+msgid "Token testen: Kein Token hinterlegt."
+msgstr "Tester le jeton : aucun jeton enregistré."
+

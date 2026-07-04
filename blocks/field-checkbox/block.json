@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "bdfrms/field-checkbox",
+    "version": "2.0.0",
+    "title": "Checkbox",
+    "category": "bdfrms-fields",
+    "icon": {
+        "src": "yes-alt"
+    },
+    "description": "Checkbox-Feld.",
+    "textdomain": "blitz-donner-forms",
+    "attributes": {
+        "label": {
+            "type": "string",
+            "default": "Ich stimme zu"
+        },
+        "name": {
+            "type": "string",
+            "default": ""
+        },
+        "nameClientId": {
+            "type": "string",
+            "default": ""
+        },
+        "required": {
+            "type": "boolean",
+            "default": false
+        },
+        "sensitive": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "supports": {
+        "html": false
+    },
+    "usesContext": [
+        "bdfrms/formId",
+        "bdfrms/appearanceMode",
+        "bdfrms/colorLabel",
+        "bdfrms/colorText",
+        "bdfrms/colorPlaceholder",
+        "bdfrms/colorFieldBg",
+        "bdfrms/colorBorder",
+        "bdfrms/colorFocus",
+        "bdfrms/colorButtonBg",
+        "bdfrms/colorButtonText",
+        "bdfrms/darkColorLabel",
+        "bdfrms/darkColorText",
+        "bdfrms/darkColorPlaceholder",
+        "bdfrms/darkColorFieldBg",
+        "bdfrms/darkColorBorder",
+        "bdfrms/darkColorFocus",
+        "bdfrms/darkColorButtonBg",
+        "bdfrms/darkColorButtonText",
+        "bdfrms/colorFormShell",
+        "bdfrms/darkColorFormShell"
+    ],
+    "editorScript": "bdfrms-editor",
+    "example": {
+        "attributes": {
+            "label": "Ich stimme den Bedingungen zu",
+            "name": "sb_check",
+            "required": false
+        }
+    },
+    "ancestor": [
+        "bdfrms/form"
+    ]
+}

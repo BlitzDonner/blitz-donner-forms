@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "bdfrms/field-time",
+    "version": "2.0.7",
+    "title": "Uhrzeit",
+    "category": "bdfrms-fields",
+    "icon": {
+        "src": "clock"
+    },
+    "description": "Uhrzeit.",
+    "textdomain": "blitz-donner-forms",
+    "attributes": {
+        "label": {
+            "type": "string",
+            "default": "Uhrzeit"
+        },
+        "name": {
+            "type": "string",
+            "default": ""
+        },
+        "nameClientId": {
+            "type": "string",
+            "default": ""
+        },
+        "required": {
+            "type": "boolean",
+            "default": false
+        },
+        "defaultValue": {
+            "type": "string",
+            "default": ""
+        },
+        "sensitive": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "supports": {
+        "html": false
+    },
+    "usesContext": [
+        "bdfrms/formId",
+        "bdfrms/appearanceMode",
+        "bdfrms/colorLabel",
+        "bdfrms/colorText",
+        "bdfrms/colorPlaceholder",
+        "bdfrms/colorFieldBg",
+        "bdfrms/colorBorder",
+        "bdfrms/colorFocus",
+        "bdfrms/colorButtonBg",
+        "bdfrms/colorButtonText",
+        "bdfrms/darkColorLabel",
+        "bdfrms/darkColorText",
+        "bdfrms/darkColorPlaceholder",
+        "bdfrms/darkColorFieldBg",
+        "bdfrms/darkColorBorder",
+        "bdfrms/darkColorFocus",
+        "bdfrms/darkColorButtonBg",
+        "bdfrms/darkColorButtonText",
+        "bdfrms/colorFormShell",
+        "bdfrms/darkColorFormShell"
+    ],
+    "editorScript": "bdfrms-editor",
+    "example": {
+        "attributes": {
+            "label": "Uhrzeit",
+            "name": "sb_time",
+            "required": false
+        }
+    },
+    "ancestor": [
+        "bdfrms/form"
+    ]
+}

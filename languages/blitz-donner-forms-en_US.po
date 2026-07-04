@@ -1,0 +1,450 @@
+# English (United States) translation for Gutenberg Formbuilder
+# Copyright (C) 2026
+msgid ""
+msgstr ""
+"Project-Id-Version: Gutenberg Formbuilder 2.0.7\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-10 12:00+0000\n"
+"PO-Revision-Date: 2026-05-10 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Danke! Das Formular wurde erfolgreich gesendet."
+msgstr "Thank you! The form was sent successfully."
+
+msgid "Ungültige Formularanfrage."
+msgstr "Invalid form request."
+
+msgid "Sicherheitsprüfung fehlgeschlagen. Bitte Seite neu laden und erneut absenden."
+msgstr "Security check failed. Please reload the page and submit again."
+
+msgid "Sitzung abgelaufen. Bitte Seite neu laden und erneut absenden."
+msgstr "Session expired. Please reload the page and submit again."
+
+msgid "Die Anfrage wurde als Spam erkannt."
+msgstr "This request was identified as spam."
+
+msgid "Zu viele Anfragen. Bitte warte kurz und versuche es erneut."
+msgstr "Too many requests. Please wait a moment and try again."
+
+msgid "Formularschema nicht gefunden."
+msgstr "Form schema not found."
+
+msgid "Doppelte technische Feldnamen im Formular. Bitte eines der betroffenen Felder duplizieren oder Label bzw. Platzhalter anpassen."
+msgstr "Duplicate technical field names in the form. Please duplicate one of the affected fields or adjust the label or placeholder."
+
+msgid "Das Formular wurde nicht übermittelt. Bitte prüfe die Hinweise und sende erneut."
+msgstr "The form was not submitted. Please review the messages and submit again."
+
+msgid "Eine hochgeladene Datei wurde abgelehnt. Das Formular wurde in diesem Fall nicht übermittelt; es wurde kein neuer Eintrag gespeichert."
+msgstr "An uploaded file was rejected. In this case the form was not submitted; no new entry was saved."
+
+msgid "Speichern fehlgeschlagen. Bitte versuche es erneut."
+msgstr "Saving failed. Please try again."
+
+msgid "Die Anfrage konnte nicht verarbeitet werden."
+msgstr "The request could not be processed."
+
+msgid "Verschlüsselung ist auf diesem Server nicht eingerichtet. Bitte den Administrator kontaktieren."
+msgstr "Encryption is not configured on this server. Please contact the administrator."
+
+msgid "Eine hochgeladene Datei wurde vom Virenscanner als schädlich erkannt."
+msgstr "An uploaded file was flagged as malicious by the antivirus scanner."
+
+msgid "Die Datei wurde nicht übernommen (nicht gespeichert) und zählt nicht zur Einsendung. Nach dem Neuladen der Seite ist die Auswahl im Datei-Feld leer — bitte wähle bei Bedarf eine zulässige Datei erneut. Das gesamte Formular wurde nicht übermittelt; es wurde kein neuer Eintrag gespeichert."
+msgstr "The file was not accepted (not saved) and does not count toward your submission. After reloading the page the file field is empty — please select an allowed file again if needed. The entire form was not submitted; no new entry was saved."
+
+msgid "Neues Formular (%1$s) auf Beitrag %2$d"
+msgstr "New form (%1$s) on post %2$d"
+
+msgid "Ungültiges verstecktes Feld."
+msgstr "Invalid hidden field."
+
+msgid "Bitte fülle das Feld \"%s\" aus."
+msgstr "Please fill in the field \"%s\"."
+
+msgid "Bitte bestätige \"%s\"."
+msgstr "Please confirm \"%s\"."
+
+msgid "Das Feld \"%s\" enthält keine gültige E-Mail-Adresse."
+msgstr "The field \"%s\" does not contain a valid email address."
+
+msgid "Das Feld \"%s\" enthält keine gültige URL."
+msgstr "The field \"%s\" does not contain a valid URL."
+
+msgid "Das Feld \"%s\" muss eine Zahl sein."
+msgstr "The field \"%s\" must be a number."
+
+msgid "Zahl zu klein."
+msgstr "Number is too small."
+
+msgid "Zahl zu gross."
+msgstr "Number is too large."
+
+msgid "Ungültiges Datum."
+msgstr "Invalid date."
+
+msgid "Ungültige Uhrzeit."
+msgstr "Invalid time."
+
+msgid "Ungültiges Datum/Uhrzeit."
+msgstr "Invalid date/time."
+
+msgid "Das Feld \"%s\" enthält eine ungültige Telefonnummer."
+msgstr "The field \"%s\" contains an invalid phone number."
+
+msgid "Ungültige Auswahl."
+msgstr "Invalid selection."
+
+msgid "Eingabe zu lang."
+msgstr "Input is too long."
+
+msgid "Bitte wähle eine Datei für \"%s\"."
+msgstr "Please choose a file for \"%s\"."
+
+msgid "Mehrfach-Uploads sind nicht erlaubt."
+msgstr "Multiple uploads are not allowed."
+
+msgid "Datei-Upload fehlgeschlagen."
+msgstr "File upload failed."
+
+msgid "Datei ist zu gross."
+msgstr "The file is too large."
+
+msgid "Diese Datei wurde vom Virenscanner als schädlich erkannt."
+msgstr "This file was flagged as malicious by the antivirus scanner."
+
+msgid "Virenscan derzeit nicht verfügbar; Upload wird verweigert."
+msgstr "Antivirus scan is currently unavailable; the upload was rejected."
+
+msgid "Ungültiger Datei-Upload."
+msgstr "Invalid file upload."
+
+msgid "Ungültiger Dateiname."
+msgstr "Invalid file name."
+
+msgid "Dieser Dateityp ist nicht erlaubt."
+msgstr "This file type is not allowed."
+
+msgid "Dateien ohne Endung sind nicht erlaubt."
+msgstr "Files without an extension are not allowed."
+
+msgid "Dateityp konnte nicht verifiziert werden."
+msgstr "The file type could not be verified."
+
+msgid "Dateiinhalt passt nicht zur Endung."
+msgstr "The file contents do not match the extension."
+
+msgid "Dateityp ist für dieses Feld nicht erlaubt."
+msgstr "This file type is not allowed for this field."
+
+msgid "Datei-Uploads sind aktuell blockiert: Die Option \"Pflicht für Datei-Uploads\" ist aktiv, aber kein ClamAV-Scanner eingerichtet. Lösung: in \"Sicherheit & Einstellungen\" entweder ClamAV korrekt konfigurieren ODER die Pflicht-Option deaktivieren."
+msgstr "File uploads are currently blocked: the \"Required for file uploads\" option is enabled, but no ClamAV scanner is configured. Fix this under \"Security & settings\" by configuring ClamAV correctly OR by disabling the required option."
+
+msgid "Verschlüsselung nicht konfiguriert."
+msgstr "Encryption is not configured."
+
+msgid "Kein gültiger Upload."
+msgstr "Not a valid upload."
+
+msgid "Storage-Verzeichnis konnte nicht angelegt werden."
+msgstr "The storage directory could not be created."
+
+msgid "Datei konnte nicht gelesen werden."
+msgstr "The file could not be read."
+
+msgid "Verschlüsselung fehlgeschlagen."
+msgstr "Encryption failed."
+
+msgid "Storage-Unterordner konnte nicht angelegt werden."
+msgstr "The storage subdirectory could not be created."
+
+msgid "Storage-Schreibfehler."
+msgstr "Storage write error."
+
+msgid "Datei-Metadaten konnten nicht gespeichert werden."
+msgstr "File metadata could not be saved."
+
+msgid "Datei nicht gefunden."
+msgstr "File not found."
+
+msgid "Verschlüsselung nicht verfügbar."
+msgstr "Encryption is not available."
+
+msgid "Schlüssel konnte nicht entwrappt werden."
+msgstr "The key could not be unwrapped."
+
+msgid "Datei nicht im Storage gefunden."
+msgstr "File not found in storage."
+
+msgid "Datei konnte nicht entschlüsselt werden (Tag-Mismatch)."
+msgstr "The file could not be decrypted (tag mismatch)."
+
+msgid "Beim Absenden ist ein Fehler aufgetreten."
+msgstr "An error occurred while submitting the form."
+
+msgid "Entwurf löschen"
+msgstr "Clear draft"
+
+msgid "Voreingestellter Wert (optional)"
+msgstr "Default value (optional)"
+
+msgid "Leer lassen für keinen Startwert. Format: JJJJ-MM-TT, z. B. 2026-05-10."
+msgstr "Leave empty for no initial value. Format: YYYY-MM-DD, e.g. 2026-05-10."
+
+msgid "Leer lassen für keinen Startwert. Format: HH:MM (24 Stunden), z. B. 09:30."
+msgstr "Leave empty for no initial value. Format: HH:MM (24-hour), e.g. 09:30."
+
+msgid "Leer lassen für keinen Startwert. Format: JJJJ-MM-TTTHH:MM (lokal), z. B. 2026-05-10T14:00."
+msgstr "Leave empty for no initial value. Format: YYYY-MM-DDTHH:mm (local), e.g. 2026-05-10T14:00."
+
+msgid "Rückmeldung"
+msgstr "Confirmation"
+
+msgid "Rückmeldungsfelder"
+msgstr "Confirmation fields"
+
+# --- CAPTCHA-Integration (v2.7.0) ---
+
+msgid "Spam-Schutz"
+msgstr "Spam protection"
+
+msgid "Bitte den Spam-Schutz abschliessen, bevor du das Formular absendest."
+msgstr "Please complete the spam protection before submitting the form."
+
+msgid "Spam-Schutz mit Friendly Captcha\n\nZum Schutz unserer Formulare vor automatisiertem Missbrauch setzen wir den Dienst Friendly Captcha (Friendly Captcha GmbH, Deutschland) ein. Das Verfahren beruht auf einem rechnerischen Nachweis (Proof-of-Work) im Browser. Es verwendet keine Cookies, erstellt keinen Geraete-Fingerabdruck und verfolgt das Nutzungsverhalten nicht. Zur Durchfuehrung der Pruefung wird die IP-Adresse innerhalb der EU verarbeitet; eine Uebermittlung in Drittlaender findet nicht statt. Mit dem Anbieter besteht ein Auftragsverarbeitungsvertrag. Rechtsgrundlage ist unser berechtigtes Interesse an der Abwehr von Spam (Art. 6 Abs. 1 lit. f DSGVO bzw. die entsprechende Bestimmung des revidierten Schweizer Datenschutzgesetzes)."
+msgstr "Spam protection with Friendly Captcha\n\nTo protect our forms against automated abuse we use the Friendly Captcha service (Friendly Captcha GmbH, Germany). The method relies on a computational proof of work in the browser. It uses no cookies, creates no device fingerprint and does not track usage behaviour. To run the check, the IP address is processed within the EU; no transfer to third countries takes place. A data processing agreement is in place with the provider. The legal basis is our legitimate interest in fending off spam (Art. 6(1)(f) GDPR or the corresponding provision of the revised Swiss Data Protection Act)."
+
+msgid "CAPTCHA-Einstellungen gespeichert."
+msgstr "CAPTCHA settings saved."
+
+msgid "Spam-Schutz (CAPTCHA) – Friendly Captcha"
+msgstr "Spam protection (CAPTCHA) – Friendly Captcha"
+
+msgid "CAPTCHA ist aktiv, aber unvollständig konfiguriert – es wird vorerst kein Widget angezeigt. Bitte Site-Key und API-Key eintragen."
+msgstr "CAPTCHA is active but not fully configured – no widget is shown for now. Please enter the site key and API key."
+
+msgid "CAPTCHA aktiv (global)"
+msgstr "CAPTCHA active (global)"
+
+msgid "Steuert, ob auf Formularen ein CAPTCHA erscheinen kann. Pro Formular zusätzlich im Block überschreibbar."
+msgstr "Controls whether a CAPTCHA can appear on forms. Can additionally be overridden per form in the block."
+
+msgid "Anbieter"
+msgstr "Provider"
+
+msgid "Friendly Captcha"
+msgstr "Friendly Captcha"
+
+msgid "(EU, Proof-of-Work, kein Drittlandtransfer)"
+msgstr "(EU, proof of work, no third-country transfer)"
+
+msgid "Site-Key"
+msgstr "Site key"
+
+msgid "API-Key (Secret)"
+msgstr "API key (secret)"
+
+msgid "Erzwingung"
+msgstr "Enforcement"
+
+msgid "Mit Ausnahme bei Serverausfall"
+msgstr "With exception on server outage"
+
+msgid "Das Formular verlangt ein bestandenes Captcha. Nur wenn Friendly Captcha einmal nicht erreichbar ist, lässt sich das Formular trotzdem absenden – damit eine seltene Störung beim Dienst Ihre Formulare nicht blockiert."
+msgstr "The form requires a passed captcha. Only if Friendly Captcha is temporarily unreachable can the form still be submitted – so that a rare outage of the service does not block your forms."
+
+msgid "Streng"
+msgstr "Strict"
+
+msgid "Ohne bestandenes Captcha wird nicht abgesendet – auch dann nicht, wenn Friendly Captcha gerade gestört ist."
+msgstr "Without a passed captcha, nothing is submitted – not even when Friendly Captcha is currently disrupted."
+
+msgid "CAPTCHA-Einstellungen speichern"
+msgstr "Save CAPTCHA settings"
+
+msgid "Datenschutz-Hinweis (Friendly Captcha)"
+msgstr "Privacy note (Friendly Captcha)"
+
+msgid "IP-Verarbeitung in der EU, kein Drittlandtransfer"
+msgstr "IP processing in the EU, no third-country transfer"
+
+msgid "Kein Fingerprint, keine Cookies (Proof-of-Work)"
+msgstr "No fingerprint, no cookies (proof of work)"
+
+msgid "AVV im Tarif enthalten"
+msgstr "Data processing agreement included in the plan"
+
+msgid "(unverbindliche Vorlage, keine Rechtsberatung)"
+msgstr "(non-binding template, not legal advice)"
+
+msgid "Der Spam-Schutz wurde nicht bestätigt. Bitte schliesse die Spam-Prüfung im Formular ab und sende erneut."
+msgstr "Spam protection was not confirmed. Please complete the spam check in the form and submit again."
+
+msgid "Der Spam-Schutz ist derzeit nicht verfügbar. Bitte versuche es in einigen Minuten erneut."
+msgstr "Spam protection is currently unavailable. Please try again in a few minutes."
+
+msgid "API-Key"
+msgstr "API key"
+
+msgid "Aktuell gesetzt – zum Ändern neuen Wert eintragen, sonst leer lassen."
+msgstr "Currently set – enter a new value to change it, otherwise leave empty."
+
+msgid "Wird serverseitig gehalten und nie an das Frontend ausgegeben. Aus Sicherheitsgründen leer dargestellt."
+msgstr "Kept server-side and never output to the front end. Shown empty for security reasons."
+
+msgid "Nein"
+msgstr "No"
+
+msgid "Ja"
+msgstr "Yes"
+
+# E-neu: erweiterte Datenschutz-Bausteine (v2.7.0)
+msgid "Spam-Schutz durch Friendly Captcha\n\nWir setzen auf unseren Formularen den Dienst Friendly Captcha ein, einen Dienst der Friendly Captcha GmbH, Deutschland. [Firmenbezeichnung und Adresse]\n\nZweck. Friendly Captcha schützt unsere Formulare vor Spam und automatisiertem Missbrauch (etwa durch Bots).\n\nVerarbeitete Daten. Verarbeitet werden Ihre IP-Adresse sowie technische Angaben Ihres Geräts, die für den Berechnungsnachweis (Proof-of-Work) nötig sind. Friendly Captcha setzt dabei keine Cookies, nutzt kein Fingerprinting und kein Tracking.\n\nFunktionsweise. Statt Ihr Verhalten zu beobachten, lässt Friendly Captcha Ihren Browser im Hintergrund eine kleine Rechenaufgabe lösen (Proof-of-Work). Diese Aufgabe ist für Menschen unbemerkbar, für massenhaft automatisierte Anfragen aber aufwendig – so werden Bots ausgebremst, ohne dass Sie verfolgt werden.\n\nRechtsgrundlage. Die Verarbeitung stützt sich auf unser berechtigtes Interesse am Schutz unserer Formulare vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO; für die Schweiz Art. 31 revDSG).\n\nSpeicherort. Die Verarbeitung erfolgt auf Servern in der Europäischen Union. Eine Übermittlung in Drittländer findet nicht statt.\n\nAuftragsverarbeitung. Mit der Friendly Captcha GmbH besteht ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO (bzw. Art. 9 revDSG).\n\nSpeicherdauer. Die Daten werden nur zur Verifikation der Anfrage verarbeitet und nicht zur Profilbildung genutzt. [Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]\n\nWiderspruchsrecht. Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen diese auf berechtigtem Interesse beruhende Verarbeitung Widerspruch einzulegen (Art. 21 DSGVO).\n\nIhre Rechte. Ihnen stehen die Rechte auf Auskunft, Berichtigung und Löschung zu sowie ein Beschwerderecht bei der zuständigen Aufsichtsbehörde.\n\n(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "Spam protection by Friendly Captcha\n\nOn our forms we use the service Friendly Captcha, a service of Friendly Captcha GmbH, Germany. [Please add the full company name and address from your data processing agreement.]\n\nPurpose. Friendly Captcha protects our forms against spam and automated misuse (for example by bots).\n\nData processed. We process your IP address as well as technical details of your device that are required for the proof of work. Friendly Captcha sets no cookies and uses no fingerprinting and no tracking.\n\nHow it works. Instead of observing your behaviour, Friendly Captcha has your browser solve a small computation in the background (proof of work). This task is imperceptible for humans but costly for mass automated requests – so bots are slowed down without you being tracked.\n\nLegal basis. The processing is based on our legitimate interest in protecting our forms against misuse (Art. 6 (1) (f) GDPR; for Switzerland Art. 31 revFADP).\n\nStorage location. Processing takes place on servers within the European Union. No transfer to third countries occurs.\n\nData processing agreement. A data processing agreement under Art. 28 GDPR (or Art. 9 revFADP) is in place with Friendly Captcha GmbH.\n\nRetention period. The data is processed solely to verify the request and is not used for profiling. [Please add the specific retention period from the Friendly Captcha documentation.]\n\nRight to object. You have the right, on grounds relating to your particular situation, to object at any time to this processing based on legitimate interest (Art. 21 GDPR).\n\nYour rights. You have the rights to access, rectification and erasure as well as a right to lodge a complaint with the competent supervisory authority.\n\n(Non-binding template, not legal advice. Please adapt it to your specific situation and have it reviewed legally if in doubt.)"
+
+msgid "Interessenabwägung – Einsatz von Friendly Captcha\n\nInternes Dokument zur Dokumentation des berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO / Art. 31 revDSG).\n\n1. Zweck / berechtigtes Interesse\nWir schützen unsere Web-Formulare vor Spam und automatisiertem Missbrauch. Funktionierende Formulare ohne Bot-Flut sind die Grundlage für die Kommunikation mit unseren Besucherinnen und Besuchern.\n\n2. Erforderlichkeit / kein milderes Mittel\nReine serverseitige Massnahmen (Honeypot, Rate-Limit) fangen einfache Bots ab, aber nicht gezielten automatisierten Missbrauch. Ein Proof-of-Work-Captcha ohne Cookies und ohne Tracking ist das mildeste Mittel, das den Schutz spürbar erhöht, ohne das Verhalten der Besucher zu beobachten.\n\n3. Interessenabwägung\nDer Eingriff ist gering: Verarbeitet wird allein die IP-Adresse, es findet kein Profiling statt, die Verarbeitung erfolgt in der EU und nur kurz zur Verifikation. Besucherinnen und Besucher erwarten, dass Formulare gegen Spam geschützt sind. Dem geringen Eingriff steht ein legitimer Schutzbedarf gegenüber. Die Interessen der Betroffenen überwiegen nicht.\n\n4. Ergebnis\nDer Einsatz von Friendly Captcha auf berechtigtem Interesse ist zulässig.\nDatum: [TT.MM.JJJJ]\nVerantwortliche Person: [Name / Funktion]\n\n(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "Legitimate interest assessment (LIA) – use of Friendly Captcha\n\nInternal note documenting the legitimate interest (Art. 6 (1) (f) GDPR / Art. 31 revFADP).\n\n1. Purpose / legitimate interest\nWe protect our web forms against spam and automated misuse. Working forms without a flood of bots are the basis for communicating with our visitors.\n\n2. Necessity / no milder means\nPurely server-side measures (honeypot, rate limit) catch simple bots but not targeted automated misuse. A proof-of-work captcha without cookies and without tracking is the mildest means that noticeably raises protection without observing visitor behaviour.\n\n3. Balancing of interests\nThe intrusion is minor: only the IP address is processed, no profiling takes place, processing occurs in the EU and only briefly for verification. Visitors expect forms to be protected against spam. The minor intrusion is offset by a legitimate need for protection. The interests of the data subjects do not prevail.\n\n4. Result\nThe use of Friendly Captcha on the basis of legitimate interest is permissible.\nDate: [DD.MM.YYYY]\nResponsible person: [Name / role]\n\n(Non-binding template, not legal advice. Please adapt it to your specific situation and have it reviewed legally if in doubt.)"
+
+msgid "Was Sie zum Datenschutz wissen sollten"
+msgstr "What you should know about data protection"
+
+msgid "Die IP-Adresse wird nur in der EU verarbeitet, nichts geht ins Ausland."
+msgstr "The IP address is processed only within the EU, nothing leaves the country."
+
+msgid "Kein Tracking: keine Cookies, kein Wiedererkennen des Geräts. Stattdessen löst Ihr Browser im Hintergrund eine kleine Rechenaufgabe («Proof-of-Work»). Das bremst Bots, ohne Sie zu beobachten."
+msgstr "No tracking: no cookies, no device recognition (a computation instead of observation, «proof of work»)."
+
+msgid "Pflicht: Sie müssen mit Friendly Captcha einen Auftragsverarbeitungsvertrag (AVV) abschliessen. Diesen erhalten Sie direkt bei Friendly Captcha. Ohne AVV ist der Einsatz nicht rechtmässig."
+msgstr "Mandatory: conclude a data processing agreement with Friendly Captcha (DPA – the contract that governs processing carried out on your behalf)."
+
+msgid "Im Normalbetrieb müssen Besucher nicht zustimmen (berechtigtes Interesse). Dafür muss Ihre Datenschutzerklärung den vollständigen Textbaustein unten enthalten."
+msgstr "In normal operation visitors do not need to consent (legitimate interest). In return, your privacy policy must contain the full text block below."
+
+msgid "Empfehlung: Halten Sie den internen Vermerk zur Rechtsgrundlage (Interessenabwägung) ausgefüllt bereit – als Nachweis bei einer Prüfung."
+msgstr "Recommendation: keep the internal note on the legal basis (balancing of interests) filled in and ready – as evidence in case of an audit."
+
+msgid "Datenschutz-Hinweise und Textbausteine anzeigen"
+msgstr "Show privacy notes and text blocks"
+
+msgid "Textbaustein für Ihre Datenschutzerklärung (öffentlich) anzeigen"
+msgstr "Show template for the privacy policy"
+
+msgid "Diesen Text kopieren Sie in Ihre öffentliche Datenschutzerklärung auf der Website."
+msgstr "A ready-made text block you can copy into your privacy policy."
+
+msgid "Internes Dokument zur Rechtsgrundlage (Interessenabwägung) anzeigen"
+msgstr "Show internal note on the legal basis (balancing of interests)"
+
+msgid "Kurzes internes Dokument als Nachweis, warum der Spam-Schutz erlaubt ist. Bleibt bei Ihnen, nicht öffentlich."
+msgstr "A short internal document showing why the spam protection is permitted. Stays with you, not public."
+
+msgid "In die Zwischenablage kopieren"
+msgstr "Copy to clipboard"
+
+msgid "Kopiert!"
+msgstr "Copied!"
+
+msgid "Vor dem Einfügen ausfüllen:"
+msgstr "Fill in before pasting:"
+
+msgid "Vor dem Veröffentlichen die beiden Platzhalter in eckigen Klammern ersetzen: «[Firmenbezeichnung und Adresse]» aus Ihrem Auftragsverarbeitungsvertrag, «[Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]» aus der Anbieter-Dokumentation."
+msgstr "Before publishing, replace the two placeholders in square brackets: «[company name and address]» from your data processing agreement, «[specific retention period from the Friendly Captcha documentation]» from the provider documentation."
+
+
+# Lizenz / Updates – Backend-Token (hinzugefügt 2026-06-21)
+msgid "Lizenz / Updates"
+msgstr "License / Updates"
+
+msgid "Mit einem gültigen Lizenz-Token bezieht das Plugin automatische Updates vom Server plugins.blitzdonner.ch. Ohne Token läuft das Plugin ganz normal weiter – es werden lediglich keine automatischen Updates angeboten (kein Abschalten, kein Funktionsverlust)."
+msgstr "With a valid license token, the plugin receives automatic updates from the server plugins.blitzdonner.ch. Without a token the plugin keeps working normally – it simply receives no automatic updates (nothing is switched off, no loss of features)."
+
+msgid "Lizenz-Token"
+msgstr "License token"
+
+msgid "•••••••••• (gespeichert – leer lassen, um beizubehalten)"
+msgstr "•••••••••• (saved – leave empty to keep)"
+
+msgid "per wp-config gesetzt"
+msgstr "set via wp-config"
+
+msgid "Das Token ist per wp-config (Konstante BDFRMS_UPDATE_TOKEN) gesetzt und hat Vorrang."
+msgstr "The token is set via wp-config (constant BDFRMS_UPDATE_TOKEN) and takes precedence."
+
+msgid "Eingaben in diesem Feld werden ignoriert. Um das Token zu ändern, passe die Konstante in der wp-config.php an."
+msgstr "Input in this field is ignored. To change the token, adjust the constant in wp-config.php."
+
+msgid "Empfehlung: das Token stattdessen als Konstante BDFRMS_UPDATE_TOKEN in der wp-config.php setzen – das ist robuster und hat Vorrang."
+msgstr "Recommendation: instead set the token as the constant BDFRMS_UPDATE_TOKEN in wp-config.php – that is more robust and takes precedence."
+
+msgid "Lizenz-Token speichern"
+msgstr "Save license token"
+
+msgid "Token testen"
+msgstr "Test token"
+
+msgid "Prüft das hinterlegte Token sofort gegen den Update-Server, unabhängig vom üblichen Update-Takt."
+msgstr "Checks the stored token against the update server immediately, regardless of the usual update interval."
+
+msgid "Token gültig – automatische Updates aktiv."
+msgstr "Token valid – automatic updates active."
+
+msgid "Installiert: Version %1$s. Auf dem Server verfügbar: Version %2$s."
+msgstr "Installed: version %1$s. Available on the server: version %2$s."
+
+msgid "Installierte Version: %s. Aktuell – kein Update verfügbar."
+msgstr "Installed version: %s. Up to date – no update available."
+
+msgid "Token per wp-config gesetzt (Vorrang)."
+msgstr "Token set via wp-config (precedence)."
+
+msgid "Das Token stammt aus der Konstante BDFRMS_UPDATE_TOKEN. Eingaben im Backend werden ignoriert."
+msgstr "The token comes from the constant BDFRMS_UPDATE_TOKEN. Backend input is ignored."
+
+msgid "Token abgelaufen oder ungültig – keine Updates."
+msgstr "Token expired or invalid – no updates."
+
+msgid "Der Server hat das Token abgelehnt. Das Plugin funktioniert weiterhin normal, es werden nur keine Updates angeboten."
+msgstr "The server rejected the token. The plugin keeps working normally, only no updates are offered."
+
+msgid "Update-Server nicht erreichbar."
+msgstr "Update server unreachable."
+
+msgid "Der Server konnte gerade nicht erreicht werden. Das ist meist vorübergehend – später erneut «Token testen»."
+msgstr "The server could not be reached right now. This is usually temporary – try «Test token» again later."
+
+msgid "Kein Token hinterlegt."
+msgstr "No token stored."
+
+msgid "Trage unten ein Lizenz-Token ein, um automatische Updates zu aktivieren. Ohne Token läuft das Plugin normal weiter."
+msgstr "Enter a license token below to activate automatic updates. Without a token the plugin keeps working normally."
+
+msgid "Lizenz-Token wird per wp-config gesetzt (Vorrang). Eingaben im Backend werden ignoriert."
+msgstr "The license token is set via wp-config (precedence). Backend input is ignored."
+
+msgid "Update-Client nicht verfügbar."
+msgstr "Update client not available."
+
+msgid "Lizenz-Token gespeichert."
+msgstr "License token saved."
+
+msgid "Token testen: Token gültig – automatische Updates aktiv."
+msgstr "Test token: token valid – automatic updates active."
+
+msgid "Token testen: Token per wp-config gesetzt (Vorrang)."
+msgstr "Test token: token set via wp-config (precedence)."
+
+msgid "Token testen: Token abgelaufen oder ungültig – keine Updates."
+msgstr "Test token: token expired or invalid – no updates."
+
+msgid "Token testen: Update-Server nicht erreichbar – bitte später erneut versuchen."
+msgstr "Test token: update server unreachable – please try again later."
+
+msgid "Token testen: Kein Token hinterlegt."
+msgstr "Test token: no token stored."
+

@@ -1,0 +1,76 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "bdfrms/field-email",
+    "version": "2.0.0",
+    "title": "E-Mail-Feld",
+    "category": "bdfrms-fields",
+    "icon": {
+        "src": "email"
+    },
+    "description": "E-Mail-Eingabefeld.",
+    "textdomain": "blitz-donner-forms",
+    "attributes": {
+        "label": {
+            "type": "string",
+            "default": "E-Mail"
+        },
+        "name": {
+            "type": "string",
+            "default": ""
+        },
+        "nameClientId": {
+            "type": "string",
+            "default": ""
+        },
+        "placeholder": {
+            "type": "string",
+            "default": ""
+        },
+        "required": {
+            "type": "boolean",
+            "default": true
+        },
+        "sensitive": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "supports": {
+        "html": false
+    },
+    "usesContext": [
+        "bdfrms/formId",
+        "bdfrms/appearanceMode",
+        "bdfrms/colorLabel",
+        "bdfrms/colorText",
+        "bdfrms/colorPlaceholder",
+        "bdfrms/colorFieldBg",
+        "bdfrms/colorBorder",
+        "bdfrms/colorFocus",
+        "bdfrms/colorButtonBg",
+        "bdfrms/colorButtonText",
+        "bdfrms/darkColorLabel",
+        "bdfrms/darkColorText",
+        "bdfrms/darkColorPlaceholder",
+        "bdfrms/darkColorFieldBg",
+        "bdfrms/darkColorBorder",
+        "bdfrms/darkColorFocus",
+        "bdfrms/darkColorButtonBg",
+        "bdfrms/darkColorButtonText",
+        "bdfrms/colorFormShell",
+        "bdfrms/darkColorFormShell"
+    ],
+    "editorScript": "bdfrms-editor",
+    "example": {
+        "attributes": {
+            "label": "E-Mail",
+            "name": "sb_email",
+            "placeholder": "name@beispiel.de",
+            "required": false
+        }
+    },
+    "ancestor": [
+        "bdfrms/form"
+    ]
+}

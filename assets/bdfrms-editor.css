@@ -1,0 +1,59 @@
+/**
+ * Nur Block-Editor-Chrome: Block-Listen-Icons, Hinweise, Erfolgsbereich-Rahmen,
+ * Platzhalter-Hilfe, Canvas-Hintergrund im Theme-Modus.
+ * KEINE Formular-Optik – die liegt vollstaendig in form.css und wird per
+ * bdfrmsSyncEditorFormStylesheet auch in den Canvas-Iframe gehaengt (Parität).
+ */
+
+/* Editor-Hinweis bei verstecktem Feld (kein Frontend-Äquivalent). */
+.bdfrms-editor-hidden-field-hint {
+	margin: 0;
+	font-size: 0.8125rem;
+	line-height: 1.4;
+	color: GrayText;
+}
+
+/*
+ * BDFRMS-Blöcke im Block-Inserter / Schnell+: Iconfarbe folgt der Editor-Oberfläche.
+ */
+.block-editor button[class*="editor-block-list-item-bdfrms-"] .block-editor-block-icon,
+.block-editor button[class*="editor-block-list-item-bdfrms-"] .block-editor-block-icon svg,
+.block-editor button[class*="editor-block-list-item-bdfrms-"] svg {
+	color: currentColor;
+	fill: currentColor;
+}
+
+.block-editor [class*="editor-block-list-item-bdfrms-"] .block-editor-block-icon.has-colors,
+.block-editor [class*="editor-block-list-item-bdfrms-"] .block-editor-block-icon.has-colors svg {
+	color: currentColor;
+	fill: currentColor;
+}
+
+/* Theme-Formular ohne Kartenfläche: hinter transparentem Wrapper schimmert der graue Editor-Canvas – wie Seitenfläche (Canvas) wirken lassen, sofern kein Block-Hintergrund gesetzt ist. */
+.editor-styles-wrapper .bdfrms-form-wrapper[data-bdfrms-appearance="theme"]:not(.has-background) {
+	background-color: Canvas;
+}
+
+/* Editor: Erfolgsbereich-Block (Chrome, kein Frontend-Äquivalent). */
+.block-editor-block-list__block .bdfrms-form-success-editor {
+	border: 1px dashed color-mix(in srgb, CanvasText 28%, transparent);
+	border-radius: 10px;
+	padding: 0.75rem 1rem;
+}
+
+.bdfrms-form-success-editor__inner > .block-list-appender {
+	margin-top: 0.5rem;
+}
+
+/* Editor: Platzhalter-Hilfe (bdfrms/token) im Erfolgsbereich. */
+.bdfrms-token-hint-editor {
+	padding: 0.35rem 0;
+	max-width: 28rem;
+}
+
+.bdfrms-token-hint-editor__intro {
+	margin: 0 0 0.5rem;
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	color: color-mix(in srgb, CanvasText 82%, transparent);
+}

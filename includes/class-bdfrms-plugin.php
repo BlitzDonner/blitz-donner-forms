@@ -1,0 +1,1550 @@
+<?php
+/**
+ * Core plugin bootstrap and block registration.
+ *
+ * @package Blitz_Donner_Forms
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Block-Registrierung, Formular-Rendering und Frontend-Assets.
+ */
+class BDFRMS_Plugin {
+
+	/**
+	 * Option: Safari/WebKit Datums-Fallback (Textfelder statt native Picker).
+	 *
+	 * @var string
+	 */
+	const OPTION_WEBKIT_DATETIME_FALLBACK = 'bdfrms_webkit_datetime_fallback';
+
+	/**
+	 * Safari/WebKit: date/time/datetime-local durch Text + pattern ersetzen?
+	 * Standard: an (historisches Verhalten). In Sicherheit → Einstellungen abschaltbar.
+	 *
+	 * @return bool
+	 */
+	public static function is_webkit_datetime_fallback_enabled() {
+		$raw     = get_option( self::OPTION_WEBKIT_DATETIME_FALLBACK, '1' );
+		$enabled = ( '1' === (string) $raw || true === $raw );
+		return (bool) apply_filters( 'bdfrms_webkit_datetime_fallback', $enabled );
+	}
+
+	/**
+	 * Boot hooks.
+	 *
+	 * @return void
+	 */
+	public static function boot() {
+		add_filter( 'block_categories_all', array( __CLASS__, 'register_block_category' ), 999, 2 );
+		add_action( 'init', array( 'BDFRMS_Install', 'maybe_upgrade' ), 0 );
+		add_action( 'init', array( __CLASS__, 'register_assets' ) );
+		add_action( 'init', array( __CLASS__, 'register_blocks' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_frontend_for_redirect_query' ), 5 );
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_editor_assets' ) );
+		add_action( 'admin_post_bdfrms_submit', array( 'BDFRMS_Submit_Handler', 'handle' ) );
+		add_action( 'admin_post_nopriv_bdfrms_submit', array( 'BDFRMS_Submit_Handler', 'handle' ) );
+		BDFRMS_Admin_Submissions::boot();
+	}
+
+	/**
+	 * Zwei Block-Kategorien: „Formular“ (Container) und „Formularfelder“ (alle Feld-Blöcke).
+	 *
+	 * @param array<int,array<string,mixed>> $categories Bestehende Kategorien.
+	 * @param mixed                          $context Editor-Kontext.
+	 * @return array<int,array<string,mixed>>
+	 */
+	public static function register_block_category( $categories, $context = null ) {
+		$our_slugs = array( 'bdfrms', 'bdfrms-form', 'bdfrms-fields' );
+		$out       = array();
+		foreach ( $categories as $cat ) {
+			if ( isset( $cat['slug'] ) && in_array( $cat['slug'], $our_slugs, true ) ) {
+				continue;
+			}
+			$out[] = $cat;
+		}
+		$out[] = array(
+			'slug'  => 'bdfrms-form',
+			'title' => __( 'Formular', 'blitz-donner-forms' ),
+			'icon'  => null,
+		);
+		$out[] = array(
+			'slug'  => 'bdfrms-fields',
+			'title' => __( 'Formularfelder', 'blitz-donner-forms' ),
+			'icon'  => null,
+		);
+
+		return $out;
+	}
+
+	/**
+	 * Register scripts/styles.
+	 *
+	 * @return void
+	 */
+	public static function register_assets() {
+		wp_register_script(
+			'bdfrms-editor',
+			BDFRMS_PLUGIN_URL . 'assets/editor.js',
+			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-data', 'wp-core-data' ),
+			BDFRMS_PLUGIN_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'bdfrms-editor',
+			'bdfrmsEditorAssets',
+			array(
+				'editorCanvasFormStylesUrl' => BDFRMS_PLUGIN_URL . 'assets/form.css',
+				'editorChromeStylesUrl'     => BDFRMS_PLUGIN_URL . 'assets/bdfrms-editor.css',
+				'version'                   => BDFRMS_PLUGIN_VERSION,
+				'adminEmail'                => sanitize_email( (string) get_option( 'admin_email' ) ),
+			)
+		);
+
+		wp_register_script(
+			'bdfrms-frontend',
+			BDFRMS_PLUGIN_URL . 'assets/frontend.js',
+			array(),
+			BDFRMS_PLUGIN_VERSION,
+			true
+		);
+
+		// Strings statt bool: wp_localize_script castet Werte zu Strings (false → "").
+		wp_localize_script(
+			'bdfrms-frontend',
+			'bdfrmsFrontendConfig',
+			array(
+				'webkitDateTimeFallback' => self::is_webkit_datetime_fallback_enabled() ? '1' : '0',
+			)
+		);
+
+		wp_register_style(
+			'bdfrms-form',
+			BDFRMS_PLUGIN_URL . 'assets/form.css',
+			array(),
+			BDFRMS_PLUGIN_VERSION
+		);
+
+		// CAPTCHA-Lazy-Loader: laedt das Friendly-Captcha-SDK erst nach der ersten
+		// Formular-Interaktion (verzoegertes Laden zur Datensparsamkeit). Wird nur
+		// enqueued, wenn CAPTCHA fuer ein gerendertes Formular aktiv ist (siehe
+		// render_form_block).
+		wp_register_script(
+			'bdfrms-captcha',
+			BDFRMS_PLUGIN_URL . 'assets/captcha.js',
+			array(),
+			BDFRMS_PLUGIN_VERSION,
+			true
+		);
+		wp_localize_script(
+			'bdfrms-captcha',
+			'bdfrmsCaptchaConfig',
+			array(
+				'scriptUrl' => BDFRMS_Captcha::widget_script_url(),
+			)
+		);
+	}
+
+	/**
+	 * Lädt bdfrms-frontend auf Folgeseiten ohne Formularblock (IndexedDB-Entwurf per URL löschen).
+	 *
+	 * @return void
+	 */
+	public static function enqueue_frontend_for_redirect_query() {
+		if ( is_admin() ) {
+			return;
+		}
+		if ( empty( $_GET['bdfrms_status'] ) || empty( $_GET['bdfrms_draft_key'] ) ) {
+			return;
+		}
+		if ( 'success' !== sanitize_key( wp_unslash( $_GET['bdfrms_status'] ) ) ) {
+			return;
+		}
+		wp_enqueue_script( 'bdfrms-frontend' );
+	}
+
+	/**
+	 * Canvas-Styles: `form.css` + schmales `bdfrms-editor.css` per editor.js in den Block-Iframe.
+	 * `bdfrms-editor` lädt über block.json → editorScript.
+	 *
+	 * @return void
+	 */
+	public static function enqueue_editor_assets() {
+	}
+
+	/**
+	 * Register block metadata.
+	 *
+	 * @return void
+	 */
+	public static function register_blocks() {
+		register_block_type(
+			BDFRMS_PLUGIN_DIR . 'blocks/form',
+			array(
+				'render_callback' => array( __CLASS__, 'render_form_block' ),
+			)
+		);
+
+		register_block_type(
+			BDFRMS_PLUGIN_DIR . 'blocks/form-success',
+			array(
+				'render_callback' => array( __CLASS__, 'render_form_success_block' ),
+			)
+		);
+
+		register_block_type(
+			BDFRMS_PLUGIN_DIR . 'blocks/token',
+			array(
+				'render_callback' => static function () {
+					return '';
+				},
+			)
+		);
+
+		// Alle Field-Blöcke werden serverseitig gerendert (K3 Variante A).
+		// HTML-Output kommt aus BDFRMS_Field_Renderer; das im Editor `save()`
+		// erzeugte Markup wird nur für deprecated-Validierung ungültiger
+		// Altbestand benutzt (Backwards-Compat).
+		$field_blocks = array(
+			'bdfrms/field-text',
+			'bdfrms/field-email',
+			'bdfrms/field-textarea',
+			'bdfrms/field-select',
+			'bdfrms/field-checkbox',
+			'bdfrms/field-submit',
+			'bdfrms/field-number',
+			'bdfrms/field-tel',
+			'bdfrms/field-url',
+			'bdfrms/field-date',
+			'bdfrms/field-time',
+			'bdfrms/field-datetime',
+			'bdfrms/field-radio',
+			'bdfrms/field-hidden',
+			'bdfrms/field-range',
+			'bdfrms/field-file',
+		);
+		foreach ( $field_blocks as $name ) {
+			$slug = substr( $name, strlen( 'bdfrms/' ) );
+			register_block_type(
+				BDFRMS_PLUGIN_DIR . 'blocks/' . $slug,
+				array(
+					'render_callback' => static function ( $attrs ) use ( $name ) {
+						return BDFRMS_Field_Renderer::render( $name, is_array( $attrs ) ? $attrs : array() );
+					},
+				)
+			);
+		}
+	}
+
+	/**
+	 * Erscheinungsmodus: Theme (Standard), Automatisch, Hell, Dunkel.
+	 *
+	 * @param mixed $value Raw attribute.
+	 * @return string theme|auto|light|dark
+	 */
+	private static function sanitize_appearance_mode( $value ) {
+		$v = is_string( $value ) ? sanitize_key( $value ) : 'theme';
+		if ( in_array( $v, array( 'theme', 'auto', 'light', 'dark' ), true ) ) {
+			return $v;
+		}
+		return 'theme';
+	}
+
+	/**
+	 * Klammern in einem CSS-Wert prüfen (eine Ebene reicht für typische Farb-/Verlaufsfunktionen).
+	 *
+	 * @param string $s Wert.
+	 * @return bool
+	 */
+	private static function bdfrms_css_parentheses_balanced( $s ) {
+		$d   = 0;
+		$len = strlen( $s );
+		for ( $i = 0; $i < $len; $i++ ) {
+			$c = $s[ $i ];
+			if ( '(' === $c ) {
+				++$d;
+				if ( $d > 80 ) {
+					return false;
+				}
+			} elseif ( ')' === $c ) {
+				--$d;
+				if ( $d < 0 ) {
+					return false;
+				}
+			}
+		}
+		return 0 === $d;
+	}
+
+	/**
+	 * Gefährliche CSS-Fragmente ausschliessen (kein url(), kein expression etc.).
+	 * M3: zusätzlich Newlines und Semikolons, um Style-Property-Injection zu unterbinden.
+	 *
+	 * @param string $s Wert.
+	 * @return bool True wenn unsicher.
+	 */
+	private static function bdfrms_css_value_has_blocked_tokens( $s ) {
+		if ( preg_match( '/\burl\s*\(|expression\s*\(|@import|javascript\s*:/i', $s ) ) {
+			return true;
+		}
+		foreach ( array( '<', '>', '`', '\\', ';', "\r", "\n", "\t", "\0" ) as $bad ) {
+			if ( false !== strpos( $s, $bad ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Erlaubt eine begrenzte Länge, ausgewogene Klammern und keine blockierten Token.
+	 * M3: Default-Limit auf 512 reduziert (vorher 4096).
+	 *
+	 * @param string $value Wert.
+	 * @param int    $max_len Maximale Zeichenlänge.
+	 * @return string Bereinigter Wert oder leer.
+	 */
+	private static function bdfrms_sanitize_functional_css_color( $value, $max_len = 512 ) {
+		if ( strlen( $value ) > $max_len ) {
+			return '';
+		}
+		if ( self::bdfrms_css_value_has_blocked_tokens( $value ) ) {
+			return '';
+		}
+		if ( ! self::bdfrms_css_parentheses_balanced( $value ) ) {
+			return '';
+		}
+		return $value;
+	}
+
+	/**
+	 * Farbwert / Verlauf für style="--var: …" (Block-Editor: Hex, Alpha, Verläufe, moderne Farbräume).
+	 *
+	 * @param mixed $value Raw attribute.
+	 * @return string Sicherer CSS-Wert oder leer.
+	 */
+	private static function sanitize_bdfrms_color( $value ) {
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+		$value = trim( $value );
+		if ( '' === $value ) {
+			return '';
+		}
+		$lower = strtolower( $value );
+		if ( 'transparent' === $lower ) {
+			return 'transparent';
+		}
+		if ( 'currentcolor' === $lower ) {
+			return 'currentColor';
+		}
+		$hex = sanitize_hex_color( $value );
+		if ( is_string( $hex ) && '' !== $hex ) {
+			return $hex;
+		}
+		// 8-stelliges Hex (#RRGGBBAA), von Color-Pickern üblich — sanitize_hex_color lehnt das ab.
+		if ( preg_match( '/^#([A-Fa-f0-9]{8})$/', $value ) ) {
+			return $value;
+		}
+		// 4-stelliges Hex (#RGBA)
+		if ( preg_match( '/^#([A-Fa-f0-9]{4})$/', $value ) ) {
+			return $value;
+		}
+		// var(--name) oder var(--name, Fallback) — Fallback rekursiv prüfen.
+		if ( preg_match( '/^var\s*\(\s*(--[a-zA-Z0-9\-]+)\s*\)$/i', $value, $vm ) ) {
+			return 'var(' . $vm[1] . ')';
+		}
+		if ( preg_match( '/^var\s*\(\s*(--[a-zA-Z0-9\-]+)\s*,\s*(.+)\)$/is', $value, $vm2 ) ) {
+			$inner = self::sanitize_bdfrms_color( trim( $vm2[2] ) );
+			if ( '' === $inner ) {
+				return '';
+			}
+			return 'var(' . $vm2[1] . ', ' . $inner . ')';
+		}
+		// rgb() / rgba() — klassisch mit Komma oder modern mit Leerzeichen und / Alpha.
+		if ( preg_match( '/^rgba?\(\s*[\d.]+%?\s*,\s*[\d.]+%?\s*,\s*[\d.]+%?\s*(,\s*[\d.]+%?\s*)?\)$/i', $value ) ) {
+			return $value;
+		}
+		if ( preg_match( '/^rgba?\(\s*[\d.]+%?(?:\s+[\d.]+%?){2}(?:\s*\/\s*[\d.]+%?)?\s*\)$/i', $value ) ) {
+			return $value;
+		}
+		// hsl() / hsla() — klassisch oder mit / Alpha.
+		if ( preg_match( '/^hsla?\(\s*[\d.]+\s*,\s*[\d.]+%\s*,\s*[\d.]+%\s*(,\s*[\d.]+\s*)?\)$/i', $value ) ) {
+			return $value;
+		}
+		if ( preg_match( '/^hsla?\(\s*[\d.]+\s+[\d.]+%\s+[\d.]+%(?:\s*\/\s*[\d.]+%?)?\s*\)$/i', $value ) ) {
+			return $value;
+		}
+		// Verläufe und Farbfunktionen mit geklammertem Inhalt (kein url()).
+		$prefixes = array(
+			'linear-gradient',
+			'radial-gradient',
+			'conic-gradient',
+			'repeating-linear-gradient',
+			'repeating-radial-gradient',
+			'repeating-conic-gradient',
+			'color-mix',
+			'oklch',
+			'oklab',
+			'hwb',
+			'lch',
+			'lab',
+		);
+		foreach ( $prefixes as $pfx ) {
+			$plen = strlen( $pfx ) + 1;
+			if ( strlen( $value ) > $plen && 0 === strcasecmp( substr( $value, 0, $plen ), $pfx . '(' ) ) {
+				$ok = self::bdfrms_sanitize_functional_css_color( $value );
+				return '' !== $ok ? $ok : '';
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Prüft, ob ein Attributwert nach Sanitization ein CSS-Bildverlauf ist (Shell-Hintergrund).
+	 *
+	 * @param mixed $raw Roher Attributwert.
+	 * @return bool
+	 */
+	private static function bdfrms_sanitized_attr_is_css_gradient( $raw ) {
+		$s = self::sanitize_bdfrms_color( is_string( $raw ) ? $raw : '' );
+		if ( '' === $s ) {
+			return false;
+		}
+		return (bool) preg_match(
+			'/^(?:linear|radial|conic|repeating-linear|repeating-radial|repeating-conic)-gradient\s*\(/i',
+			$s
+		);
+	}
+
+	/**
+	 * CSS-Variablen für das Formular-Wrapper-Element (Theme-Farben).
+	 *
+	 * @param array<string,mixed> $attributes Block-Attribute.
+	 * @return string Semikolon-getrennte Deklarationen ohne abschliessendes Semikolon am Ende (für style=").
+	 */
+	private static function build_form_inline_color_style( $attributes ) {
+		$light_map = array(
+			'colorLabel'       => '--bdfrms-light-label',
+			'colorText'        => '--bdfrms-light-text',
+			'colorPlaceholder' => '--bdfrms-light-placeholder',
+			'colorFieldBg'     => '--bdfrms-light-bg',
+			'colorBorder'      => '--bdfrms-light-border',
+			'colorFocus'       => '--bdfrms-light-border-focus',
+			'colorButtonBg'    => '--bdfrms-light-submit-bg',
+			'colorButtonText'  => '--bdfrms-light-submit-text',
+			'colorFormShell'   => '--bdfrms-light-form-shell',
+		);
+		$dark_map  = array(
+			'darkColorLabel'       => '--bdfrms-dark-label',
+			'darkColorText'        => '--bdfrms-dark-text',
+			'darkColorPlaceholder' => '--bdfrms-dark-placeholder',
+			'darkColorFieldBg'     => '--bdfrms-dark-bg',
+			'darkColorBorder'      => '--bdfrms-dark-border',
+			'darkColorFocus'       => '--bdfrms-dark-border-focus',
+			'darkColorButtonBg'    => '--bdfrms-dark-submit-bg',
+			'darkColorButtonText'  => '--bdfrms-dark-submit-text',
+			'darkColorFormShell'   => '--bdfrms-dark-form-shell',
+		);
+		$parts     = array();
+		foreach ( $light_map as $attr => $var ) {
+			if ( empty( $attributes[ $attr ] ) ) {
+				continue;
+			}
+			$c = self::sanitize_bdfrms_color( $attributes[ $attr ] );
+			if ( '' !== $c ) {
+				$parts[] = $var . ':' . $c;
+			}
+		}
+		foreach ( $dark_map as $attr => $var ) {
+			if ( empty( $attributes[ $attr ] ) ) {
+				continue;
+			}
+			$c = self::sanitize_bdfrms_color( $attributes[ $attr ] );
+			if ( '' !== $c ) {
+				$parts[] = $var . ':' . $c;
+			}
+		}
+		return implode( ';', $parts );
+	}
+
+	/**
+	 * Attribute aus dem gespeicherten Block mit denen aus dem Render-Callback zusammenführen
+	 * (manchmal fehlen Defaults bzw. einzelne Keys im dynamischen Render).
+	 *
+	 * @param array<string,mixed> $attributes Vom Renderer übergebene Attribute.
+	 * @param WP_Block|null       $block      Block-Instanz.
+	 * @return array<string,mixed>
+	 */
+	private static function merge_form_render_attributes( $attributes, $block ) {
+		$attrs = is_array( $attributes ) ? $attributes : array();
+		if ( $block instanceof WP_Block && ! empty( $block->parsed_block['attrs'] ) && is_array( $block->parsed_block['attrs'] ) ) {
+			return array_merge( $block->parsed_block['attrs'], $attrs );
+		}
+		return $attrs;
+	}
+
+	/**
+	 * Klassen + Layout-CSS für den InnerBlocks-Bereich (vertikaler Block-Abstand / blockGap).
+	 *
+	 * @param array<string,mixed> $attributes Gemergte Block-Attribute.
+	 * @param WP_Block|null       $block      Block-Instanz.
+	 * @return array{classes:array<int,string>,style_css:string}
+	 */
+	private static function build_form_inner_fields_layout( $attributes, $block ) {
+		$classes = array( 'bdfrms-form-fields' );
+		if ( function_exists( 'wp_unique_prefixed_id' ) ) {
+			$classes[] = wp_unique_prefixed_id( 'bdfrms-form-fields-' );
+		} else {
+			$classes[] = 'bdfrms-form-fields-' . wp_generate_password( 8, false, false );
+		}
+		$unique_class = end( $classes );
+
+		$used_layout = array(
+			'type'        => 'flex',
+			'orientation' => 'vertical',
+		);
+		if ( ! empty( $attributes['layout'] ) && is_array( $attributes['layout'] ) ) {
+			$used_layout = array_merge( $used_layout, $attributes['layout'] );
+		}
+		if ( empty( $used_layout['type'] ) ) {
+			$used_layout['type'] = 'flex';
+		}
+
+		$gap_value = null;
+		if ( ! empty( $attributes['style']['spacing']['blockGap'] ) ) {
+			$gap_value = $attributes['style']['spacing']['blockGap'];
+		}
+		if ( is_array( $gap_value ) ) {
+			foreach ( $gap_value as $gk => $gv ) {
+				if ( $gv && preg_match( '%[\\\\(&=}]|/\\*%', (string) $gv ) ) {
+					$gap_value[ $gk ] = null;
+				}
+			}
+		} elseif ( $gap_value && preg_match( '%[\\\\(&=}]|/\\*%', (string) $gap_value ) ) {
+			$gap_value = null;
+		}
+
+		$global_settings = function_exists( 'wp_get_global_settings' ) ? wp_get_global_settings() : array();
+		$theme_block_gap = isset( $global_settings['spacing']['blockGap'] ) ? $global_settings['spacing']['blockGap'] : null;
+		$has_block_gap   = isset( $theme_block_gap ) || ( null !== $gap_value );
+
+		$block_type = null;
+		if ( $block instanceof WP_Block && $block->block_type instanceof WP_Block_Type ) {
+			$block_type = $block->block_type;
+		} else {
+			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'bdfrms/form' );
+		}
+		$should_skip_gap = $block_type
+			? wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' )
+			: false;
+
+		$fallback_gap = '0.5em';
+		if ( $block_type && isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) ) {
+			$fallback_gap = (string) $block_type->supports['spacing']['blockGap']['__experimentalDefault'];
+		}
+
+		$block_spacing = null;
+		if ( ! empty( $attributes['style']['spacing'] ) && is_array( $attributes['style']['spacing'] ) ) {
+			$block_spacing = $attributes['style']['spacing'];
+		}
+
+		$style_css = '';
+		if ( function_exists( 'wp_get_layout_style' ) ) {
+			$style_css = wp_get_layout_style(
+				'.' . $unique_class,
+				$used_layout,
+				$has_block_gap,
+				$gap_value,
+				$should_skip_gap,
+				$fallback_gap,
+				$block_spacing
+			);
+		}
+
+		return array(
+			'classes'   => $classes,
+			'style_css' => is_string( $style_css ) ? $style_css : '',
+		);
+	}
+
+	/**
+	 * Prüft, ob mindestens eine Hell- oder Dunkelfarbe gesetzt ist.
+	 *
+	 * @param array<string,mixed> $attributes Block-Attribute.
+	 * @return bool
+	 */
+	private static function form_has_any_custom_colors( $attributes ) {
+		$keys = array(
+			'colorLabel',
+			'colorText',
+			'colorPlaceholder',
+			'colorFieldBg',
+			'colorBorder',
+			'colorFocus',
+			'colorButtonBg',
+			'colorButtonText',
+			'colorFormShell',
+			'darkColorLabel',
+			'darkColorText',
+			'darkColorPlaceholder',
+			'darkColorFieldBg',
+			'darkColorBorder',
+			'darkColorFocus',
+			'darkColorButtonBg',
+			'darkColorButtonText',
+			'darkColorFormShell',
+		);
+		foreach ( $keys as $k ) {
+			if ( ! empty( $attributes[ $k ] ) && '' !== self::sanitize_bdfrms_color( $attributes[ $k ] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Render form wrapper and status state.
+	 *
+	 * @param array    $attributes Block attributes.
+	 * @param string   $content Inner content.
+	 * @param WP_Block $block Block object.
+	 * @return string
+	 */
+	public static function render_form_block( $attributes, $content, $block ) {
+		$attributes = self::merge_form_render_attributes( $attributes, $block );
+		$form_id    = ! empty( $attributes['formId'] ) ? sanitize_key( $attributes['formId'] ) : '';
+		if ( ! $form_id ) {
+			return '';
+		}
+
+		$post_id = get_the_ID();
+		if ( ! $post_id ) {
+			global $post;
+			$post_id = $post instanceof WP_Post ? (int) $post->ID : 0;
+		}
+
+		$action = esc_url( admin_url( 'admin-post.php' ) );
+
+		// Stabiler Entwurf-Schlüssel pro Block-Instanz (IndexedDB), nicht pro PHP-Render (sonst Löschen/Restore falsch).
+		$instance_id = isset( $attributes['blockInstanceId'] ) ? sanitize_key( (string) $attributes['blockInstanceId'] ) : '';
+		if ( '' === $instance_id ) {
+			$instance_id = '0';
+		}
+		$key              = $post_id . ':' . $form_id . ':' . $instance_id;
+		$draft_enabled    = ! isset( $attributes['draftEnabled'] ) || (bool) $attributes['draftEnabled'];
+		$restore_mode     = isset( $attributes['restoreMode'] ) ? sanitize_key( (string) $attributes['restoreMode'] ) : 'auto';
+		$draft_ttl_days   = isset( $attributes['draftTtlDays'] ) ? absint( $attributes['draftTtlDays'] ) : 7;
+		$show_draft_reset = ! isset( $attributes['showDraftReset'] ) || (bool) $attributes['showDraftReset'];
+
+		if ( $draft_ttl_days < 1 ) {
+			$draft_ttl_days = 1;
+		}
+		if ( $draft_ttl_days > 30 ) {
+			$draft_ttl_days = 30;
+		}
+
+		$appearance = self::sanitize_appearance_mode( isset( $attributes['appearanceMode'] ) ? $attributes['appearanceMode'] : 'theme' );
+
+		wp_enqueue_script( 'bdfrms-frontend' );
+		/* Immer laden: bei „Theme + eigene Farben“ verbinden die Regeln Inline-Variablen mit den Feldern; bei Hell/Dunkel/Auto über Tokens am Wrapper. */
+		wp_enqueue_style( 'bdfrms-form' );
+
+		// H5: Status + Detail aus URL nur über Whitelist; Texte serverseitig.
+		$status      = isset( $_GET['bdfrms_status'] ) ? sanitize_key( wp_unslash( $_GET['bdfrms_status'] ) ) : '';
+		$status_form = isset( $_GET['bdfrms_form'] ) ? sanitize_key( wp_unslash( $_GET['bdfrms_form'] ) ) : '';
+		$status_code = isset( $_GET['bdfrms_code'] ) ? sanitize_key( wp_unslash( $_GET['bdfrms_code'] ) ) : '';
+		$status_msg  = '';
+		if ( in_array( $status, array( 'success', 'error' ), true ) && $status_form === $form_id ) {
+			if ( '' !== $status_code ) {
+				$status_msg = BDFRMS_Submit_Handler::status_message_for( $status_code );
+			}
+			if ( '' === $status_msg ) {
+				$status_msg = ( 'success' === $status )
+					? __( 'Danke! Das Formular wurde erfolgreich gesendet.', 'blitz-donner-forms' )
+					: __( 'Beim Absenden ist ein Fehler aufgetreten.', 'blitz-donner-forms' );
+			}
+			// Optionaler Detailtext (URL-Whitelist); nur serverseitig erzeugte Slugs.
+			$detail_codes = array( 'err_validation', 'err_file', 'err_external', 'err_crypto' );
+			if ( 'error' === $status && $status_code && in_array( $status_code, $detail_codes, true ) && isset( $_GET['bdfrms_detail'] ) ) {
+				$detail = sanitize_text_field( wp_unslash( $_GET['bdfrms_detail'] ) );
+				$detail = mb_substr( $detail, 0, 500 );
+				if ( '' !== $detail ) {
+					$status_msg .= ' ' . $detail;
+				}
+			}
+		} else {
+			// Status nicht zu unserem Formular oder ungültig -> kein Notice anzeigen.
+			$status = '';
+		}
+
+		$inner_blocks_parsed = array();
+		if ( $block instanceof WP_Block && ! empty( $block->parsed_block['innerBlocks'] ) && is_array( $block->parsed_block['innerBlocks'] ) ) {
+			$inner_blocks_parsed = $block->parsed_block['innerBlocks'];
+		}
+		$split_inner          = self::split_form_inner_blocks( $inner_blocks_parsed );
+		$field_only_blocks    = $split_inner['fields'];
+		$success_only_blocks  = $split_inner['success'];
+		$thank_you_page_id    = isset( $attributes['thankYouPageId'] ) ? absint( $attributes['thankYouPageId'] ) : 0;
+		$is_same_page_success = ( 'success' === $status && $status_form === $form_id && $thank_you_page_id < 1 );
+		$show_success_panels  = $is_same_page_success && ! empty( $success_only_blocks );
+
+		$has_file_field = self::parsed_blocks_contain_block( $field_only_blocks, 'bdfrms/field-file' );
+
+		// CAPTCHA-Wirksamkeit pro Formular (global aktiv + vollstaendig
+		// konfiguriert + captchaMode). Nur dann Widget + Lazy-Loader.
+		$captcha_active = BDFRMS_Captcha::is_active_for_form( $attributes );
+		if ( $captcha_active ) {
+			wp_enqueue_script( 'bdfrms-captcha' );
+		}
+
+		$wrapper_classes  = array( 'bdfrms-form-wrapper' );
+		$form_color_style = self::build_form_inline_color_style( $attributes );
+		/* Theme + eigene Farben: form.css bindet --bdfrms-light-* / --bdfrms-dark-* an die Felder (siehe .bdfrms-form-colors-custom). */
+		if ( 'theme' === $appearance && self::form_has_any_custom_colors( $attributes ) ) {
+			$wrapper_classes[] = 'bdfrms-form-colors-custom';
+		}
+		if ( 'theme' !== $appearance ) {
+			if ( self::bdfrms_sanitized_attr_is_css_gradient( $attributes['colorFormShell'] ?? '' ) ) {
+				$wrapper_classes[] = 'bdfrms-form-shell-gradient--light';
+			}
+			if ( self::bdfrms_sanitized_attr_is_css_gradient( $attributes['darkColorFormShell'] ?? '' ) ) {
+				$wrapper_classes[] = 'bdfrms-form-shell-gradient--dark';
+			}
+		}
+		$wrapper_attr_args = array(
+			'class'                  => implode( ' ', $wrapper_classes ),
+			'data-bdfrms-appearance' => $appearance,
+			'data-bdfrms-form-id'    => $form_id,
+			'data-bdfrms-key'        => $key,
+		);
+		if ( $show_success_panels ) {
+			$wrapper_attr_args['data-bdfrms-await-tokens'] = '1';
+			$labels_for_map                                = array();
+			foreach ( self::get_form_schema_from_post( $post_id, $form_id ) as $row ) {
+				if ( ! empty( $row['name'] ) ) {
+					$labels_for_map[ (string) $row['name'] ] = isset( $row['label'] ) ? wp_strip_all_tags( (string) $row['label'] ) : '';
+				}
+			}
+			if ( ! empty( $labels_for_map ) ) {
+				$wrapper_attr_args['data-bdfrms-label-map'] = wp_json_encode(
+					$labels_for_map,
+					JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+				);
+			}
+		}
+		if ( '' !== $form_color_style ) {
+			$wrapper_attr_args['style'] = $form_color_style;
+		}
+		$wrapper_attrs = get_block_wrapper_attributes( $wrapper_attr_args, $block );
+
+		$inner_fields = self::build_form_inner_fields_layout( $attributes, $block );
+		$inner_class  = implode( ' ', $inner_fields['classes'] );
+
+		// H1+H3: Honeypot-Feldname pro Instanz + HMAC-Token, der den Honeypot-Namen mitbindet.
+		$hp_field     = BDFRMS_Security::honeypot_field_name( $post_id, $form_id, $instance_id );
+		$bdfrms_token = BDFRMS_Security::create_token( $post_id, $form_id, $instance_id, $hp_field );
+
+		// K3: Inner-Block-Markup vor Ausgabe streng filtern, damit selbst manipulierte
+		// Block-Comments keine Skripte/Attribute einschleusen können.
+		$fields_serialized = '';
+		foreach ( $field_only_blocks as $fb ) {
+			$fields_serialized .= serialize_block( $fb );
+		}
+		$fields_html  = '' !== $fields_serialized ? do_blocks( $fields_serialized ) : '';
+		$safe_content = self::ksesed_inner_blocks_html( $fields_html );
+		if ( '' === trim( $safe_content ) && '' !== trim( (string) $content ) && empty( $inner_blocks_parsed ) ) {
+			$safe_content = self::ksesed_inner_blocks_html( (string) $content );
+		}
+
+		$success_serialized = '';
+		foreach ( $success_only_blocks as $sb ) {
+			$success_serialized .= serialize_block( $sb );
+		}
+		$safe_success = '';
+		if ( '' !== $success_serialized ) {
+			$safe_success = self::ksesed_success_inner_html( do_blocks( $success_serialized ) );
+		}
+
+		$show_notice = ( $status && $status_msg && ! $show_success_panels );
+
+		ob_start();
+		if ( $show_success_panels ) :
+			?>
+		<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<div class="bdfrms-form-success-output" data-bdfrms-success-root="1">
+				<?php echo $safe_success; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_kses (Erfolgs-Whitelist) ?>
+			</div>
+		</div>
+			<?php
+		else :
+			?>
+		<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<?php if ( $show_notice ) : ?>
+				<div class="bdfrms-notice bdfrms-notice-<?php echo esc_attr( $status ); ?>">
+					<?php echo esc_html( $status_msg ); ?>
+				</div>
+			<?php endif; ?>
+			<form class="bdfrms-form" method="post" action="<?php echo esc_url( $action ); ?>" data-bdfrms-key="<?php echo esc_attr( $key ); ?>" data-bdfrms-webkit-datetime-fallback="<?php echo esc_attr( self::is_webkit_datetime_fallback_enabled() ? '1' : '0' ); ?>" lang="<?php echo esc_attr( determine_locale() ); ?>"<?php echo $has_file_field ? ' enctype="multipart/form-data"' : ''; ?>>
+				<input type="hidden" name="bdfrms_token" value="<?php echo esc_attr( $bdfrms_token ); ?>" />
+				<input type="hidden" name="bdfrms_instance_id" value="<?php echo esc_attr( $instance_id ); ?>" />
+				<input type="text" name="<?php echo esc_attr( $hp_field ); ?>" value="" tabindex="-1" autocomplete="off" class="bdfrms-hp-field" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;pointer-events:none;" />
+				<?php wp_nonce_field( 'bdfrms_submit_' . $form_id . '_' . $post_id, 'bdfrms_nonce' ); ?>
+				<input type="hidden" name="action" value="bdfrms_submit" />
+				<input type="hidden" name="bdfrms_post_id" value="<?php echo esc_attr( $post_id ); ?>" />
+				<input type="hidden" name="bdfrms_form_id" value="<?php echo esc_attr( $form_id ); ?>" />
+				<input type="hidden" name="bdfrms_draft_key" value="<?php echo esc_attr( $key ); ?>" />
+				<input type="hidden" name="bdfrms_draft_enabled" value="<?php echo esc_attr( $draft_enabled ? '1' : '0' ); ?>" />
+				<input type="hidden" name="bdfrms_draft_mode" value="<?php echo esc_attr( $restore_mode ); ?>" />
+				<input type="hidden" name="bdfrms_draft_ttl_days" value="<?php echo esc_attr( (string) $draft_ttl_days ); ?>" />
+				<?php if ( $draft_enabled && $show_draft_reset ) : ?>
+					<p class="bdfrms-draft-tools">
+						<button type="button" class="bdfrms-draft-reset-button"><?php esc_html_e( 'Entwurf löschen', 'blitz-donner-forms' ); ?></button>
+					</p>
+				<?php endif; ?>
+				<?php if ( ! empty( $inner_fields['style_css'] ) ) : ?>
+					<style><?php echo $inner_fields['style_css']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS aus wp_get_layout_style() ?></style>
+				<?php endif; ?>
+				<div class="<?php echo esc_attr( $inner_class ); ?>">
+					<?php echo $safe_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- über wp_kses() vorgefiltert ?>
+				</div>
+				<?php
+				// CAPTCHA-Widget als letztes Element vor dem Absenden (B1).
+				// Nur Site-Key im Markup; das Skript laedt lazy ueber bdfrms-captcha.
+				if ( $captcha_active ) {
+					echo BDFRMS_Captcha::render_widget( $instance_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_widget escaped intern
+				}
+				?>
+			</form>
+		</div>
+			<?php
+		endif;
+		return ob_get_clean();
+	}
+
+	/**
+	 * Strenge KSES-Whitelist für das von Field-Block-`save()` produzierte HTML.
+	 *
+	 * Verteidigung gegen Stored XSS, falls jemand mit unfiltered_html-Capability
+	 * (oder bei kuenftigen WP-Kses-Bypass-Bugs) Block-Markup direkt manipuliert.
+	 *
+	 * @param string $html Roh-HTML aus do_blocks() der InnerBlocks.
+	 * @return string Gefiltertes HTML.
+	 */
+	private static function ksesed_inner_blocks_html( $html ) {
+		$attr_global     = array(
+			'class'    => true,
+			'id'       => true,
+			'style'    => true,
+			'data-*'   => true,
+			'tabindex' => true,
+			'aria-*'   => true,
+			'role'     => true,
+			'hidden'   => true,
+			'title'    => true,
+			'lang'     => true,
+			'dir'      => true,
+		);
+		$attr_form_input = array_merge(
+			$attr_global,
+			array(
+				'name'         => true,
+				'value'        => true,
+				'placeholder'  => true,
+				'required'     => true,
+				'readonly'     => true,
+				'disabled'     => true,
+				'autocomplete' => true,
+				'autofocus'    => true,
+				'min'          => true,
+				'max'          => true,
+				'step'         => true,
+				'minlength'    => true,
+				'maxlength'    => true,
+				'pattern'      => true,
+				'inputmode'    => true,
+				'multiple'     => true,
+				'accept'       => true,
+				'size'         => true,
+				'type'         => true,
+				'checked'      => true,
+				'list'         => true,
+			)
+		);
+
+		$allowed = array(
+			'div'        => $attr_global,
+			'span'       => $attr_global,
+			'p'          => $attr_global,
+			'label'      => array_merge( $attr_global, array( 'for' => true ) ),
+			'fieldset'   => array_merge( $attr_global, array( 'form' => true ) ),
+			'legend'     => $attr_global,
+			'small'      => $attr_global,
+			'em'         => $attr_global,
+			'strong'     => $attr_global,
+			'br'         => $attr_global,
+			'ul'         => $attr_global,
+			'ol'         => $attr_global,
+			'li'         => $attr_global,
+			'output'     => array_merge(
+				$attr_global,
+				array(
+					'for'  => true,
+					'name' => true,
+				)
+			),
+			'input'      => $attr_form_input,
+			'textarea'   => array_merge(
+				$attr_form_input,
+				array(
+					'rows' => true,
+					'cols' => true,
+					'wrap' => true,
+				)
+			),
+			'select'     => $attr_form_input,
+			'option'     => array_merge(
+				$attr_global,
+				array(
+					'value'    => true,
+					'selected' => true,
+					'disabled' => true,
+					'label'    => true,
+				)
+			),
+			'optgroup'   => array_merge(
+				$attr_global,
+				array(
+					'label'    => true,
+					'disabled' => true,
+				)
+			),
+			'datalist'   => $attr_global,
+			'button'     => array_merge(
+				$attr_global,
+				array(
+					'type'     => true,
+					'name'     => true,
+					'value'    => true,
+					'disabled' => true,
+					'form'     => true,
+				)
+			),
+			'a'          => array_merge(
+				$attr_global,
+				array(
+					'href'   => true,
+					'target' => true,
+					'rel'    => true,
+				)
+			),
+
+			// Bild / Medien (Core-Blöcke: image, gallery, video, audio, cover).
+			'img'        => array_merge(
+				$attr_global,
+				array(
+					'src'      => true,
+					'alt'      => true,
+					'width'    => true,
+					'height'   => true,
+					'loading'  => true,
+					'decoding' => true,
+					'srcset'   => true,
+					'sizes'    => true,
+				)
+			),
+			'figure'     => $attr_global,
+			'figcaption' => $attr_global,
+			'picture'    => $attr_global,
+			'source'     => array(
+				'srcset' => true,
+				'sizes'  => true,
+				'media'  => true,
+				'type'   => true,
+			),
+			'video'      => array_merge(
+				$attr_global,
+				array(
+					'src'         => true,
+					'poster'      => true,
+					'controls'    => true,
+					'autoplay'    => true,
+					'loop'        => true,
+					'muted'       => true,
+					'preload'     => true,
+					'width'       => true,
+					'height'      => true,
+					'playsinline' => true,
+				)
+			),
+			'audio'      => array_merge(
+				$attr_global,
+				array(
+					'src'      => true,
+					'controls' => true,
+					'autoplay' => true,
+					'loop'     => true,
+					'muted'    => true,
+					'preload'  => true,
+				)
+			),
+
+			// Typografie (Core-Blöcke: heading, paragraph, list, quote, code, preformatted, details).
+			'h1'         => $attr_global,
+			'h2'         => $attr_global,
+			'h3'         => $attr_global,
+			'h4'         => $attr_global,
+			'h5'         => $attr_global,
+			'h6'         => $attr_global,
+			'blockquote' => array_merge( $attr_global, array( 'cite' => true ) ),
+			'cite'       => $attr_global,
+			'pre'        => $attr_global,
+			'code'       => $attr_global,
+			'mark'       => $attr_global,
+			'sub'        => $attr_global,
+			'sup'        => $attr_global,
+			'abbr'       => $attr_global,
+			'details'    => array_merge( $attr_global, array( 'open' => true ) ),
+			'summary'    => $attr_global,
+
+			// Tabellen (Core-Block: table).
+			'table'      => $attr_global,
+			'thead'      => $attr_global,
+			'tbody'      => $attr_global,
+			'tfoot'      => $attr_global,
+			'tr'         => $attr_global,
+			'th'         => array_merge(
+				$attr_global,
+				array(
+					'scope'   => true,
+					'colspan' => true,
+					'rowspan' => true,
+				)
+			),
+			'td'         => array_merge(
+				$attr_global,
+				array(
+					'colspan' => true,
+					'rowspan' => true,
+				)
+			),
+			'caption'    => $attr_global,
+
+			// Trennlinie (Core-Block: separator).
+			'hr'         => $attr_global,
+
+			// Inline-Elemente.
+			'del'        => $attr_global,
+			'ins'        => $attr_global,
+			'kbd'        => $attr_global,
+			'var'        => $attr_global,
+			'samp'       => $attr_global,
+			'time'       => array_merge( $attr_global, array( 'datetime' => true ) ),
+		);
+
+		/**
+		 * Erlaubte Tags/Attribute für Field-Block-Inner-HTML. Erweiterungen mit
+		 * Bedacht (nichts mit JS-/Style-führenden Attributen wie on*, srcdoc, etc.).
+		 *
+		 * @param array<string,array<string,bool>> $allowed
+		 */
+		$allowed = apply_filters( 'bdfrms_inner_blocks_allowed_html', $allowed );
+
+		$kses = wp_kses( $html, $allowed, array( 'http', 'https', 'mailto', 'tel' ) );
+
+		// Sicherheitsnetz: alle "on*"-Eventhandler entfernen, falls sie irgendwo durchrutschen sollten.
+		$kses = preg_replace( '/\s+on[a-z]+\s*=\s*"[^"]*"/i', '', (string) $kses );
+		$kses = preg_replace( '/\s+on[a-z]+\s*=\s*\'[^\']*\'/i', '', (string) $kses );
+
+		return (string) $kses;
+	}
+
+	/**
+	 * Erfolgsbereich: KSES wie typischer Beitragsinhalt (ohne Skripte), plus Sicherheitsnetz gegen on*-Handler.
+	 *
+	 * @param string $html HTML aus do_blocks() der Erfolgs-InnerBlocks.
+	 * @return string
+	 */
+	private static function ksesed_success_inner_html( $html ) {
+		$allowed = wp_kses_allowed_html( 'post' );
+		unset( $allowed['script'], $allowed['style'] );
+		/**
+		 * Erlaubte Tags für den Erfolgsbereich (Core-Blöcke o. ä.).
+		 *
+		 * @param array<string,array<string,bool>> $allowed
+		 */
+		$allowed = apply_filters( 'bdfrms_success_inner_blocks_allowed_html', $allowed );
+		$kses    = wp_kses( (string) $html, $allowed, array( 'http', 'https', 'mailto', 'tel' ) );
+		$kses    = preg_replace( '/\s+on[a-z]+\s*=\s*"[^"]*"/i', '', (string) $kses );
+		$kses    = preg_replace( '/\s+on[a-z]+\s*=\s*\'[^\']*\'/i', '', (string) $kses );
+		return (string) $kses;
+	}
+
+	/**
+	 * Innere Blöcke des Formulars in Felder vs. Erfolgsbereiche splitten.
+	 *
+	 * @param array<int,array<string,mixed>> $inner_blocks Geparste innerBlocks des bdfrms/form-Blocks.
+	 * @return array{fields:array<int,array<string,mixed>>,success:array<int,array<string,mixed>>}
+	 */
+	private static function split_form_inner_blocks( $inner_blocks ) {
+		$fields  = array();
+		$success = array();
+		foreach ( $inner_blocks as $b ) {
+			if ( ! is_array( $b ) ) {
+				continue;
+			}
+			if ( 'bdfrms/form-success' === ( $b['blockName'] ?? '' ) ) {
+				$success[] = $b;
+			} else {
+				$fields[] = $b;
+			}
+		}
+		return array(
+			'fields'  => $fields,
+			'success' => $success,
+		);
+	}
+
+	/**
+	 * Frontend: ein Erfolgs-Panel (InnerBlocks als HTML, KSES in render_form_success_block).
+	 *
+	 * @param array<string,mixed> $attributes Block-Attribute.
+	 * @param string              $content    Gerenderte InnerBlocks.
+	 * @param WP_Block            $block      Block-Instanz.
+	 * @return string
+	 */
+	public static function render_form_success_block( $attributes, $content, $block ) {
+		unset( $attributes, $block );
+		$html = is_string( $content ) ? $content : '';
+		$safe = self::ksesed_success_inner_html( $html );
+		return '<section class="bdfrms-form-success-panel" data-bdfrms-success-panel="1">' . $safe . '</section>';
+	}
+
+	/**
+	 * Payload einer Einsendung: zuerst form_id der Zeile, dann nur Felder dieses Formularschemas.
+	 *
+	 * Verhindert Vermischung, wenn auf einer Seite mehrere Formulare dieselben Feldnamen hatten
+	 * oder historische Daten ohne eindeutige Zuordnung vorliegen.
+	 *
+	 * @param object|array<string,mixed> $row DB-Zeile (mind. form_id, post_id, payload).
+	 * @return array<string,mixed> Feldwerte ohne _bdfrms_labels.
+	 */
+	public static function get_submission_payload_for_row( $row ) {
+		$form_id = '';
+		$post_id = 0;
+		$raw     = '';
+
+		if ( is_object( $row ) ) {
+			$form_id = isset( $row->form_id ) ? sanitize_key( (string) $row->form_id ) : '';
+			$post_id = isset( $row->post_id ) ? absint( $row->post_id ) : 0;
+			$raw     = isset( $row->payload ) ? (string) $row->payload : '';
+		} elseif ( is_array( $row ) ) {
+			$form_id = isset( $row['form_id'] ) ? sanitize_key( (string) $row['form_id'] ) : '';
+			$post_id = isset( $row['post_id'] ) ? absint( $row['post_id'] ) : 0;
+			$raw     = isset( $row['payload'] ) ? (string) $row['payload'] : '';
+		}
+
+		if ( '' === $form_id ) {
+			return array();
+		}
+
+		$payload = json_decode( $raw, true );
+		if ( ! is_array( $payload ) ) {
+			return array();
+		}
+
+		$schema_keys = array();
+		if ( $post_id > 0 ) {
+			foreach ( self::get_form_schema_from_post( $post_id, $form_id ) as $field ) {
+				$n = isset( $field['name'] ) ? sanitize_key( (string) $field['name'] ) : '';
+				if ( '' !== $n ) {
+					$schema_keys[ $n ] = true;
+				}
+			}
+		}
+
+		$out = array();
+		foreach ( $payload as $key => $value ) {
+			if ( '_bdfrms_labels' === $key ) {
+				continue;
+			}
+			$k = sanitize_key( (string) $key );
+			if ( '' === $k ) {
+				continue;
+			}
+			if ( ! empty( $schema_keys ) && ! isset( $schema_keys[ $k ] ) ) {
+				continue;
+			}
+			$out[ $k ] = $value;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Build field schema for server validation.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $form_id Form ID.
+	 * @return array<int,array<string,mixed>>
+	 */
+	public static function get_form_schema_from_post( $post_id, $form_id ) {
+		$form_block = self::locate_form_block_for_post( $post_id, $form_id );
+		if ( null === $form_block ) {
+			return array();
+		}
+
+		return self::extract_fields_from_inner_blocks( $form_block['innerBlocks'] ?? array() );
+	}
+
+	/**
+	 * Attribute des bdfrms/form-Blocks (z. B. Folgeseite nach Absenden).
+	 *
+	 * @param int    $post_id Post-ID.
+	 * @param string $form_id Formular-ID.
+	 * @return array<string,mixed>
+	 */
+	public static function get_form_block_attributes_from_post( $post_id, $form_id ) {
+		$form_block = self::locate_form_block_for_post( $post_id, $form_id );
+		if ( null === $form_block ) {
+			return array();
+		}
+		return isset( $form_block['attrs'] ) && is_array( $form_block['attrs'] ) ? $form_block['attrs'] : array();
+	}
+
+	/**
+	 * Findet den bdfrms/form-Block in Beitragsinhalt, synchronisierten Blöcken, Template-Parts und FSE-Templates.
+	 *
+	 * @param int    $post_id Post-ID (wie beim Rendern / bdfrms_post_id).
+	 * @param string $form_id Formular-ID (sanitize_key).
+	 * @return array<string,mixed>|null Geparster Block oder null.
+	 */
+	public static function locate_form_block_for_post( $post_id, $form_id ) {
+		$post_id = absint( $post_id );
+		$form_id = sanitize_key( (string) $form_id );
+		if ( ! $post_id || '' === $form_id ) {
+			return null;
+		}
+
+		$visited = array();
+		$sources = array();
+
+		$content = get_post_field( 'post_content', $post_id );
+		if ( is_string( $content ) && '' !== $content ) {
+			$sources[] = $content;
+		}
+
+		foreach ( self::bdfrms_fse_template_markup_candidates_for_post( $post_id ) as $markup ) {
+			if ( is_string( $markup ) && '' !== $markup ) {
+				$sources[] = $markup;
+			}
+		}
+
+		/**
+		 * Zusätzliche Roh-Markup-Quellen (z. B. Custom-Layouts), filterbar.
+		 *
+		 * @param array<int,string> $sources   Kandidaten (Block-Markup).
+		 * @param int               $post_id   Post-ID.
+		 * @param string            $form_id   Formular-ID.
+		 */
+		$sources = apply_filters( 'bdfrms_form_schema_markup_sources', $sources, $post_id, $form_id );
+
+		foreach ( $sources as $source ) {
+			$blocks     = parse_blocks( $source );
+			$form_block = self::find_form_block_recursive( $blocks, $form_id, $visited );
+			if ( null !== $form_block ) {
+				return $form_block;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Block-Templates (FSE), in denen ein Formular typischerweise liegt, wenn nicht im Beitragsinhalt.
+	 *
+	 * @param int $post_id Post-ID.
+	 * @return array<int,string> HTML/Block-Markup (Reihenfolge: spezifischer zuerst).
+	 */
+	private static function bdfrms_fse_template_markup_candidates_for_post( $post_id ) {
+		$out = array();
+		if ( ! $post_id || ! function_exists( 'get_block_template' ) || ! current_theme_supports( 'block-templates' ) ) {
+			return $out;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return $out;
+		}
+
+		$ptype = $post->post_type;
+		$slug  = isset( $post->post_name ) ? (string) $post->post_name : '';
+		$slug  = sanitize_title( $slug );
+
+		$hierarchy = array();
+		if ( 'page' === $ptype ) {
+			if ( $slug ) {
+				$hierarchy[] = 'page-' . $slug;
+			}
+			$hierarchy[] = 'page';
+		} elseif ( 'post' === $ptype ) {
+			if ( $slug ) {
+				$hierarchy[] = 'single-' . $slug;
+			}
+			$hierarchy[] = 'single';
+		} else {
+			if ( $slug ) {
+				$hierarchy[] = 'single-' . $ptype . '-' . $slug;
+			}
+			$hierarchy[] = 'single-' . $ptype;
+		}
+		$hierarchy[] = 'singular';
+		$hierarchy[] = 'index';
+
+		$theme_slugs = array_unique(
+			array_filter(
+				array(
+					get_stylesheet(),
+					get_template() !== get_stylesheet() ? get_template() : '',
+				)
+			)
+		);
+
+		foreach ( $hierarchy as $tpl_slug ) {
+			foreach ( $theme_slugs as $theme_slug ) {
+				$tpl = get_block_template( $theme_slug . '//' . $tpl_slug, 'wp_template' );
+				if ( $tpl && ! empty( $tpl->content ) ) {
+					$out[] = $tpl->content;
+					break;
+				}
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Sucht ein bdfrms/form mit passender formId (verschachtelt, Synopsis, Template-Part).
+	 *
+	 * @param array<int,array<string,mixed>> $blocks  Geparste Blöcke.
+	 * @param string                         $form_id Formular-ID.
+	 * @param array<string,bool>             $visited Schutz vor Zyklen (Refs/Template-Parts).
+	 * @return array<string,mixed>|null Block-Array oder null.
+	 */
+	private static function find_form_block_recursive( $blocks, $form_id, array &$visited ) {
+		foreach ( $blocks as $block ) {
+			if ( 'bdfrms/form' === ( $block['blockName'] ?? '' ) ) {
+				$attrs = isset( $block['attrs'] ) ? $block['attrs'] : array();
+				$id    = isset( $attrs['formId'] ) ? sanitize_key( (string) $attrs['formId'] ) : '';
+				if ( $id === $form_id ) {
+					return $block;
+				}
+			}
+
+			// Synchronisierter Muster-/Bibliotheks-Block: Inhalt liegt im wp_block-Beitrag (ref).
+			if ( 'core/block' === ( $block['blockName'] ?? '' ) ) {
+				$ref = isset( $block['attrs']['ref'] ) ? absint( $block['attrs']['ref'] ) : 0;
+				if ( $ref && empty( $visited[ 'core_block:' . $ref ] ) ) {
+					$visited[ 'core_block:' . $ref ] = true;
+					$ref_post                        = get_post( $ref );
+					if ( $ref_post && 'wp_block' === $ref_post->post_type && 'publish' === $ref_post->post_status ) {
+						$inner = parse_blocks( (string) $ref_post->post_content );
+						$found = self::find_form_block_recursive( $inner, $form_id, $visited );
+						if ( null !== $found ) {
+							return $found;
+						}
+					}
+				}
+			}
+
+			// Template-Part (FSE): Inhalt aus Theme/DB auflösen.
+			if ( 'core/template-part' === ( $block['blockName'] ?? '' ) ) {
+				$slug  = isset( $block['attrs']['slug'] ) ? sanitize_text_field( (string) $block['attrs']['slug'] ) : '';
+				$theme = isset( $block['attrs']['theme'] ) ? sanitize_text_field( (string) $block['attrs']['theme'] ) : '';
+				if ( $slug && function_exists( 'get_block_template' ) ) {
+					if ( '' === $theme ) {
+						$theme = get_stylesheet();
+					}
+					$tp_key = 'template_part:' . $theme . ':' . $slug;
+					if ( empty( $visited[ $tp_key ] ) ) {
+						$visited[ $tp_key ] = true;
+						$tp                 = get_block_template( $theme . '//' . $slug, 'wp_template_part' );
+						if ( ! $tp && get_template() !== get_stylesheet() ) {
+							$tp = get_block_template( get_template() . '//' . $slug, 'wp_template_part' );
+						}
+						if ( $tp && ! empty( $tp->content ) ) {
+							$inner = parse_blocks( $tp->content );
+							$found = self::find_form_block_recursive( $inner, $form_id, $visited );
+							if ( null !== $found ) {
+								return $found;
+							}
+						}
+					}
+				}
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$found = self::find_form_block_recursive( $block['innerBlocks'], $form_id, $visited );
+				if ( null !== $found ) {
+					return $found;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Recursively gather form fields from inner blocks.
+	 *
+	 * @param array $inner_blocks Nested blocks.
+	 * @return array<int,array<string,mixed>>
+	 */
+	private static function extract_fields_from_inner_blocks( $inner_blocks ) {
+		$fields = array();
+		foreach ( $inner_blocks as $block ) {
+			$name = $block['blockName'] ?? '';
+			if ( 'bdfrms/form-success' === $name ) {
+				continue;
+			}
+			$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+
+			$row = self::block_to_field_row( $name, $attrs );
+			if ( null !== $row ) {
+				$fields[] = $row;
+			}
+
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$fields = array_merge( $fields, self::extract_fields_from_inner_blocks( $block['innerBlocks'] ) );
+			}
+		}
+		return $fields;
+	}
+
+	/**
+	 * Map block type to schema row.
+	 *
+	 * @param string              $block_name Block name.
+	 * @param array<string,mixed> $attrs Attributes.
+	 * @return array<string,mixed>|null
+	 */
+	private static function block_to_field_row( $block_name, $attrs ) {
+		$map = array(
+			'bdfrms/field-text'     => 'text',
+			'bdfrms/field-email'    => 'email',
+			'bdfrms/field-textarea' => 'textarea',
+			'bdfrms/field-select'   => 'select',
+			'bdfrms/field-checkbox' => 'checkbox',
+			'bdfrms/field-number'   => 'number',
+			'bdfrms/field-tel'      => 'tel',
+			'bdfrms/field-url'      => 'url',
+			'bdfrms/field-date'     => 'date',
+			'bdfrms/field-time'     => 'time',
+			'bdfrms/field-datetime' => 'datetime',
+			'bdfrms/field-radio'    => 'radio',
+			'bdfrms/field-hidden'   => 'hidden',
+			'bdfrms/field-range'    => 'range',
+			'bdfrms/field-file'     => 'file',
+		);
+		if ( ! isset( $map[ $block_name ] ) ) {
+			return null;
+		}
+		$type = $map[ $block_name ];
+		$key  = isset( $attrs['name'] ) ? sanitize_key( (string) $attrs['name'] ) : '';
+		if ( ! $key ) {
+			return null;
+		}
+
+		$label = isset( $attrs['label'] ) ? sanitize_text_field( (string) $attrs['label'] ) : $key;
+		if ( 'hidden' === $type && '' === $label ) {
+			$label = $key;
+		}
+
+		$row = array(
+			'name'      => $key,
+			'label'     => $label,
+			'type'      => $type,
+			'required'  => ! empty( $attrs['required'] ) && 'hidden' !== $type,
+			// Sensitive: Vertraulich-Flag; die Verschlüsselung liefert das Security-Add-on.
+			'sensitive' => ! empty( $attrs['sensitive'] ),
+		);
+		// Files liegen immer geschützt im Storage; das `sensitive`-Flag ist hier ohne Effekt.
+		if ( 'file' === $type ) {
+			$row['sensitive'] = false;
+		}
+
+		if ( in_array( $type, array( 'select', 'radio' ), true ) && isset( $attrs['options'] ) ) {
+			$row['options'] = self::parse_option_lines( (string) $attrs['options'] );
+		}
+
+		if ( in_array( $type, array( 'number', 'range' ), true ) ) {
+			foreach ( array( 'min', 'max', 'step' ) as $k ) {
+				if ( isset( $attrs[ $k ] ) && '' !== (string) $attrs[ $k ] ) {
+					$row[ $k ] = sanitize_text_field( (string) $attrs[ $k ] );
+				}
+			}
+		}
+
+		if ( 'date' === $type ) {
+			foreach ( array( 'min', 'max' ) as $k ) {
+				if ( isset( $attrs[ $k ] ) && '' !== (string) $attrs[ $k ] ) {
+					$row[ $k ] = sanitize_text_field( (string) $attrs[ $k ] );
+				}
+			}
+		}
+
+		if ( 'hidden' === $type && isset( $attrs['hiddenValue'] ) ) {
+			$row['hidden_value'] = sanitize_text_field( (string) $attrs['hiddenValue'] );
+		}
+
+		// M5: lockedValue erzwingt den Server-Wert. Client-POST wird ignoriert.
+		if ( 'hidden' === $type && ! empty( $attrs['lockedValue'] ) ) {
+			$row['locked'] = true;
+		}
+
+		if ( 'file' === $type ) {
+			$row['accept']      = isset( $attrs['accept'] ) ? sanitize_text_field( (string) $attrs['accept'] ) : '';
+			$row['max_size_mb'] = isset( $attrs['maxSizeMb'] ) ? max( 1, absint( $attrs['maxSizeMb'] ) ) : 8;
+		}
+
+		return $row;
+	}
+
+	/**
+	 * Parse option lines.
+	 *
+	 * @param string $raw Multiline options.
+	 * @return array<int,string>
+	 */
+	private static function parse_option_lines( $raw ) {
+		$out   = array();
+		$lines = explode( "\n", $raw );
+		foreach ( $lines as $line ) {
+			$line = trim( $line );
+			if ( '' !== $line ) {
+				$out[] = sanitize_text_field( $line );
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Parsed blocks contain block.
+	 *
+	 * @param array<int,array<string,mixed>> $blocks Parsed blocks.
+	 * @param string                         $needle Block name.
+	 */
+	private static function parsed_blocks_contain_block( $blocks, $needle ) {
+		foreach ( $blocks as $b ) {
+			if ( ( $b['blockName'] ?? '' ) === $needle ) {
+				return true;
+			}
+			if ( ! empty( $b['innerBlocks'] ) && self::parsed_blocks_contain_block( $b['innerBlocks'], $needle ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+}

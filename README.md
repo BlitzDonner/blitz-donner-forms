@@ -4,7 +4,7 @@ Block-native Formulare für den WordPress-Editor. Gratis-Basis für WordPress.or
 
 ## Status
 
-Etappe 1 – Gerüst. Aktivierbares Plugin-Skelett mit Datenbank-Schema, Capability-Modell, Friendly-Captcha-Integration, Einstellungs-Karten, Einsendungen-Backend und der vollständigen, dokumentierten Hook-Oberfläche für Add-ons. Die Formular- und Feld-Blöcke folgen in Etappe 2 (Übernahme aus dem Bestand «Blitz & Donner Formular»).
+Etappe 2 – Basis-Extraktion abgeschlossen. Formular- und Feld-Blöcke, Submit-Pfad mit Abwehrkette, Benachrichtigung, Erscheinungsbild-System, Entwurfs-Speicherung und Einsendungen-Backend sind aus dem Bestand «Blitz & Donner Formular» übernommen und auf bdfrms umbenannt. Verschlüsselung, Audit-Log und ClamAV sind durch Hooks ersetzt – sie kommen als Security-Add-on (Etappe 3).
 
 ## Kennungen
 

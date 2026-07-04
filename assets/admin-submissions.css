@@ -1,0 +1,685 @@
+/**
+ * Formular-Einträge (wp-admin) – Typo/Layout; Farben als feste WP-Admin-Werte.
+ * Selektoren mit #wpbody-content .wrap… damit sie gegen Core-Admin-Styles gewinnen.
+ */
+
+#wpbody-content .wrap.bdfrms-admin.bdfrms-admin-list {
+	max-width: 1200px;
+}
+
+#wpbody-content .wrap.bdfrms-admin {
+	--bdfrms-font: inherit;
+	--bdfrms-text: #1d2327;
+	--bdfrms-label: #50575e;
+	--bdfrms-muted: #646970;
+	--bdfrms-border: #c3c4c7;
+	--bdfrms-border-focus: #2271b1;
+	--bdfrms-bg: #fff;
+	--bdfrms-bg-subtle: #f6f7f7;
+	--bdfrms-radius: 10px;
+	--bdfrms-radius-sm: 8px;
+	--bdfrms-stack: 1.25rem;
+	--bdfrms-shadow: 0 1px 1px rgba(0,0,0,0.04);
+	box-sizing: border-box;
+	font-family: var(--bdfrms-font) !important;
+	color: var(--bdfrms-text) !important;
+	max-width: 960px;
+}
+
+#wpbody-content .wrap.bdfrms-admin *,
+#wpbody-content .wrap.bdfrms-admin *::before,
+#wpbody-content .wrap.bdfrms-admin *::after {
+	box-sizing: border-box;
+}
+
+#wpbody-content .wrap.bdfrms-admin h1 {
+	font-family: var(--bdfrms-font) !important;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	margin-bottom: 0.35em;
+	color: var(--bdfrms-text) !important;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-lead {
+	font-size: 14px;
+	color: var(--bdfrms-muted);
+	margin: 0 0 var(--bdfrms-stack);
+	line-height: 1.5;
+	max-width: 42rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-back {
+	margin: 0 0 1.25rem;
+	font-size: 14px;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-back a {
+	color: var(--bdfrms-border-focus);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-back a:hover {
+	text-decoration: underline;
+}
+
+/* Metadaten-Karte */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-card {
+	background: var(--bdfrms-bg);
+	border: 1px solid var(--bdfrms-border);
+	border-radius: var(--bdfrms-radius);
+	box-shadow: var(--bdfrms-shadow);
+	padding: 1.25rem 1.35rem 1.1rem;
+	margin-bottom: var(--bdfrms-stack);
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-heading {
+	font-size: 0.8125rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--bdfrms-muted);
+	margin: 0 0 1rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-grid {
+	display: grid;
+	grid-template-columns: minmax(8rem, 11rem) 1fr;
+	gap: 0.65rem 1.25rem;
+	margin: 0;
+	align-items: start;
+}
+
+@media (max-width: 600px) {
+	#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-grid dt {
+	margin: 0;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--bdfrms-label);
+	padding-top: 0.15rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-grid dd {
+	margin: 0;
+	font-size: 0.9375rem;
+	line-height: 1.45;
+	word-break: break-word;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-meta-grid code {
+	font-size: 0.8125rem;
+	background: var(--bdfrms-bg-subtle);
+	padding: 0.15rem 0.45rem;
+	border-radius: 6px;
+	border: 1px solid var(--bdfrms-border);
+}
+
+/* Feldliste (Detail) */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-fields-heading {
+	font-size: 1.125rem;
+	font-weight: 600;
+	margin: 1.75rem 0 0.85rem;
+	letter-spacing: -0.015em;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-field-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--bdfrms-stack);
+	margin-bottom: 1.5rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-field {
+	background: var(--bdfrms-bg);
+	border: 1px solid var(--bdfrms-border);
+	border-radius: var(--bdfrms-radius);
+	box-shadow: var(--bdfrms-shadow);
+	padding: 1rem 1.15rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-field-label {
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--bdfrms-label);
+	margin: 0 0 0.45rem;
+	line-height: 1.3;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-field-value {
+	font-size: 1.0625rem;
+	line-height: 1.45;
+	color: var(--bdfrms-text);
+	min-height: 1.25rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-field-value a {
+	color: var(--bdfrms-border-focus);
+	text-decoration: none;
+	font-weight: 500;
+	word-break: break-all;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-field-value a:hover {
+	text-decoration: underline;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-pre {
+	margin: 0;
+	padding: 0.75rem 0.85rem;
+	background: var(--bdfrms-bg-subtle);
+	border: 1px solid var(--bdfrms-border);
+	border-radius: var(--bdfrms-radius-sm);
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	overflow-x: auto;
+	max-width: 100%;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-empty {
+	color: var(--bdfrms-muted);
+	font-size: 0.9375rem;
+	margin: 0;
+	padding: 0.5rem 0;
+}
+
+/* Aktionen */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-actions {
+	margin-top: 1.75rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--bdfrms-border);
+}
+
+#wpbody-content .wrap.bdfrms-admin .button.bdfrms-admin-btn-delete {
+	background: #fff;
+	border-color: #c3c4c7;
+	color: #1d2327;
+}
+
+#wpbody-content .wrap.bdfrms-admin .button.bdfrms-admin-btn-delete:hover {
+	background: #f6f7f7;
+	border-color: #2271b1;
+	color: #1d2327;
+}
+
+/* Liste */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-table-wrap {
+	margin-top: 0.5rem;
+	background: var(--bdfrms-bg);
+	border: 1px solid var(--bdfrms-border);
+	border-radius: var(--bdfrms-radius);
+	box-shadow: var(--bdfrms-shadow);
+	overflow: hidden;
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table {
+	border: none;
+	box-shadow: none;
+	margin: 0;
+	border-radius: 0;
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table thead th {
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--bdfrms-muted);
+	background: var(--bdfrms-bg-subtle);
+	border-bottom: 1px solid var(--bdfrms-border);
+	padding: 0.65rem 1rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table tbody td {
+	padding: 0.85rem 1rem;
+	font-size: 0.9375rem;
+	vertical-align: top;
+	border-top: 1px solid rgba(29,35,39,0.10);
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table tbody tr:hover td {
+	background: rgba(29,35,39,0.04);
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table code {
+	font-size: 0.8125rem;
+	background: var(--bdfrms-bg-subtle);
+	padding: 0.12rem 0.4rem;
+	border-radius: 6px;
+	border: 1px solid var(--bdfrms-border);
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table a {
+	color: var(--bdfrms-border-focus);
+	font-weight: 500;
+	text-decoration: none;
+}
+
+#wpbody-content .wrap.bdfrms-admin table.bdfrms-admin-table a:hover {
+	color: #135e96;
+	text-decoration: underline;
+}
+
+#wpbody-content .wrap.bdfrms-admin .tablenav {
+	margin: 1rem 0 0;
+	border: none;
+	padding: 0;
+}
+
+#wpbody-content .wrap.bdfrms-admin .tablenav-pages {
+	float: none;
+	text-align: left;
+}
+
+#wpbody-content .wrap.bdfrms-admin .tablenav-pages .pagination-links {
+	display: inline-flex;
+	gap: 0.25rem;
+	align-items: center;
+}
+
+#wpbody-content .wrap.bdfrms-admin .tablenav-pages a,
+#wpbody-content .wrap.bdfrms-admin .tablenav-pages span {
+	padding: 0.35rem 0.65rem;
+	border-radius: 6px;
+	border: 1px solid var(--bdfrms-border);
+	background: var(--bdfrms-bg);
+}
+
+#wpbody-content .wrap.bdfrms-admin .tablenav-pages span.current {
+	background: var(--bdfrms-bg-subtle);
+	font-weight: 600;
+}
+
+#wpbody-content .wrap.bdfrms-admin .notice {
+	border-radius: var(--bdfrms-radius-sm);
+	max-width: 42rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.65rem 1rem;
+	margin: 0 0 var(--bdfrms-stack);
+	max-width: 52rem;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-filters .bdfrms-admin-filter-label select {
+	min-width: 12rem;
+	max-width: 100%;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-cell-form .bdfrms-admin-form-id {
+	color: var(--bdfrms-muted);
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-cell-sender .bdfrms-admin-sender-email {
+	font-weight: 500;
+	word-break: break-word;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-cell-sender .bdfrms-admin-sender-name {
+	margin-top: 0.2rem;
+	font-size: 0.875rem;
+	color: var(--bdfrms-muted);
+	word-break: break-word;
+}
+
+/* Export – kompakte horizontale Leiste mit einer Checkbox und zwei Buttons */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export {
+	margin: 0 0 var(--bdfrms-stack);
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-form {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.6rem 0;
+	border-top: 1px solid var(--bdfrms-border);
+	border-bottom: 1px solid var(--bdfrms-border);
+	background: transparent;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-info-group {
+	font-size: 0.9rem;
+	color: var(--bdfrms-text);
+	line-height: 1.3;
+	flex-shrink: 1;
+	min-width: 0;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-info-group strong {
+	font-weight: 600;
+	color: var(--bdfrms-text);
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-shrink: 0;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-decrypt-label {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: 0.875rem;
+	color: var(--bdfrms-text);
+	cursor: pointer;
+	white-space: nowrap;
+	margin: 0;
+}
+
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-log-hint {
+	font-size: 0.8125rem;
+	color: var(--bdfrms-muted);
+}
+
+/* Button-Gruppe: CSV- und ZIP-Button nebeneinander */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-btn-group {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+/* Hinweis «Alle Formulare» – eine schmale Zeile */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-notice {
+	font-size: 0.875rem;
+	color: var(--bdfrms-muted);
+	margin: 0;
+	line-height: 1.4;
+	padding: 0.55rem 0;
+	border-top: 1px solid var(--bdfrms-border);
+	border-bottom: 1px solid var(--bdfrms-border);
+	background: transparent;
+}
+
+/* Hinweis «ZipArchive fehlt» – inline neben dem CSV-Button */
+#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-zip-unavailable {
+	font-size: 0.8125rem;
+	color: var(--bdfrms-muted);
+	margin: 0;
+	padding: 0;
+}
+
+@media (max-width: 782px) {
+	#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-form {
+		flex-wrap: wrap;
+	}
+	#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-controls {
+		flex-wrap: wrap;
+	}
+	#wpbody-content .wrap.bdfrms-admin .bdfrms-admin-export-btn-group {
+		flex-wrap: wrap;
+	}
+}
+
+/* ------------------------------------------------------------------ *
+ * Sicherheit & Einstellungen – Karten-Layout
+ * Nutzt dieselben Variablen wie die Einträge-Seite (.wrap.bdfrms-admin).
+ * ------------------------------------------------------------------ */
+
+/* Sektions-Karten: gleiche Optik wie .bdfrms-admin-meta-card */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card {
+	background: var(--bdfrms-bg);
+	border: 1px solid var(--bdfrms-border);
+	border-radius: var(--bdfrms-radius);
+	box-shadow: var(--bdfrms-shadow);
+	padding: 1.25rem 1.35rem 1.1rem;
+	margin-bottom: var(--bdfrms-stack);
+	overflow-x: auto;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card > h2 {
+	margin: 0 0 0.6em;
+	padding: 0;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--bdfrms-text);
+}
+
+/* Fliesstext: lesbare Zeilenlänge statt voller Fensterbreite */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card p,
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .description,
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card li {
+	max-width: 46rem;
+	line-height: 1.55;
+}
+
+/* Eingabefelder: begrenzte Breite statt Vollbreite */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="text"],
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="password"],
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="email"],
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="url"] {
+	width: 100%;
+	max-width: 26rem;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="number"] {
+	max-width: 7rem;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card textarea {
+	width: 100%;
+	max-width: 46rem;
+}
+
+/* Formulare in der Karte: klarer Abstand statt Aneinanderkleben */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card form {
+	margin: 0 0 1rem;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card form:last-child {
+	margin-bottom: 0;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card form + form {
+	border-top: 1px solid var(--bdfrms-bg-subtle);
+	padding-top: 0.9rem;
+}
+
+/* Speichern-Knöpfe: kompakter Abstand innerhalb der Karte */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card p.submit {
+	margin: 0.4rem 0 0;
+	padding: 0;
+}
+
+/* form-table: Beschriftungsspalte fixieren, Luft zwischen den Zeilen */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card table.form-table th {
+	width: 14rem;
+	padding: 0.9rem 0.8rem 0.9rem 0;
+	vertical-align: top;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card table.form-table td {
+	padding: 0.9rem 0;
+}
+
+/* Aufklapp-Elemente (details): dezenter Block statt nackter Zeile */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card details {
+	background: var(--bdfrms-bg-subtle);
+	border: 1px solid var(--bdfrms-border);
+	border-radius: var(--bdfrms-radius-sm);
+	padding: 0.6rem 0.9rem;
+	margin: 0 0 0.9rem;
+	max-width: 46rem;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card details > summary {
+	cursor: pointer;
+	font-weight: 500;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card details[open] > summary {
+	margin-bottom: 0.5rem;
+}
+
+/* Radio-/Checkbox-Gruppen: Abstand zwischen den Optionen (z. B. «Nein / Ja») */
+/* WP-Core setzt in forms.css «.form-table td fieldset label { margin: … !important }»
+   und überschreibt damit sogar Inline-Styles – darum hier ebenfalls !important. */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card fieldset > label,
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card td > label {
+	display: inline-block !important;
+	margin: 0 1.5rem 0.35rem 0 !important;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="radio"],
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card input[type="checkbox"] {
+	margin-right: 0.35rem;
+}
+
+/* Berechtigungs-Matrix: passt in die Kartenbreite, kein Quer-Scroller.
+   Feste Spaltenaufteilung; Beschreibungen brechen innerhalb der Spalte um. */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card table.bdfrms-caps-table {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table th.bdfrms-caps-role-col,
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table td.bdfrms-caps-role-cell {
+	width: 8.5rem;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table thead th {
+	vertical-align: top;
+	padding: 0.7rem 0.6rem 0.7rem 0;
+	white-space: normal;
+	word-break: normal;
+	overflow-wrap: break-word;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table th.bdfrms-caps-role-col {
+	vertical-align: bottom;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table .bdfrms-caps-title {
+	display: block;
+	font-weight: 600;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table .bdfrms-caps-desc {
+	display: block;
+	font-weight: 400;
+	font-size: 11px;
+	line-height: 1.45;
+	color: var(--bdfrms-label);
+	margin: 0.3rem 0 0.35rem;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table code.bdfrms-caps-code {
+	font-size: 10px;
+	color: var(--bdfrms-muted);
+	background: var(--bdfrms-bg-subtle);
+	padding: 1px 4px;
+	/* Umbruch nur an den <wbr>-Stellen (nach Unterstrichen), nicht mitten im Wort. */
+}
+
+/* Rollen-Zelle: Name und Kennung untereinander, kein Umbruch mitten im Wort */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table td.bdfrms-caps-role-cell code.bdfrms-caps-code {
+	display: block;
+	width: fit-content;
+	margin-top: 3px;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table tbody td {
+	vertical-align: top;
+	padding: 0.6rem 0.6rem 0.6rem 0;
+}
+
+/* Aufklappbare Einstellungs-Karten: Titelzeile als Klappkopf, grössere Überschrift */
+#wpbody-content .wrap.bdfrms-settings details.bdfrms-settings-card > summary {
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	user-select: none;
+}
+
+#wpbody-content .wrap.bdfrms-settings details.bdfrms-settings-card > summary::-webkit-details-marker {
+	display: none;
+}
+
+#wpbody-content .wrap.bdfrms-settings details.bdfrms-settings-card > summary::before {
+	content: '';
+	width: 0.55rem;
+	height: 0.55rem;
+	border-right: 2px solid var(--bdfrms-muted);
+	border-bottom: 2px solid var(--bdfrms-muted);
+	transform: rotate(-45deg);
+	transition: transform 0.15s ease;
+	flex: 0 0 auto;
+}
+
+#wpbody-content .wrap.bdfrms-settings details.bdfrms-settings-card[open] > summary::before {
+	transform: rotate(45deg);
+}
+
+#wpbody-content .wrap.bdfrms-settings details.bdfrms-settings-card > summary h2 {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--bdfrms-text);
+	display: inline;
+}
+
+#wpbody-content .wrap.bdfrms-settings details.bdfrms-settings-card[open] > summary {
+	margin-bottom: 0.9rem;
+}
+
+/* Status-Etiketten in der Titelzeile zugeklappter Karten */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-card-badge {
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+	padding: 4px 9px;
+	border-radius: 999px;
+	white-space: nowrap;
+	flex: 0 0 auto;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-card-badge--on {
+	background: #edfaef;
+	color: #1a7f37;
+	border: 1px solid #b7e0c0;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-card-badge--off {
+	background: #fcebec;
+	color: #a32016;
+	border: 1px solid #f0b8b8;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-card-badge--warn {
+	background: #fcf3e6;
+	color: #8a5a00;
+	border: 1px solid #eed3a0;
+}
+
+#wpbody-content .wrap.bdfrms-settings .bdfrms-card-badge--neutral {
+	background: var(--bdfrms-bg-subtle);
+	color: var(--bdfrms-muted);
+	border: 1px solid var(--bdfrms-border);
+}
+
+/* Einstellungsseite: Karten nutzen die volle verfügbare Breite
+   (überschreibt das 960-px-Limit von .wrap.bdfrms-admin; Fliesstext
+   bleibt über die 46-rem-Regel lesbar begrenzt). */
+#wpbody-content .wrap.bdfrms-admin.bdfrms-settings {
+	max-width: none;
+}
+
+/* Berechtigungs-Matrix: Innenabstand links, damit nichts am Tabellenrand klebt */
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table thead th,
+#wpbody-content .wrap.bdfrms-settings .bdfrms-settings-card .bdfrms-caps-table tbody td {
+	padding-left: 0.8rem;
+}

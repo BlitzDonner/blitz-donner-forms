@@ -13,6 +13,17 @@
 	<config name="minimum_wp_version" value="6.6"/>
 	<config name="testVersion" value="7.4-"/>
 
+	<!-- Warnungen anzeigen, aber nicht als CI-Fehler werten. -->
+	<config name="ignore_warnings_on_exit" value="1"/>
+
+	<!-- Submit-Endpoint: Die Nonce-Prüfung ist die erste Stufe der Abwehrkette
+	     in handle(); der Sniff erkennt die Kette nicht. Die Frontend-
+	     Statusparameter (GET) sind reine Anzeige und werden sanitisiert. -->
+	<rule ref="WordPress.Security.NonceVerification">
+		<exclude-pattern>*/includes/class-bdfrms-submit-handler\.php</exclude-pattern>
+		<exclude-pattern>*/includes/class-bdfrms-plugin\.php</exclude-pattern>
+	</rule>
+
 	<rule ref="WordPress">
 		<!-- Direkte Tabellenzugriffe sind Kern des Plugins (eigene Tabellen). -->
 		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery"/>

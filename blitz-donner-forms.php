@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Blitz & Donner Forms
  * Description: Block-native forms for the WordPress editor. Build forms like any other content, manage submissions in the backend – with server-side validation, honeypot, rate limiting and optional Friendly Captcha.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Plugin URI: https://plugins.blitzdonner.ch
  * Author: Blitz & Donner
  * Author URI: https://www.blitzdonner.ch
@@ -23,12 +23,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'BDFRMS_PLUGIN_FILE', __FILE__ );
 define( 'BDFRMS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BDFRMS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'BDFRMS_PLUGIN_VERSION', '0.1.0' );
+define( 'BDFRMS_PLUGIN_VERSION', '0.2.0' );
 
-// Reihenfolge wichtig: Capabilities zuerst, dann alles, was sie nutzt.
+// Reihenfolge wichtig: Capabilities und Security zuerst, dann alles, was sie nutzt.
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-capabilities.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-security.php';
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-captcha.php';
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-file-storage.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-field-renderer.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-plugin.php';
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-submit-handler.php';
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-install.php';
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-admin-submissions.php';
@@ -52,7 +55,8 @@ add_action( 'init', 'bdfrms_load_textdomain', 1 );
 
 register_activation_hook( __FILE__, array( 'BDFRMS_Install', 'activate' ) );
 
+BDFRMS_Security::boot();
 BDFRMS_File_Storage::boot();
-BDFRMS_Submit_Handler::boot();
+BDFRMS_Plugin::boot();
 BDFRMS_Admin_Submissions::boot();
 BDFRMS_Admin_Settings::boot();

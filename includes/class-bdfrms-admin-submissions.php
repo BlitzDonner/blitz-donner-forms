@@ -31,8 +31,9 @@ class BDFRMS_Admin_Submissions {
 	 */
 	public static function boot() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
-		add_action( 'admin_post_bdf_delete_submission', array( __CLASS__, 'handle_delete' ) );
-		add_action( 'admin_post_bdf_export_csv', array( __CLASS__, 'handle_export_csv' ) );
+		add_action( 'admin_post_bdfrms_delete_submission', array( __CLASS__, 'handle_delete' ) );
+		add_action( 'admin_post_bdfrms_export_csv', array( __CLASS__, 'handle_export_csv' ) );
+		add_action( 'admin_post_bdfrms_export_zip', array( __CLASS__, 'handle_export_zip' ) );
 	}
 
 	/**
@@ -161,7 +162,24 @@ class BDFRMS_Admin_Submissions {
 			$payload = array();
 		}
 
+		// Label-Snapshot vom Zeitpunkt des Absendens (Submit-Handler).
+		$labels = array();
+		if ( isset( $payload['_bdfrms_labels'] ) && is_array( $payload['_bdfrms_labels'] ) ) {
+			$labels = $payload['_bdfrms_labels'];
+			unset( $payload['_bdfrms_labels'] );
+		}
+
 		$actions = array();
+		if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
+			$actions['export_zip'] = array(
+				'label' => __( 'Als ZIP herunterladen', 'blitz-donner-forms' ),
+				'url'   => wp_nonce_url(
+					admin_url( 'admin-post.php?action=bdfrms_export_zip&submission=' . (int) $submission_id ),
+					'bdfrms_export_zip_' . (int) $submission_id
+				),
+				'class' => 'button',
+			);
+		}
 		if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
 			$actions['delete'] = array(
 				'label' => __( 'Löschen', 'blitz-donner-forms' ),
@@ -205,27 +223,42 @@ class BDFRMS_Admin_Submissions {
 					</tr>
 					<?php foreach ( $payload as $field_name => $value ) : ?>
 						<tr>
-							<th><?php echo esc_html( (string) $field_name ); ?></th>
+							<th><?php echo esc_html( isset( $labels[ $field_name ] ) ? (string) $labels[ $field_name ] : (string) $field_name ); ?></th>
 							<td>
 								<?php
-								$display = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+								// Datei-Referenz: Download-Link statt Rohwert.
+								if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
+									$file_id      = (int) ( $value['file_id'] ?? 0 );
+									$download_url = wp_nonce_url(
+										admin_url( 'admin-post.php?action=bdfrms_download&file_id=' . $file_id ),
+										'bdfrms_download_' . $file_id
+									);
+									printf(
+										'<a href="%s">%s</a>',
+										esc_url( $download_url ),
+										/* translators: %d: file ID. */
+										esc_html( sprintf( __( 'Datei #%d herunterladen', 'blitz-donner-forms' ), $file_id ) )
+									);
+								} else {
+									$display = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
 
-								/**
-								 * Anzeige eines Feldwerts in der Einzelansicht.
-								 *
-								 * Das Security-Add-on maskiert hier verschlüsselte
-								 * Werte oder entschlüsselt sie Capability-abhängig.
-								 * Rückgabe: anzeigefertiger Klartext (wird escaped).
-								 *
-								 * @since 0.1.0
-								 *
-								 * @param string $display    Anzeigewert der Basis.
-								 * @param string $field_name Feldname.
-								 * @param mixed  $value      Gespeicherter Rohwert.
-								 * @param array  $row        Zeile aus {prefix}bdfrms_submissions.
-								 */
-								$display = apply_filters( 'bdfrms_render_field_value', $display, (string) $field_name, $value, $row );
-								echo esc_html( (string) $display );
+									/**
+									 * Anzeige eines Feldwerts in der Einzelansicht.
+									 *
+									 * Das Security-Add-on maskiert hier verschlüsselte
+									 * Werte oder entschlüsselt sie Capability-abhängig.
+									 * Rückgabe: anzeigefertiger Klartext (wird escaped).
+									 *
+									 * @since 0.1.0
+									 *
+									 * @param string $display    Anzeigewert der Basis.
+									 * @param string $field_name Feldname.
+									 * @param mixed  $value      Gespeicherter Rohwert.
+									 * @param array  $row        Zeile aus {prefix}bdfrms_submissions.
+									 */
+									$display = apply_filters( 'bdfrms_render_field_value', $display, (string) $field_name, $value, $row );
+									echo esc_html( (string) $display );
+								}
 								?>
 							</td>
 						</tr>
@@ -254,6 +287,9 @@ class BDFRMS_Admin_Submissions {
 		}
 		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0;
 		check_admin_referer( 'bdfrms_delete_submission_' . $submission_id );
+
+		// Zuerst die abgelegten Dateien aufräumen, dann die Zeile löschen.
+		BDFRMS_File_Storage::delete_for_submission( $submission_id );
 
 		global $wpdb;
 		$wpdb->delete( self::table_name(), array( 'id' => $submission_id ), array( '%d' ) );
@@ -301,9 +337,11 @@ class BDFRMS_Admin_Submissions {
 		$field_names = array();
 		$payloads    = array();
 		foreach ( $rows as $row ) {
-			$payload                      = json_decode( (string) $row['payload'], true );
-			$payloads[ (int) $row['id'] ] = is_array( $payload ) ? $payload : array();
-			$field_names                  = array_merge( $field_names, array_keys( $payloads[ (int) $row['id'] ] ) );
+			$payload = json_decode( (string) $row['payload'], true );
+			$payload = is_array( $payload ) ? $payload : array();
+			unset( $payload['_bdfrms_labels'] );
+			$payloads[ (int) $row['id'] ] = $payload;
+			$field_names                  = array_merge( $field_names, array_keys( $payload ) );
 		}
 		$field_names = array_values( array_unique( $field_names ) );
 
@@ -313,7 +351,11 @@ class BDFRMS_Admin_Submissions {
 			$line = array( (int) $row['id'], (string) $row['created_at'], (string) $row['form_title'] );
 			foreach ( $field_names as $field_name ) {
 				$value = isset( $payloads[ (int) $row['id'] ][ $field_name ] ) ? $payloads[ (int) $row['id'] ][ $field_name ] : '';
-				$cell  = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+				if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
+					$cell = 'Datei #' . (int) ( $value['file_id'] ?? 0 );
+				} else {
+					$cell = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+				}
 
 				/**
 				 * Zellwert im CSV-Export.
@@ -339,6 +381,87 @@ class BDFRMS_Admin_Submissions {
 		}
 
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Stream-Export.
+		exit;
+	}
+
+	/**
+	 * ZIP-Export einer einzelnen Einsendung (admin_post_bdfrms_export_zip):
+	 * eine Textdatei mit allen Feldern plus die abgelegten Datei-Anhänge.
+	 * Übernommen aus dem Bestand, ohne Verschlüsselungsbezug.
+	 *
+	 * @return void
+	 */
+	public static function handle_export_zip() {
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
+			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
+		}
+		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0;
+		check_admin_referer( 'bdfrms_export_zip_' . $submission_id );
+
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			wp_die( esc_html__( 'ZIP-Export nicht verfügbar (PHP-Erweiterung zip fehlt).', 'blitz-donner-forms' ), 500 );
+		}
+
+		global $wpdb;
+		$table = self::table_name();
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $submission_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
+		if ( ! $row ) {
+			wp_die( esc_html__( 'Einsendung nicht gefunden.', 'blitz-donner-forms' ), 404 );
+		}
+
+		$payload = json_decode( (string) $row['payload'], true );
+		$payload = is_array( $payload ) ? $payload : array();
+		$labels  = array();
+		if ( isset( $payload['_bdfrms_labels'] ) && is_array( $payload['_bdfrms_labels'] ) ) {
+			$labels = $payload['_bdfrms_labels'];
+			unset( $payload['_bdfrms_labels'] );
+		}
+
+		// Feldliste als Textdatei.
+		$lines   = array();
+		$lines[] = 'Einsendung #' . (int) $row['id'];
+		$lines[] = 'Eingang: ' . (string) $row['created_at'];
+		$lines[] = 'Formular: ' . ( '' !== (string) $row['form_title'] ? (string) $row['form_title'] : (string) $row['form_id'] );
+		$lines[] = '';
+		foreach ( $payload as $field_name => $value ) {
+			$label = isset( $labels[ $field_name ] ) ? (string) $labels[ $field_name ] : (string) $field_name;
+			if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
+				$cell = '[Datei-Anhang, siehe ZIP]';
+			} else {
+				$cell = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+			}
+
+			/** Dokumentiert in handle_export_csv(). */
+			$cell    = apply_filters( 'bdfrms_export_cell', $cell, (string) $field_name, $row );
+			$lines[] = $label . ': ' . $cell;
+		}
+
+		$tmp = wp_tempnam( 'bdfrms-export' );
+		$zip = new ZipArchive();
+		if ( true !== $zip->open( $tmp, ZipArchive::OVERWRITE ) ) {
+			wp_die( esc_html__( 'ZIP konnte nicht erstellt werden.', 'blitz-donner-forms' ), 500 );
+		}
+		$zip->addFromString( 'einsendung-' . (int) $row['id'] . '.txt', implode( "\n", $lines ) . "\n" );
+
+		// Datei-Anhänge aus der Klartext-Ablage beilegen.
+		$files_table = BDFRMS_File_Storage::table_name();
+		$files       = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$files_table} WHERE submission_id = %d", $submission_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
+		foreach ( $files as $file_row ) {
+			$path = BDFRMS_File_Storage::storage_root() . '/' . basename( (string) $file_row['storage_id'] );
+			if ( ! is_readable( $path ) ) {
+				continue;
+			}
+			$entry_name = (int) $file_row['id'] . '-' . sanitize_file_name( (string) $file_row['original_name'] );
+			$zip->addFile( $path, 'dateien/' . $entry_name );
+		}
+		$zip->close();
+
+		nocache_headers();
+		header( 'Content-Type: application/zip' );
+		header( 'Content-Disposition: attachment; filename="bdfrms-einsendung-' . (int) $row['id'] . '.zip"' );
+		header( 'Content-Length: ' . (string) filesize( $tmp ) );
+		readfile( $tmp );
+		wp_delete_file( $tmp );
 		exit;
 	}
 }

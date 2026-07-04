@@ -92,11 +92,23 @@ class BDFRMS_File_Storage {
 	/**
 	 * Validierten Upload ablegen und Metadaten-Zeile schreiben.
 	 *
-	 * @param array{tmp_name:string,name:string,type:string,size:int} $file    Validierter Upload (bereits durch die Abwehrkette).
-	 * @param array{submission_id:int,field_name:string}              $context Zuordnung zur Einsendung.
+	 * Läuft VOR dem Insert der Einsendung (submission_id = 0); der Handler
+	 * verbindet die Datei nach erfolgreicher Persistenz über
+	 * attach_to_submission().
+	 *
+	 * @param array{tmp_name:string,name:string,type:string,size:int} $file       Validierter Upload (bereits durch Security-Validierung).
+	 * @param string                                                  $field_name Technischer Feldname.
+	 * @param string                                                  $mime       Verifizierter finfo-MIME.
+	 * @param string                                                  $ext        Verifizierte Dateiendung.
 	 * @return array{file_id:int,storage_id:string}|WP_Error
 	 */
-	public static function store( array $file, array $context ) {
+	public static function store( array $file, $field_name, $mime = '', $ext = '' ) {
+		$context = array(
+			'field_name' => (string) $field_name,
+			'mime'       => (string) $mime,
+			'ext'        => (string) $ext,
+		);
+
 		/**
 		 * Datei-Ablage übernehmen.
 		 *
@@ -109,7 +121,7 @@ class BDFRMS_File_Storage {
 		 *
 		 * @param null|array|WP_Error $result  null = Basis übernimmt.
 		 * @param array               $file    Validierter Upload ($_FILES-Eintrag).
-		 * @param array               $context {submission_id, field_name}.
+		 * @param array               $context {field_name, mime, ext}.
 		 */
 		$handled = apply_filters( 'bdfrms_store_file', null, $file, $context );
 		if ( null !== $handled ) {
@@ -140,10 +152,10 @@ class BDFRMS_File_Storage {
 		$inserted = $wpdb->insert(
 			self::table_name(),
 			array(
-				'submission_id' => (int) $context['submission_id'],
-				'field_name'    => sanitize_key( (string) $context['field_name'] ),
+				'submission_id' => 0,
+				'field_name'    => sanitize_key( (string) $field_name ),
 				'original_name' => sanitize_file_name( (string) $file['name'] ),
-				'mime'          => sanitize_text_field( (string) $file['type'] ),
+				'mime'          => sanitize_text_field( '' !== $context['mime'] ? $context['mime'] : (string) $file['type'] ),
 				'size_bytes'    => (int) $file['size'],
 				'sha256'        => (string) hash_file( 'sha256', $target ),
 				'storage_id'    => $storage_id,
@@ -162,6 +174,79 @@ class BDFRMS_File_Storage {
 			'file_id'    => (int) $wpdb->insert_id,
 			'storage_id' => $storage_id,
 		);
+	}
+
+	/**
+	 * Gespeicherte Dateien nach erfolgreichem Submission-Insert verbinden.
+	 *
+	 * @param array<int,int> $file_ids      Datei-IDs aus store().
+	 * @param int            $submission_id Zeilen-ID in {prefix}bdfrms_submissions.
+	 * @return void
+	 */
+	public static function attach_to_submission( array $file_ids, $submission_id ) {
+		global $wpdb;
+		foreach ( $file_ids as $fid ) {
+			$wpdb->update(
+				self::table_name(),
+				array( 'submission_id' => (int) $submission_id ),
+				array( 'id' => (int) $fid ),
+				array( '%d' ),
+				array( '%d' )
+			);
+		}
+	}
+
+	/**
+	 * Datei samt Metadaten-Zeile löschen (Aufräumen nach Validierungsfehlern
+	 * oder beim Löschen einer Einsendung).
+	 *
+	 * @param int $file_id Zeilen-ID in {prefix}bdfrms_files.
+	 * @return void
+	 */
+	public static function delete( $file_id ) {
+		/**
+		 * Löschen einer Datei übernehmen (Gegenstück zu `bdfrms_store_file`).
+		 *
+		 * Ein Add-on, das die Ablage übernommen hat, löscht hier seine
+		 * eigene Ablage und gibt true zurück; die Basis fasst dann nichts
+		 * mehr an.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param null|bool $handled null = Basis löscht.
+		 * @param int       $file_id Datei-ID.
+		 */
+		$handled = apply_filters( 'bdfrms_delete_file', null, (int) $file_id );
+		if ( null !== $handled ) {
+			return;
+		}
+
+		global $wpdb;
+		$table = self::table_name();
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $file_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
+		if ( ! $row ) {
+			return;
+		}
+		$path = self::storage_root() . '/' . basename( (string) $row['storage_id'] );
+		if ( is_readable( $path ) ) {
+			wp_delete_file( $path );
+		}
+		$wpdb->delete( self::table_name(), array( 'id' => (int) $file_id ), array( '%d' ) );
+	}
+
+	/**
+	 * Alle Dateien einer Einsendung löschen.
+	 *
+	 * @param int $submission_id Zeilen-ID in {prefix}bdfrms_submissions.
+	 * @return void
+	 */
+	public static function delete_for_submission( $submission_id ) {
+		global $wpdb;
+		$table = self::table_name();
+		$ids   = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE submission_id = %d", (int) $submission_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
+		foreach ( $ids as $fid ) {
+			self::delete( (int) $fid );
+		}
 	}
 
 	// Abschnitt: Download.
