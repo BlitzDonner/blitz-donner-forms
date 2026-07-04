@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Installations- und Schema-Routinen der Basis.
  */
-class BDF_Install {
+class BDFRMS_Install {
 
 	/**
 	 * Schema-Version der Basis-Tabellen. Bei Schemaänderungen erhöhen und in
@@ -24,7 +24,7 @@ class BDF_Install {
 	 */
 	const DB_VERSION = 1;
 
-	const OPTION_DB_VERSION = 'bdf_db_version';
+	const OPTION_DB_VERSION = 'bdfrms_db_version';
 
 	/**
 	 * Plugin-Aktivierung: Tabellen, Storage-Verzeichnis, Capabilities.
@@ -36,8 +36,8 @@ class BDF_Install {
 		self::install_files_table();
 		update_option( self::OPTION_DB_VERSION, self::DB_VERSION );
 
-		BDF_File_Storage::ensure_storage_directory();
-		BDF_Capabilities::bootstrap_defaults();
+		BDFRMS_File_Storage::ensure_storage_directory();
+		BDFRMS_Capabilities::bootstrap_defaults();
 
 		/**
 		 * Läuft nach der Basis-Installation. Add-ons können hier eigene
@@ -46,14 +46,14 @@ class BDF_Install {
 		 *
 		 * @since 0.1.0
 		 */
-		do_action( 'bdf_activated' );
+		do_action( 'bdfrms_activated' );
 	}
 
 	/**
 	 * Submissions-Tabelle anlegen/aktualisieren (dbDelta).
 	 *
 	 * Die Basis speichert den Feld-Datensatz (`payload`) als Klartext-JSON.
-	 * Add-ons können ihn über den Filter `bdf_store_submission_payload`
+	 * Add-ons können ihn über den Filter `bdfrms_store_submission_payload`
 	 * vor dem Speichern ersetzen (z. B. durch verschlüsselte Envelopes).
 	 *
 	 * @return void
@@ -61,7 +61,7 @@ class BDF_Install {
 	public static function install_submissions_table() {
 		global $wpdb;
 
-		$table_name      = $wpdb->prefix . 'bdf_submissions';
+		$table_name      = $wpdb->prefix . 'bdfrms_submissions';
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE {$table_name} (
@@ -86,14 +86,14 @@ class BDF_Install {
 	 *
 	 * Ohne Krypto-Spalten: Die Basis legt Dateien im Klartext ab. Das
 	 * Security-Add-on übernimmt die Ablage komplett über den Filter
-	 * `bdf_store_file` und führt seine eigenen Metadaten.
+	 * `bdfrms_store_file` und führt seine eigenen Metadaten.
 	 *
 	 * @return void
 	 */
 	public static function install_files_table() {
 		global $wpdb;
 
-		$table_name      = $wpdb->prefix . 'bdf_files';
+		$table_name      = $wpdb->prefix . 'bdfrms_files';
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE {$table_name} (

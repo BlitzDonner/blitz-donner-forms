@@ -5,7 +5,7 @@
  * Jede Funktionsgruppe ist eine Karte in einer Registry. Die Basis bringt
  * die Karten «Spam-Schutz» (Friendly Captcha), «Berechtigungen» und
  * «Erweiterungen» mit; Add-ons ergänzen eigene Karten über den Filter
- * `bdf_settings_cards`, ohne diese Datei anzufassen.
+ * `bdfrms_settings_cards`, ohne diese Datei anzufassen.
  *
  * @package Blitz_Donner_Forms
  */
@@ -17,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Einstellungsseite als erweiterbares Karten-Cockpit.
  */
-class BDF_Admin_Settings {
+class BDFRMS_Admin_Settings {
 
-	const PAGE_SLUG = 'bdf-settings';
+	const PAGE_SLUG = 'bdfrms-settings';
 
 	/**
 	 * Hooks registrieren.
@@ -38,10 +38,10 @@ class BDF_Admin_Settings {
 	 */
 	public static function register_menu() {
 		add_submenu_page(
-			BDF_Admin_Submissions::MENU_SLUG,
+			BDFRMS_Admin_Submissions::MENU_SLUG,
 			__( 'Einstellungen', 'blitz-donner-forms' ),
 			__( 'Einstellungen', 'blitz-donner-forms' ),
-			BDF_Capabilities::CAP_MANAGE_SETTINGS,
+			BDFRMS_Capabilities::CAP_MANAGE_SETTINGS,
 			self::PAGE_SLUG,
 			array( __CLASS__, 'render_page' )
 		);
@@ -84,7 +84,7 @@ class BDF_Admin_Settings {
 		 *
 		 * @param array<string,array{title:string,render:callable,save:callable|null}> $cards Karten der Basis.
 		 */
-		$filtered = apply_filters( 'bdf_settings_cards', $cards );
+		$filtered = apply_filters( 'bdfrms_settings_cards', $cards );
 
 		return is_array( $filtered ) ? $filtered : $cards;
 	}
@@ -95,10 +95,10 @@ class BDF_Admin_Settings {
 	 * @return void
 	 */
 	public static function render_page() {
-		if ( ! BDF_Capabilities::user_can( BDF_Capabilities::CAP_MANAGE_SETTINGS ) ) {
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
 		}
-		$saved = isset( $_GET['bdf_saved'] ) ? '1' === sanitize_text_field( wp_unslash( $_GET['bdf_saved'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reine Anzeige einer Erfolgsmeldung.
+		$saved = isset( $_GET['bdfrms_saved'] ) ? '1' === sanitize_text_field( wp_unslash( $_GET['bdfrms_saved'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reine Anzeige einer Erfolgsmeldung.
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Blitz & Donner Forms – Einstellungen', 'blitz-donner-forms' ); ?></h1>
@@ -106,8 +106,8 @@ class BDF_Admin_Settings {
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Einstellungen gespeichert.', 'blitz-donner-forms' ); ?></p></div>
 			<?php endif; ?>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="bdf_save_settings" />
-				<?php wp_nonce_field( 'bdf_save_settings' ); ?>
+				<input type="hidden" name="action" value="bdfrms_save_settings" />
+				<?php wp_nonce_field( 'bdfrms_save_settings' ); ?>
 				<?php foreach ( self::cards() as $card_id => $card ) : ?>
 					<div class="card" style="max-width:720px;margin-bottom:16px;">
 						<h2><?php echo esc_html( (string) $card['title'] ); ?></h2>
@@ -131,10 +131,10 @@ class BDF_Admin_Settings {
 	 * @return void
 	 */
 	public static function handle_save() {
-		if ( ! BDF_Capabilities::user_can( BDF_Capabilities::CAP_MANAGE_SETTINGS ) ) {
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
 		}
-		check_admin_referer( 'bdf_save_settings' );
+		check_admin_referer( 'bdfrms_save_settings' );
 
 		foreach ( self::cards() as $card ) {
 			if ( isset( $card['save'] ) && is_callable( $card['save'] ) ) {
@@ -146,7 +146,7 @@ class BDF_Admin_Settings {
 			add_query_arg(
 				array(
 					'page'      => self::PAGE_SLUG,
-					'bdf_saved' => '1',
+					'bdfrms_saved' => '1',
 				),
 				admin_url( 'admin.php' )
 			)
@@ -162,27 +162,27 @@ class BDF_Admin_Settings {
 	 * @return void
 	 */
 	public static function render_card_captcha() {
-		$s = BDF_Captcha::get_settings();
+		$s = BDFRMS_Captcha::get_settings();
 		?>
 		<p class="description"><?php esc_html_e( 'Friendly Captcha ist ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen.', 'blitz-donner-forms' ); ?></p>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Aktiv', 'blitz-donner-forms' ); ?></th>
-				<td><label><input type="checkbox" name="bdf_captcha[enabled]" value="1" <?php checked( $s['enabled'] ); ?> /> <?php esc_html_e( 'Friendly Captcha global einschalten', 'blitz-donner-forms' ); ?></label></td>
+				<td><label><input type="checkbox" name="bdfrms_captcha[enabled]" value="1" <?php checked( $s['enabled'] ); ?> /> <?php esc_html_e( 'Friendly Captcha global einschalten', 'blitz-donner-forms' ); ?></label></td>
 			</tr>
 			<tr>
-				<th scope="row"><label for="bdf-captcha-site-key"><?php esc_html_e( 'Site-Key', 'blitz-donner-forms' ); ?></label></th>
-				<td><input type="text" class="regular-text" id="bdf-captcha-site-key" name="bdf_captcha[site_key]" value="<?php echo esc_attr( $s['site_key'] ); ?>" autocomplete="off" /></td>
+				<th scope="row"><label for="bdfrms-captcha-site-key"><?php esc_html_e( 'Site-Key', 'blitz-donner-forms' ); ?></label></th>
+				<td><input type="text" class="regular-text" id="bdfrms-captcha-site-key" name="bdfrms_captcha[site_key]" value="<?php echo esc_attr( $s['site_key'] ); ?>" autocomplete="off" /></td>
 			</tr>
 			<tr>
-				<th scope="row"><label for="bdf-captcha-api-key"><?php esc_html_e( 'API-Key', 'blitz-donner-forms' ); ?></label></th>
-				<td><input type="password" class="regular-text" id="bdf-captcha-api-key" name="bdf_captcha[api_key]" value="<?php echo esc_attr( $s['api_key'] ); ?>" autocomplete="off" /></td>
+				<th scope="row"><label for="bdfrms-captcha-api-key"><?php esc_html_e( 'API-Key', 'blitz-donner-forms' ); ?></label></th>
+				<td><input type="password" class="regular-text" id="bdfrms-captcha-api-key" name="bdfrms_captcha[api_key]" value="<?php echo esc_attr( $s['api_key'] ); ?>" autocomplete="off" /></td>
 			</tr>
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Modus', 'blitz-donner-forms' ); ?></th>
 				<td>
-					<label><input type="radio" name="bdf_captcha[mode]" value="soft" <?php checked( 'soft', $s['mode'] ); ?> /> <?php esc_html_e( 'Soft – bei nicht erreichbarem Anbieter durchlassen', 'blitz-donner-forms' ); ?></label><br />
-					<label><input type="radio" name="bdf_captcha[mode]" value="strict" <?php checked( 'strict', $s['mode'] ); ?> /> <?php esc_html_e( 'Strict – bei nicht erreichbarem Anbieter ablehnen', 'blitz-donner-forms' ); ?></label>
+					<label><input type="radio" name="bdfrms_captcha[mode]" value="soft" <?php checked( 'soft', $s['mode'] ); ?> /> <?php esc_html_e( 'Soft – bei nicht erreichbarem Anbieter durchlassen', 'blitz-donner-forms' ); ?></label><br />
+					<label><input type="radio" name="bdfrms_captcha[mode]" value="strict" <?php checked( 'strict', $s['mode'] ); ?> /> <?php esc_html_e( 'Strict – bei nicht erreichbarem Anbieter ablehnen', 'blitz-donner-forms' ); ?></label>
 				</td>
 			</tr>
 		</table>
@@ -195,11 +195,11 @@ class BDF_Admin_Settings {
 	 * @return void
 	 */
 	public static function save_card_captcha() {
-		if ( ! isset( $_POST['bdf_captcha'] ) || ! is_array( $_POST['bdf_captcha'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce in handle_save().
+		if ( ! isset( $_POST['bdfrms_captcha'] ) || ! is_array( $_POST['bdfrms_captcha'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce in handle_save().
 			return;
 		}
-		$raw = map_deep( wp_unslash( $_POST['bdf_captcha'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		BDF_Captcha::update_settings( $raw );
+		$raw = map_deep( wp_unslash( $_POST['bdfrms_captcha'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		BDFRMS_Captcha::update_settings( $raw );
 	}
 
 	// Abschnitt: Karte: Berechtigungen.
@@ -214,7 +214,7 @@ class BDF_Admin_Settings {
 		if ( ! ( $wp_roles instanceof WP_Roles ) ) {
 			return;
 		}
-		$registry = BDF_Capabilities::registry();
+		$registry = BDFRMS_Capabilities::registry();
 		?>
 		<p class="description"><?php esc_html_e( 'Welche Rolle darf was? Administratoren behalten über manage_options immer vollen Zugriff.', 'blitz-donner-forms' ); ?></p>
 		<table class="widefat striped" style="max-width:700px;">
@@ -236,7 +236,7 @@ class BDF_Admin_Settings {
 						<?php foreach ( $wp_roles->roles as $role_slug => $role_data ) : ?>
 							<td>
 								<input type="checkbox"
-									name="bdf_caps[<?php echo esc_attr( $role_slug ); ?>][<?php echo esc_attr( $cap ); ?>]"
+									name="bdfrms_caps[<?php echo esc_attr( $role_slug ); ?>][<?php echo esc_attr( $cap ); ?>]"
 									value="1"
 									<?php checked( ! empty( $role_data['capabilities'][ $cap ] ) ); ?> />
 							</td>
@@ -259,13 +259,13 @@ class BDF_Admin_Settings {
 			return;
 		}
 		$posted = array();
-		if ( isset( $_POST['bdf_caps'] ) && is_array( $_POST['bdf_caps'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce in handle_save().
-			$posted = map_deep( wp_unslash( $_POST['bdf_caps'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['bdfrms_caps'] ) && is_array( $_POST['bdfrms_caps'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce in handle_save().
+			$posted = map_deep( wp_unslash( $_POST['bdfrms_caps'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 		foreach ( $wp_roles->roles as $role_slug => $_ ) {
-			foreach ( BDF_Capabilities::all_caps() as $cap ) {
+			foreach ( BDFRMS_Capabilities::all_caps() as $cap ) {
 				$enabled = ! empty( $posted[ $role_slug ][ $cap ] );
-				BDF_Capabilities::set_role_cap( $role_slug, $cap, $enabled );
+				BDFRMS_Capabilities::set_role_cap( $role_slug, $cap, $enabled );
 			}
 		}
 	}

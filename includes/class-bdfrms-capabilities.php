@@ -8,7 +8,7 @@
  * zu geben.
  *
  * Die Basis kennt: sehen, löschen, exportieren, Einstellungen. Add-ons
- * ergänzen eigene Capabilities über den Filter `bdf_capabilities`
+ * ergänzen eigene Capabilities über den Filter `bdfrms_capabilities`
  * (das Security-Add-on z. B. «entschlüsseln» getrennt von «herunterladen»).
  *
  * Default-Mapping bei Aktivierung: alle Caps -> Rolle `administrator`.
@@ -23,12 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Capability-Registry und Rollen-Zuweisung.
  */
-class BDF_Capabilities {
+class BDFRMS_Capabilities {
 
-	const CAP_VIEW_SUBMISSIONS   = 'bdf_view_submissions';
-	const CAP_DELETE_SUBMISSIONS = 'bdf_delete_submissions';
-	const CAP_EXPORT_SUBMISSIONS = 'bdf_export_submissions';
-	const CAP_MANAGE_SETTINGS    = 'bdf_manage_settings';
+	const CAP_VIEW_SUBMISSIONS   = 'bdfrms_view_submissions';
+	const CAP_DELETE_SUBMISSIONS = 'bdfrms_delete_submissions';
+	const CAP_EXPORT_SUBMISSIONS = 'bdfrms_export_submissions';
+	const CAP_MANAGE_SETTINGS    = 'bdfrms_manage_settings';
 
 	/**
 	 * Capability-Registry: Slug => Titel + Beschreibung für den Admin.
@@ -67,7 +67,7 @@ class BDF_Capabilities {
 		 *
 		 * @param array<string,array{title:string,description:string}> $caps Registry.
 		 */
-		$filtered = apply_filters( 'bdf_capabilities', $caps );
+		$filtered = apply_filters( 'bdfrms_capabilities', $caps );
 
 		return is_array( $filtered ) ? $filtered : $caps;
 	}

@@ -3,9 +3,9 @@
  * Einsendungen im Backend: Liste, Einzelansicht, Löschen, CSV-Export.
  *
  * Etappe-1-Gerüst mit vollständiger Hook-Oberfläche:
- *  - `bdf_render_field_value`  Anzeige eines Feldwerts in der Einzelansicht
- *  - `bdf_submission_actions`  Aktionsknöpfe der Einzelansicht
- *  - `bdf_export_cell`         Zellwert im CSV-Export
+ *  - `bdfrms_render_field_value`  Anzeige eines Feldwerts in der Einzelansicht
+ *  - `bdfrms_submission_actions`  Aktionsknöpfe der Einzelansicht
+ *  - `bdfrms_export_cell`         Zellwert im CSV-Export
  *
  * Die komfortable Liste (Filter, Suche, Spaltenwahl) folgt in Etappe 2 aus
  * dem Bestand.
@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Backend für Einsendungen: Liste, Detail, Löschen, Export.
  */
-class BDF_Admin_Submissions {
+class BDFRMS_Admin_Submissions {
 
-	const MENU_SLUG = 'bdf-submissions';
+	const MENU_SLUG = 'bdfrms-submissions';
 
 	/**
 	 * Hooks registrieren.
@@ -44,7 +44,7 @@ class BDF_Admin_Submissions {
 		add_menu_page(
 			__( 'Formulare', 'blitz-donner-forms' ),
 			__( 'Formulare', 'blitz-donner-forms' ),
-			BDF_Capabilities::CAP_VIEW_SUBMISSIONS,
+			BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS,
 			self::MENU_SLUG,
 			array( __CLASS__, 'render_page' ),
 			'dashicons-feedback',
@@ -59,7 +59,7 @@ class BDF_Admin_Submissions {
 	 */
 	public static function table_name() {
 		global $wpdb;
-		return $wpdb->prefix . 'bdf_submissions';
+		return $wpdb->prefix . 'bdfrms_submissions';
 	}
 
 	/**
@@ -68,7 +68,7 @@ class BDF_Admin_Submissions {
 	 * @return void
 	 */
 	public static function render_page() {
-		if ( ! BDF_Capabilities::user_can( BDF_Capabilities::CAP_VIEW_SUBMISSIONS ) ) {
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) ) {
 			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
 		}
 		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reine Leseansicht, Berechtigung oben geprüft.
@@ -91,9 +91,9 @@ class BDF_Admin_Submissions {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Einsendungen', 'blitz-donner-forms' ); ?></h1>
-			<?php if ( BDF_Capabilities::user_can( BDF_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) : ?>
+			<?php if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) : ?>
 				<p>
-					<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=bdf_export_csv' ), 'bdf_export_csv' ) ); ?>">
+					<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=bdfrms_export_csv' ), 'bdfrms_export_csv' ) ); ?>">
 						<?php esc_html_e( 'CSV-Export', 'blitz-donner-forms' ); ?>
 					</a>
 				</p>
@@ -162,12 +162,12 @@ class BDF_Admin_Submissions {
 		}
 
 		$actions = array();
-		if ( BDF_Capabilities::user_can( BDF_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
+		if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
 			$actions['delete'] = array(
 				'label' => __( 'Löschen', 'blitz-donner-forms' ),
 				'url'   => wp_nonce_url(
-					admin_url( 'admin-post.php?action=bdf_delete_submission&submission=' . (int) $submission_id ),
-					'bdf_delete_submission_' . (int) $submission_id
+					admin_url( 'admin-post.php?action=bdfrms_delete_submission&submission=' . (int) $submission_id ),
+					'bdfrms_delete_submission_' . (int) $submission_id
 				),
 				'class' => 'button button-link-delete',
 			);
@@ -183,9 +183,9 @@ class BDF_Admin_Submissions {
 		 * @since 0.1.0
 		 *
 		 * @param array $actions Aktionen der Basis.
-		 * @param array $row     Zeile aus {prefix}bdf_submissions.
+		 * @param array $row     Zeile aus {prefix}bdfrms_submissions.
 		 */
-		$actions = apply_filters( 'bdf_submission_actions', $actions, $row );
+		$actions = apply_filters( 'bdfrms_submission_actions', $actions, $row );
 		?>
 		<div class="wrap">
 			<h1>
@@ -222,9 +222,9 @@ class BDF_Admin_Submissions {
 								 * @param string $display    Anzeigewert der Basis.
 								 * @param string $field_name Feldname.
 								 * @param mixed  $value      Gespeicherter Rohwert.
-								 * @param array  $row        Zeile aus {prefix}bdf_submissions.
+								 * @param array  $row        Zeile aus {prefix}bdfrms_submissions.
 								 */
-								$display = apply_filters( 'bdf_render_field_value', $display, (string) $field_name, $value, $row );
+								$display = apply_filters( 'bdfrms_render_field_value', $display, (string) $field_name, $value, $row );
 								echo esc_html( (string) $display );
 								?>
 							</td>
@@ -249,11 +249,11 @@ class BDF_Admin_Submissions {
 	 * @return void
 	 */
 	public static function handle_delete() {
-		if ( ! BDF_Capabilities::user_can( BDF_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
 			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
 		}
 		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0;
-		check_admin_referer( 'bdf_delete_submission_' . $submission_id );
+		check_admin_referer( 'bdfrms_delete_submission_' . $submission_id );
 
 		global $wpdb;
 		$wpdb->delete( self::table_name(), array( 'id' => $submission_id ), array( '%d' ) );
@@ -268,7 +268,7 @@ class BDF_Admin_Submissions {
 		 *
 		 * @param int $submission_id Gelöschte Zeilen-ID.
 		 */
-		do_action( 'bdf_submission_deleted', $submission_id );
+		do_action( 'bdfrms_submission_deleted', $submission_id );
 
 		wp_safe_redirect( add_query_arg( 'page', self::MENU_SLUG, admin_url( 'admin.php' ) ) );
 		exit;
@@ -280,10 +280,10 @@ class BDF_Admin_Submissions {
 	 * @return void
 	 */
 	public static function handle_export_csv() {
-		if ( ! BDF_Capabilities::user_can( BDF_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
 			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
 		}
-		check_admin_referer( 'bdf_export_csv' );
+		check_admin_referer( 'bdfrms_export_csv' );
 
 		global $wpdb;
 		$table = self::table_name();
@@ -291,7 +291,7 @@ class BDF_Admin_Submissions {
 
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="bdf-einsendungen-' . gmdate( 'Y-m-d' ) . '.csv"' );
+		header( 'Content-Disposition: attachment; filename="bdfrms-einsendungen-' . gmdate( 'Y-m-d' ) . '.csv"' );
 
 		$out = fopen( 'php://output', 'w' );
 		// UTF-8-BOM, damit Excel Umlaute korrekt liest.
@@ -325,9 +325,9 @@ class BDF_Admin_Submissions {
 				 *
 				 * @param string $cell       Zellwert der Basis.
 				 * @param string $field_name Feldname (Spalte).
-				 * @param array  $row        Zeile aus {prefix}bdf_submissions.
+				 * @param array  $row        Zeile aus {prefix}bdfrms_submissions.
 				 */
-				$cell = apply_filters( 'bdf_export_cell', $cell, $field_name, $row );
+				$cell = apply_filters( 'bdfrms_export_cell', $cell, $field_name, $row );
 
 				// Schutz vor CSV-Injection in Tabellenkalkulationen.
 				if ( '' !== $cell && in_array( $cell[0], array( '=', '+', '-', '@' ), true ) ) {

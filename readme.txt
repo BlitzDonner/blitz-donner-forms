@@ -28,7 +28,7 @@ Blitz & Donner Forms brings forms into the block editor – no shortcodes, no se
 
 **Extensible by design**
 
-The plugin exposes a documented set of hooks (`bdf_submit_chain`, `bdf_store_submission_payload`, `bdf_store_file`, `bdf_settings_cards`, `bdf_capabilities` and more) so that add-ons can extend the defence chain, storage and backend without patching the plugin. See `docs/hooks.md` in the plugin folder.
+The plugin exposes a documented set of hooks (`bdfrms_submit_chain`, `bdfrms_store_submission_payload`, `bdfrms_store_file`, `bdfrms_settings_cards`, `bdfrms_capabilities` and more) so that add-ons can extend the defence chain, storage and backend without patching the plugin. See `docs/hooks.md` in the plugin folder.
 
 == External services ==
 

@@ -11,9 +11,9 @@ Etappe 1 – Gerüst. Aktivierbares Plugin-Skelett mit Datenbank-Schema, Capabil
 | Ebene | Wert |
 |---|---|
 | Slug / Textdomain | `blitz-donner-forms` |
-| Code-Präfix | `bdf_` / Klassen `BDF_` |
-| Block-Namespace | `bdf/*` |
-| DB-Tabellen | `{prefix}bdf_submissions`, `{prefix}bdf_files` |
+| Code-Präfix | `bdfrms_` / Klassen `BDFRMS_` |
+| Block-Namespace | `bdfrms/*` |
+| DB-Tabellen | `{prefix}bdfrms_submissions`, `{prefix}bdfrms_files` |
 | Lizenz | GPL-2.0-or-later |
 
 ## Architektur

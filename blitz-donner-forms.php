@@ -20,19 +20,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BDF_PLUGIN_FILE', __FILE__ );
-define( 'BDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'BDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'BDF_PLUGIN_VERSION', '0.1.0' );
+define( 'BDFRMS_PLUGIN_FILE', __FILE__ );
+define( 'BDFRMS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'BDFRMS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'BDFRMS_PLUGIN_VERSION', '0.1.0' );
 
 // Reihenfolge wichtig: Capabilities zuerst, dann alles, was sie nutzt.
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-capabilities.php';
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-captcha.php';
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-file-storage.php';
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-submit-handler.php';
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-install.php';
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-admin-submissions.php';
-require_once BDF_PLUGIN_DIR . 'includes/class-bdf-admin-settings.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-capabilities.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-captcha.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-file-storage.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-submit-handler.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-install.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-admin-submissions.php';
+require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-admin-settings.php';
 
 /**
  * Lädt Übersetzungen gemäss WordPress-Locale (Einstellungen → Allgemein →
@@ -41,18 +41,18 @@ require_once BDF_PLUGIN_DIR . 'includes/class-bdf-admin-settings.php';
  *
  * @return void
  */
-function bdf_load_textdomain() {
+function bdfrms_load_textdomain() {
 	load_plugin_textdomain(
 		'blitz-donner-forms',
 		false,
-		dirname( plugin_basename( BDF_PLUGIN_FILE ) ) . '/languages'
+		dirname( plugin_basename( BDFRMS_PLUGIN_FILE ) ) . '/languages'
 	);
 }
-add_action( 'init', 'bdf_load_textdomain', 1 );
+add_action( 'init', 'bdfrms_load_textdomain', 1 );
 
-register_activation_hook( __FILE__, array( 'BDF_Install', 'activate' ) );
+register_activation_hook( __FILE__, array( 'BDFRMS_Install', 'activate' ) );
 
-BDF_File_Storage::boot();
-BDF_Submit_Handler::boot();
-BDF_Admin_Submissions::boot();
-BDF_Admin_Settings::boot();
+BDFRMS_File_Storage::boot();
+BDFRMS_Submit_Handler::boot();
+BDFRMS_Admin_Submissions::boot();
+BDFRMS_Admin_Settings::boot();

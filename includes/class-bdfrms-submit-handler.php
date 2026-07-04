@@ -8,7 +8,7 @@
  * Bestand («Blitz & Donner Formular», bis 2.9.3) übernommen.
  *
  * Abwehrkette: Honeypot -> Nonce -> Rate-Limit -> Captcha. Add-ons können
- * über den Filter `bdf_submit_chain` weitere Stufen einhängen oder
+ * über den Filter `bdfrms_submit_chain` weitere Stufen einhängen oder
  * bestehende ersetzen. Jede Stufe ist ein Callable und liefert
  * true (weiter) oder einen Status-Slug (Abbruch).
  *
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Submit-Endpoint mit erweiterbarer Abwehrkette.
  */
-class BDF_Submit_Handler {
+class BDFRMS_Submit_Handler {
 
 	const STATUS_OK                      = 'success';
 	const STATUS_ERR_REQUEST             = 'err_request';
@@ -38,7 +38,7 @@ class BDF_Submit_Handler {
 	/**
 	 * Name des Honeypot-Felds im Frontend-Formular.
 	 */
-	const HONEYPOT_FIELD = 'bdf_website_extra';
+	const HONEYPOT_FIELD = 'bdfrms_website_extra';
 
 	/**
 	 * Rate-Limit: maximale Submits pro IP im Zeitfenster.
@@ -54,15 +54,15 @@ class BDF_Submit_Handler {
 	public static function boot() {
 		add_action( 'admin_post_bdf_submit', array( __CLASS__, 'handle' ) );
 		add_action( 'admin_post_nopriv_bdf_submit', array( __CLASS__, 'handle' ) );
-		add_action( 'admin_init', array( 'BDF_Install', 'maybe_upgrade' ) );
+		add_action( 'admin_init', array( 'BDFRMS_Install', 'maybe_upgrade' ) );
 	}
 
 	// Abschnitt: Abwehrkette.
 
 	/**
-	 * Standard-Stufen der Abwehrkette, erweiterbar via `bdf_submit_chain`.
+	 * Standard-Stufen der Abwehrkette, erweiterbar via `bdfrms_submit_chain`.
 	 *
-	 * @param array<string,mixed> $form_attrs Attribute des bdf/form-Blocks.
+	 * @param array<string,mixed> $form_attrs Attribute des bdfrms/form-Blocks.
 	 * @return array<string,callable> Stufen-ID => Callable.
 	 */
 	public static function defense_chain( array $form_attrs ) {
@@ -84,9 +84,9 @@ class BDF_Submit_Handler {
 		 * @since 0.1.0
 		 *
 		 * @param array<string,callable> $chain      Stufen der Basis.
-		 * @param array<string,mixed>    $form_attrs Attribute des bdf/form-Blocks.
+		 * @param array<string,mixed>    $form_attrs Attribute des bdfrms/form-Blocks.
 		 */
-		$filtered = apply_filters( 'bdf_submit_chain', $chain, $form_attrs );
+		$filtered = apply_filters( 'bdfrms_submit_chain', $chain, $form_attrs );
 
 		return is_array( $filtered ) ? $filtered : $chain;
 	}
@@ -128,8 +128,8 @@ class BDF_Submit_Handler {
 	 * @return true|string
 	 */
 	public static function stage_nonce( array $form_attrs ) {
-		$nonce = isset( $_POST['bdf_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['bdf_nonce'] ) ) : '';
-		return wp_verify_nonce( $nonce, 'bdf_submit' ) ? true : self::STATUS_ERR_NONCE;
+		$nonce = isset( $_POST['bdfrms_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['bdfrms_nonce'] ) ) : '';
+		return wp_verify_nonce( $nonce, 'bdfrms_submit' ) ? true : self::STATUS_ERR_NONCE;
 	}
 
 	/**
@@ -143,7 +143,7 @@ class BDF_Submit_Handler {
 		if ( '' === $ip ) {
 			return true;
 		}
-		$key   = 'bdf_rate_' . md5( $ip );
+		$key   = 'bdfrms_rate_' . md5( $ip );
 		$count = (int) get_transient( $key );
 		if ( $count >= self::RATE_LIMIT_MAX ) {
 			return self::STATUS_ERR_RATE;
@@ -159,17 +159,17 @@ class BDF_Submit_Handler {
 	 * @return true|string
 	 */
 	public static function stage_captcha( array $form_attrs ) {
-		if ( ! BDF_Captcha::is_active_for_form( $form_attrs ) ) {
+		if ( ! BDFRMS_Captcha::is_active_for_form( $form_attrs ) ) {
 			return true;
 		}
-		$token  = isset( $_POST[ BDF_Captcha::RESPONSE_FIELD ] ) ? sanitize_text_field( wp_unslash( $_POST[ BDF_Captcha::RESPONSE_FIELD ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce-Stufe läuft in derselben Kette.
-		$verify = BDF_Captcha::verify( $token );
+		$token  = isset( $_POST[ BDFRMS_Captcha::RESPONSE_FIELD ] ) ? sanitize_text_field( wp_unslash( $_POST[ BDFRMS_Captcha::RESPONSE_FIELD ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce-Stufe läuft in derselben Kette.
+		$verify = BDFRMS_Captcha::verify( $token );
 
 		if ( 'pass' === $verify['result'] ) {
 			return true;
 		}
 		if ( 'unreachable' === $verify['result'] ) {
-			$settings = BDF_Captcha::get_settings();
+			$settings = BDFRMS_Captcha::get_settings();
 			// soft: bei gestörtem Anbieter durchlassen; strict: fail-closed.
 			return ( 'strict' === $settings['mode'] ) ? self::STATUS_ERR_CAPTCHA_UNREACHABLE : true;
 		}
@@ -187,8 +187,8 @@ class BDF_Submit_Handler {
 	 * @return void
 	 */
 	public static function handle() {
-		$post_id = isset( $_POST['bdf_post_id'] ) ? absint( wp_unslash( $_POST['bdf_post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce prüft die Abwehrkette.
-		$form_id = isset( $_POST['bdf_form_id'] ) ? sanitize_key( wp_unslash( $_POST['bdf_form_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$post_id = isset( $_POST['bdfrms_post_id'] ) ? absint( wp_unslash( $_POST['bdfrms_post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce prüft die Abwehrkette.
+		$form_id = isset( $_POST['bdfrms_form_id'] ) ? sanitize_key( wp_unslash( $_POST['bdfrms_form_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( $post_id <= 0 || '' === $form_id ) {
 			self::redirect_with_status( self::STATUS_ERR_REQUEST, $post_id );
@@ -234,7 +234,7 @@ class BDF_Submit_Handler {
 		/**
 		 * Feld-Datensatz vor dem Speichern verändern.
 		 *
-		 * Läuft unmittelbar vor dem INSERT in {prefix}bdf_submissions. Das
+		 * Läuft unmittelbar vor dem INSERT in {prefix}bdfrms_submissions. Das
 		 * Security-Add-on ersetzt hier Klartextwerte durch verschlüsselte
 		 * Envelopes. Der Rückgabewert wird als JSON in `payload` gespeichert.
 		 *
@@ -243,10 +243,10 @@ class BDF_Submit_Handler {
 		 * @param array<string,mixed> $payload Feld-Datensatz (Feldname => Wert).
 		 * @param array               $context {post_id, form_id, form_title}.
 		 */
-		$payload = apply_filters( 'bdf_store_submission_payload', $payload, $context );
+		$payload = apply_filters( 'bdfrms_store_submission_payload', $payload, $context );
 
 		$inserted = $wpdb->insert(
-			$wpdb->prefix . 'bdf_submissions',
+			$wpdb->prefix . 'bdfrms_submissions',
 			array(
 				'created_at' => current_time( 'mysql' ),
 				'post_id'    => (int) $post_id,
@@ -270,15 +270,15 @@ class BDF_Submit_Handler {
 		 *
 		 * Anschlusspunkt für Benachrichtigungen und Add-ons (Mautic/CRM,
 		 * Team-Workflows). Der Payload ist der GESPEICHERTE Datensatz –
-		 * nach `bdf_store_submission_payload`, also ggf. verschlüsselt.
+		 * nach `bdfrms_store_submission_payload`, also ggf. verschlüsselt.
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param int                 $submission_id Zeilen-ID in {prefix}bdf_submissions.
+		 * @param int                 $submission_id Zeilen-ID in {prefix}bdfrms_submissions.
 		 * @param array<string,mixed> $payload       Gespeicherter Datensatz.
 		 * @param array               $context       {post_id, form_id, form_title}.
 		 */
-		do_action( 'bdf_submission_stored', $submission_id, $payload, $context );
+		do_action( 'bdfrms_submission_stored', $submission_id, $payload, $context );
 
 		return $submission_id;
 	}
@@ -295,7 +295,7 @@ class BDF_Submit_Handler {
 		if ( ! $url ) {
 			$url = home_url( '/' );
 		}
-		wp_safe_redirect( add_query_arg( 'bdf_status', rawurlencode( $status ), $url ) );
+		wp_safe_redirect( add_query_arg( 'bdfrms_status', rawurlencode( $status ), $url ) );
 		exit;
 	}
 }

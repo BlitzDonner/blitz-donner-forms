@@ -17,8 +17,6 @@
 		<!-- Direkte Tabellenzugriffe sind Kern des Plugins (eigene Tabellen). -->
 		<exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery"/>
 		<exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching"/>
-		<!-- Kennung bdf_/BDF_ ist Produktentscheid (Konzept 04.07.2026, verbindlich ab Commit 1). -->
-		<exclude name="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed"/>
 		<!-- Hook- und Ketten-Signaturen führen Parameter, die einzelne Stufen nicht nutzen. -->
 		<exclude name="Generic.CodeAnalysis.UnusedFunctionParameter"/>
 		<!-- Eigene Ablage: is_writable-Check gehört zur Storage-Diagnose. -->
@@ -41,8 +39,8 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="bdf"/>
-				<element value="BDF"/>
+				<element value="bdfrms"/>
+				<element value="BDFRMS"/>
 			</property>
 		</properties>
 	</rule>

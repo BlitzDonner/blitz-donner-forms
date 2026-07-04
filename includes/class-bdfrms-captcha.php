@@ -5,11 +5,11 @@
  * Kapselt die gesamte CAPTCHA-Logik schlank in einer Klasse, analog zum
  * ClamAV-Muster des Vorgängers. Ein Anbieter, eine Klasse. Ein zweiter Anbieter liesse
  * sich später hinter render_widget()/verify() nachruesten, ohne den
- * Submit-Fluss in BDF_Submit_Handler::handle() umzubauen.
+ * Submit-Fluss in BDFRMS_Submit_Handler::handle() umzubauen.
  *
  * Verantwortlich fuer:
  *  - get_settings()/update_settings(): Persistenz im Options-Blob
- *    `bdf_captcha_settings` (analog ClamAV-Settings-Muster).
+ *    `bdfrms_captcha_settings` (analog ClamAV-Settings-Muster).
  *  - is_active_for_form(): Wirksamkeit pro Formular (global + Block-Attribut).
  *  - render_widget(): serverseitiger Widget-Container im Formular (nur Site-Key).
  *  - verify(): serverseitige Token-Pruefung gegen den Friendly-Captcha
@@ -44,12 +44,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Friendly-Captcha-Integration (Einstellungen, Widget, Verifikation).
  */
-class BDF_Captcha {
+class BDFRMS_Captcha {
 
 	/**
 	 * Options-Blob mit der gesamten CAPTCHA-Konfiguration.
 	 */
-	const OPTION_KEY = 'bdf_captcha_settings';
+	const OPTION_KEY = 'bdfrms_captcha_settings';
 
 	/**
 	 * Fester Anbieter-Slug. Es gibt nur einen Anbieter; das Feld dient allein
@@ -192,7 +192,7 @@ class BDF_Captcha {
 	 *   global Nein+ Keys ja  : on ×, inherit –
 	 *   global Nein+ Keys nein: nichts
 	 *
-	 * @param array<string,mixed> $form_attrs bdf/form-Block-Attribute.
+	 * @param array<string,mixed> $form_attrs bdfrms/form-Block-Attribute.
 	 * @return bool
 	 */
 	public static function is_active_for_form( array $form_attrs ) {
@@ -234,21 +234,21 @@ class BDF_Captcha {
 			return '';
 		}
 		$s      = self::get_settings();
-		$dom_id = 'bdf-captcha-' . preg_replace( '/[^a-z0-9_\-]/i', '', (string) $instance_id );
+		$dom_id = 'bdfrms-captcha-' . preg_replace( '/[^a-z0-9_\-]/i', '', (string) $instance_id );
 		$label  = __( 'Spam-Schutz', 'blitz-donner-forms' );
 		$hint   = __( 'Bitte den Spam-Schutz abschliessen, bevor du das Formular absendest.', 'blitz-donner-forms' );
 
 		ob_start();
 		?>
-		<div class="bdf-captcha-row" data-bdf-captcha="1">
-			<span class="bdf-captcha-label" id="<?php echo esc_attr( $dom_id ); ?>-label"><?php echo esc_html( $label ); ?></span>
+		<div class="bdfrms-captcha-row" data-bdfrms-captcha="1">
+			<span class="bdfrms-captcha-label" id="<?php echo esc_attr( $dom_id ); ?>-label"><?php echo esc_html( $label ); ?></span>
 			<div
-				class="frc-captcha bdf-captcha-widget"
+				class="frc-captcha bdfrms-captcha-widget"
 				data-sitekey="<?php echo esc_attr( $s['site_key'] ); ?>"
 				role="group"
 				aria-labelledby="<?php echo esc_attr( $dom_id ); ?>-label"
 			></div>
-			<p class="bdf-captcha-hint" id="<?php echo esc_attr( $dom_id ); ?>-hint"><?php echo esc_html( $hint ); ?></p>
+			<p class="bdfrms-captcha-hint" id="<?php echo esc_attr( $dom_id ); ?>-hint"><?php echo esc_html( $hint ); ?></p>
 		</div>
 		<?php
 		return (string) ob_get_clean();

@@ -15,27 +15,27 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 global $wpdb;
 
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdf_submissions" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Deinstallation.
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdf_files" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Deinstallation.
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdfrms_submissions" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Deinstallation.
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdfrms_files" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Deinstallation.
 
-delete_option( 'bdf_db_version' );
-delete_option( 'bdf_captcha_settings' );
+delete_option( 'bdfrms_db_version' );
+delete_option( 'bdfrms_captcha_settings' );
 
 // Capabilities aus allen Rollen entfernen.
-$bdf_caps = array(
-	'bdf_view_submissions',
-	'bdf_delete_submissions',
-	'bdf_export_submissions',
-	'bdf_manage_settings',
+$bdfrms_caps = array(
+	'bdfrms_view_submissions',
+	'bdfrms_delete_submissions',
+	'bdfrms_export_submissions',
+	'bdfrms_manage_settings',
 );
 
-$bdf_roles = wp_roles();
-foreach ( $bdf_roles->roles as $bdf_role_slug => $bdf_role_data ) {
-	$bdf_role = get_role( $bdf_role_slug );
-	if ( ! $bdf_role ) {
+$bdfrms_roles = wp_roles();
+foreach ( $bdfrms_roles->roles as $bdfrms_role_slug => $bdfrms_role_data ) {
+	$bdfrms_role = get_role( $bdfrms_role_slug );
+	if ( ! $bdfrms_role ) {
 		continue;
 	}
-	foreach ( $bdf_caps as $bdf_cap ) {
-		$bdf_role->remove_cap( $bdf_cap );
+	foreach ( $bdfrms_caps as $bdfrms_cap ) {
+		$bdfrms_role->remove_cap( $bdfrms_cap );
 	}
 }
