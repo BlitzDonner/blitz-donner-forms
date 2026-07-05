@@ -38,6 +38,54 @@
         "helpText": {
             "type": "string",
             "default": ""
+        },
+        "colorLabel": {
+            "type": "string",
+            "default": ""
+        },
+        "colorText": {
+            "type": "string",
+            "default": ""
+        },
+        "colorPlaceholder": {
+            "type": "string",
+            "default": ""
+        },
+        "colorFieldBg": {
+            "type": "string",
+            "default": ""
+        },
+        "colorBorder": {
+            "type": "string",
+            "default": ""
+        },
+        "colorFocus": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorLabel": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorText": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorPlaceholder": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorFieldBg": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorBorder": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorFocus": {
+            "type": "string",
+            "default": ""
         }
     },
     "supports": {

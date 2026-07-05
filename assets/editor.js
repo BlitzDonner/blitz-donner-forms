@@ -49,11 +49,54 @@
 		'bdfrms/field-file',
 	];
 
+	/**
+	 * Farb-Override-Zeilen für ein Feld (Stil-Tab). Leerer Wert = erbt die
+	 * Formular-Farbe. dark=true bedient die darkColor*-Attribute.
+	 *
+	 * @param {object} attributes
+	 * @param {Function} setAttributes
+	 * @param {boolean} dark
+	 * @param {boolean} isSubmit
+	 * @return {Array}
+	 */
+	function bdfrmsFieldColorRows( attributes, setAttributes, dark, isSubmit ) {
+		function row( key, label ) {
+			var attr = dark ? 'dark' + key.charAt( 0 ).toUpperCase() + key.slice( 1 ) : key;
+			return {
+				label: label,
+				value: attributes[ attr ] || '',
+				onChange: ( function ( target ) {
+					return function ( v ) {
+						var patch = {};
+						patch[ target ] = v || '';
+						setAttributes( patch );
+					};
+				} )( attr ),
+			};
+		}
+		if ( isSubmit ) {
+			return [
+				row( 'colorButtonBg', __( 'Button-Hintergrund', 'blitz-donner-forms' ) ),
+				row( 'colorButtonText', __( 'Button-Text', 'blitz-donner-forms' ) ),
+				row( 'colorFocus', __( 'Fokus', 'blitz-donner-forms' ) ),
+			];
+		}
+		return [
+			row( 'colorLabel', __( 'Label', 'blitz-donner-forms' ) ),
+			row( 'colorText', __( 'Eingabetext', 'blitz-donner-forms' ) ),
+			row( 'colorPlaceholder', __( 'Platzhalter', 'blitz-donner-forms' ) ),
+			row( 'colorFieldBg', __( 'Feldhintergrund', 'blitz-donner-forms' ) ),
+			row( 'colorBorder', __( 'Rahmen', 'blitz-donner-forms' ) ),
+			row( 'colorFocus', __( 'Fokus (Rahmen)', 'blitz-donner-forms' ) ),
+		];
+	}
+
 	wp.hooks.addFilter(
 		'blocks.registerBlockType',
 		'bdfrms/field-help-display',
 		function ( settings, name ) {
-			if ( BDFRMS_HELP_BLOCKS.indexOf( name ) === -1 || typeof settings.edit !== 'function' ) {
+			var isSubmit = 'bdfrms/field-submit' === name;
+			if ( ( BDFRMS_HELP_BLOCKS.indexOf( name ) === -1 && ! isSubmit ) || typeof settings.edit !== 'function' ) {
 				return settings;
 			}
 			var OriginalEdit = settings.edit;
@@ -62,13 +105,41 @@
 				// damit die Hooks des Original-edit intakt bleiben.
 				var out  = OriginalEdit( props );
 				var a    = props.attributes || {};
-				var text = a.helpText ? String( a.helpText ).trim() : '';
+				var text = ! isSubmit && a.helpText ? String( a.helpText ).trim() : '';
 				// Pflichtstern ohne Label: wie im Frontend schwebend am Feld.
-				var needsStar = !! a.required && '' === String( a.label || '' ).trim();
-				if ( ( '' === text && ! needsStar ) || ! out || ! out.props ) {
+				var needsStar = ! isSubmit && !! a.required && '' === String( a.label || '' ).trim();
+				if ( ! out || ! out.props ) {
 					return out;
 				}
 				var kids = wp.element.Children.toArray( out.props.children );
+
+				// Stil-Tab: Feldfarben-Overrides (leer = erbt vom Formular).
+				// Im Farbmodus «Theme» gibt es wie beim Formular keine Panels.
+				var isThemeMode = !! ( props.context && 'theme' === props.context['bdfrms/appearanceMode'] );
+				kids.push(
+					el(
+						InspectorControls,
+						{ group: 'styles', key: 'bdfrms-field-style' },
+						isThemeMode
+							? el( Notice, {
+									status: 'info',
+									isDismissible: false,
+							  }, __( 'Im Farbmodus «Theme» kommen alle Farben aus dem Theme. Feldfarben gibt es in den Modi Hell, Dunkel oder Automatisch (Stil-Tab des Formular-Blocks).', 'blitz-donner-forms' ) )
+							: el(
+									wp.element.Fragment,
+									null,
+									renderGfbColorPanel(
+										isSubmit ? __( 'Button-Farben (Hell)', 'blitz-donner-forms' ) : __( 'Feldfarben (Hell)', 'blitz-donner-forms' ),
+										bdfrmsFieldColorRows( a, props.setAttributes, false, isSubmit )
+									),
+									renderGfbColorPanel(
+										isSubmit ? __( 'Button-Farben (Dunkel)', 'blitz-donner-forms' ) : __( 'Feldfarben (Dunkel)', 'blitz-donner-forms' ),
+										bdfrmsFieldColorRows( a, props.setAttributes, true, isSubmit )
+									)
+							  )
+					)
+				);
+
 				if ( needsStar ) {
 					kids.push(
 						el(
@@ -1186,10 +1257,17 @@
 	function mergeFieldColorAttrs( fieldAttrs, ctx ) {
 		ctx = ctx || {};
 		var mode = ctx['bdfrms/appearanceMode'] || 'auto';
+		function fieldDarkKey( key ) {
+			return 'dark' + key.charAt( 0 ).toUpperCase() + key.slice( 1 );
+		}
 		function pickTheme( key, ctxLight, ctxDark ) {
 			var fv = fieldAttrs[ key ];
 			if ( fv && String( fv ).trim() !== '' ) {
 				return fv;
+			}
+			var fvDark = fieldAttrs[ fieldDarkKey( key ) ];
+			if ( fvDark && String( fvDark ).trim() !== '' ) {
+				return fvDark;
 			}
 			var light = ctx[ ctxLight ];
 			var dark = ctx[ ctxDark ];
@@ -1215,7 +1293,10 @@
 		}
 		var palette = resolveActivePalette( mode );
 		function pick( key, ctxLight, ctxDark ) {
-			var fv = fieldAttrs[ key ];
+			// Feld-Override NUR der aktiven Palette gewinnt – exakt wie im
+			// Frontend (dort binden die CSS-Variablen pro Palette); danach
+			// die Formular-Farben aus dem Kontext.
+			var fv = palette === 'dark' ? fieldAttrs[ fieldDarkKey( key ) ] : fieldAttrs[ key ];
 			if ( fv && String( fv ).trim() !== '' ) {
 				return fv;
 			}

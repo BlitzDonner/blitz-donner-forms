@@ -1015,3 +1015,55 @@
 	right: 0.85em;
 	pointer-events: none;
 }
+
+/* Feld-Overrides (Stil-Tab der Feld-Blöcke): Die Zuordnung der Hell/
+   Dunkel-Variablen wird auf Feldebene erneut ausgewertet. Ohne eigene
+   Inline-Werte erbt das Feld die Formular-Farben unverändert; setzt der
+   Block eigene --bdfrms-light-*/--bdfrms-dark-*-Werte, gewinnen sie –
+   pro Palette, exakt wie beim Formular-Wrapper. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field {
+	--bdfrms-text: var(--bdfrms-light-text, #1d1d1f);
+	--bdfrms-label: var(--bdfrms-light-label, #6e6e73);
+	--bdfrms-placeholder: var(--bdfrms-light-placeholder, var(--bdfrms-label));
+	--bdfrms-field-bg: var(--bdfrms-light-bg, #ffffff);
+	--bdfrms-border: var(--bdfrms-light-border, #d2d2d7);
+	--bdfrms-accent: var(--bdfrms-light-border-focus, #0071e3);
+	--bdfrms-on-accent: var(--bdfrms-light-submit-text, #ffffff);
+	--bdfrms-button-bg: var(--bdfrms-light-submit-bg, var(--bdfrms-accent));
+	--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+}
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field {
+	--bdfrms-text: var(--bdfrms-dark-text, #f5f5f7);
+	--bdfrms-label: var(--bdfrms-dark-label, #aeaeb2);
+	--bdfrms-placeholder: var(--bdfrms-dark-placeholder, var(--bdfrms-label));
+	--bdfrms-field-bg: var(--bdfrms-dark-bg, #2c2c2e);
+	--bdfrms-border: var(--bdfrms-dark-border, #48484a);
+	--bdfrms-accent: var(--bdfrms-dark-border-focus, #0a84ff);
+	--bdfrms-on-accent: var(--bdfrms-dark-submit-text, #ffffff);
+	--bdfrms-button-bg: var(--bdfrms-dark-submit-bg, var(--bdfrms-accent));
+	--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+}
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field {
+	--bdfrms-text: var(--bdfrms-light-text, #1d1d1f);
+	--bdfrms-label: var(--bdfrms-light-label, #6e6e73);
+	--bdfrms-placeholder: var(--bdfrms-light-placeholder, var(--bdfrms-label));
+	--bdfrms-field-bg: var(--bdfrms-light-bg, #ffffff);
+	--bdfrms-border: var(--bdfrms-light-border, #d2d2d7);
+	--bdfrms-accent: var(--bdfrms-light-border-focus, #0071e3);
+	--bdfrms-on-accent: var(--bdfrms-light-submit-text, #ffffff);
+	--bdfrms-button-bg: var(--bdfrms-light-submit-bg, var(--bdfrms-accent));
+	--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+	.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field {
+		--bdfrms-text: var(--bdfrms-dark-text, #f5f5f7);
+		--bdfrms-label: var(--bdfrms-dark-label, #aeaeb2);
+		--bdfrms-placeholder: var(--bdfrms-dark-placeholder, var(--bdfrms-label));
+		--bdfrms-field-bg: var(--bdfrms-dark-bg, #2c2c2e);
+		--bdfrms-border: var(--bdfrms-dark-border, #48484a);
+		--bdfrms-accent: var(--bdfrms-dark-border-focus, #0a84ff);
+		--bdfrms-on-accent: var(--bdfrms-dark-submit-text, #ffffff);
+		--bdfrms-button-bg: var(--bdfrms-dark-submit-bg, var(--bdfrms-accent));
+		--bdfrms-focus-ring: 0 0 0 4px color-mix(in srgb, var(--bdfrms-accent) 25%, transparent);
+	}
+}

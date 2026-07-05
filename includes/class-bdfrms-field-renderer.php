@@ -89,6 +89,8 @@ class BDFRMS_Field_Renderer {
 			'sensitive'   => ! empty( $attrs['sensitive'] ),
 			// Hilfetext (Legende) unterhalb des Felds, wie eine Bildunterschrift.
 			'help'        => isset( $attrs['helpText'] ) ? trim( wp_strip_all_tags( (string) $attrs['helpText'] ) ) : '',
+			// Farb-Overrides aus dem Stil-Tab des Felds (CSS-Variablen).
+			'style'       => BDFRMS_Plugin::build_field_inline_color_style( $attrs ),
 			// Gutenberg-Standard: «Zusätzliche CSS-Klasse(n)» aus dem Editor.
 			'_className'  => isset( $attrs['_className'] ) ? (string) $attrs['_className'] : '',
 		);
@@ -117,6 +119,9 @@ class BDFRMS_Field_Renderer {
 		$attrs = '';
 		if ( $common['sensitive'] ) {
 			$attrs = ' data-bdfrms-sensitive="1"';
+		}
+		if ( ! empty( $common['style'] ) ) {
+			$attrs .= ' style="' . esc_attr( $common['style'] ) . '"';
 		}
 		// Pill nur, wenn ein Add-on die Markierung auswertet – die Basis
 		// verspricht sonst eine Vertraulichkeit, die sie nicht liefert.
@@ -566,6 +571,9 @@ class BDFRMS_Field_Renderer {
 		if ( $c['sensitive'] ) {
 			$fs_attrs = ' data-bdfrms-sensitive="1"';
 		}
+		if ( ! empty( $c['style'] ) ) {
+			$fs_attrs .= ' style="' . esc_attr( $c['style'] ) . '"';
+		}
 		// Pill nur bei aktiver Vertraulich-Oberfläche (siehe wrap()).
 		$pill     = ( $c['sensitive'] && BDFRMS_Plugin::sensitive_ui_active() )
 			? '<span class="bdfrms-pill bdfrms-pill-sensitive" aria-label="' . esc_attr__( 'Als vertraulich markiert', 'blitz-donner-forms' ) . '">'
@@ -757,7 +765,10 @@ class BDFRMS_Field_Renderer {
 		if ( '' === $text ) {
 			$text = __( 'Formular absenden', 'blitz-donner-forms' );
 		}
-		return '<div class="bdfrms-field bdfrms-field-submit"><div class="wp-block-button is-style-default"><button type="submit" class="wp-block-button__link wp-element-button">'
+		// Button-Farb-Overrides aus dem Stil-Tab (eigener Pfad ohne wrap()).
+		$style      = BDFRMS_Plugin::build_field_inline_color_style( $a );
+		$style_attr = '' !== $style ? ' style="' . esc_attr( $style ) . '"' : '';
+		return '<div class="bdfrms-field bdfrms-field-submit"' . $style_attr . '><div class="wp-block-button is-style-default"><button type="submit" class="wp-block-button__link wp-element-button">'
 			. esc_html( $text )
 			. '</button></div></div>';
 	}

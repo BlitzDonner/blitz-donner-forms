@@ -351,7 +351,7 @@ class BDFRMS_Plugin {
 	 * @param mixed $value Raw attribute.
 	 * @return string Sicherer CSS-Wert oder leer.
 	 */
-	private static function sanitize_bdfrms_color( $value ) {
+	public static function sanitize_bdfrms_color( $value ) {
 		if ( ! is_string( $value ) ) {
 			return '';
 		}
@@ -451,6 +451,48 @@ class BDFRMS_Plugin {
 	 * @param array<string,mixed> $attributes Block-Attribute.
 	 * @return string Semikolon-getrennte Deklarationen ohne abschliessendes Semikolon am Ende (für style=").
 	 */
+	/**
+	 * CSS-Variablen für Feld-Overrides (Stil-Tab der Feld-Blöcke). Gleiche
+	 * Variablennamen wie beim Formular, nur eine Ebene tiefer auf dem
+	 * Feld-Element gesetzt – leere Attribute erben die Formular-Farbe.
+	 *
+	 * @param array<string,mixed> $attributes Feld-Block-Attribute.
+	 * @return string Semikolon-getrennte Deklarationen oder leer.
+	 */
+	public static function build_field_inline_color_style( $attributes ) {
+		$map = array(
+			'colorLabel'           => '--bdfrms-light-label',
+			'colorText'            => '--bdfrms-light-text',
+			'colorPlaceholder'     => '--bdfrms-light-placeholder',
+			'colorFieldBg'         => '--bdfrms-light-bg',
+			'colorBorder'          => '--bdfrms-light-border',
+			'colorFocus'           => '--bdfrms-light-border-focus',
+			'colorButtonBg'        => '--bdfrms-light-submit-bg',
+			'colorButtonText'      => '--bdfrms-light-submit-text',
+			'darkColorLabel'       => '--bdfrms-dark-label',
+			'darkColorText'        => '--bdfrms-dark-text',
+			'darkColorPlaceholder' => '--bdfrms-dark-placeholder',
+			'darkColorFieldBg'     => '--bdfrms-dark-bg',
+			'darkColorBorder'      => '--bdfrms-dark-border',
+			'darkColorFocus'       => '--bdfrms-dark-border-focus',
+			'darkColorButtonBg'    => '--bdfrms-dark-submit-bg',
+			'darkColorButtonText'  => '--bdfrms-dark-submit-text',
+		);
+
+		$parts = array();
+		foreach ( $map as $attr => $var ) {
+			if ( empty( $attributes[ $attr ] ) ) {
+				continue;
+			}
+			$c = self::sanitize_bdfrms_color( $attributes[ $attr ] );
+			if ( '' !== $c ) {
+				$parts[] = $var . ':' . $c;
+			}
+		}
+
+		return implode( ';', $parts );
+	}
+
 	private static function build_form_inline_color_style( $attributes ) {
 		$light_map = array(
 			'colorLabel'       => '--bdfrms-light-label',

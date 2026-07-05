@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.4.1
+Stable tag: 0.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,6 +25,7 @@ Blitz & Donner Forms brings forms into the block editor – no shortcodes, no se
 * Per-field help text: set it in the block sidebar and it renders like a caption below the field; screen readers announce it via aria-describedby
 * CSV export and per-submission ZIP download
 * Appearance system: light/dark/auto/theme, colours and gradients
+* Per-field colour overrides in the Styles tab (label, input text, placeholder, background, border, focus – light and dark; button colours on the submit block); empty values inherit from the form
 * Own capability model: decide per role who may view, delete or export submissions
 * Translation-ready (German, English, French, Italian)
 
@@ -64,6 +65,9 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.5.0 =
+* Added: per-field colour overrides in the Styles tab of every field block (label, input text, placeholder, field background, border, focus – each for light and dark). The submit block gets button background, button text and focus. Empty values inherit the form colours; the theme colour mode keeps fields theme-styled.
 
 = 0.4.1 =
 * Changed: the appearance panel (colour mode and form colours) moved from the settings tab to the Styles tab of the form block, following the editor convention.

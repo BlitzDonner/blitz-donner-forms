@@ -26,6 +26,18 @@
         "colorButtonText": {
             "type": "string",
             "default": ""
+        },
+        "darkColorFocus": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorButtonBg": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorButtonText": {
+            "type": "string",
+            "default": ""
         }
     },
     "supports": {
