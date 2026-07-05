@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,7 @@ Blitz & Donner Forms brings forms into the block editor – no shortcodes, no se
 * Server-side validation, honeypot, nonce protection and rate limiting as standard – the full defence chain is part of the free plugin
 * Optional spam protection with Friendly Captcha (privacy-friendly, no cookies, no tracking, proof-of-work, processed in the EU)
 * One email notification per submission with field placeholders
+* Local draft saving with a single switch: visitors' entries are kept in their browser, restored automatically and expire after 7 days
 * CSV export and per-submission ZIP download
 * Appearance system: light/dark/auto/theme, colours and gradients
 * Own capability model: decide per role who may view, delete or export submissions
@@ -62,6 +63,11 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.2.1 =
+* Simplified draft saving to a single on/off switch. Restore mode, expiry (7 days) and the reset button now use sensible defaults; the block attributes remain available for advanced use.
+* The "confidential" field toggle and badge only appear when an add-on actually evaluates the flag (new filter bdfrms_sensitive_ui_active) – the free base stores plain text and no longer suggests otherwise.
+* New forms default to the automatic (system) appearance mode.
 
 = 0.2.0 =
 * Ported the proven form engine from the predecessor plugin: form and field blocks (bdfrms/*), server-side schema validation, defence chain (nonce, HMAC token, honeypot, rate limit, Friendly Captcha), email notification, appearance system, draft saving, file uploads with protected storage, submissions backend with labels, file downloads, CSV export and per-submission ZIP download.

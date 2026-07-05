@@ -1744,55 +1744,18 @@
 								setAttributes( { formTitle: v == null ? '' : String( v ) } );
 							},
 						} ),
-						el( Notice, { status: 'info', isDismissible: false }, __( 'Feldwerte werden im Browser als lokale Entwürfe zwischengespeichert.', 'blitz-donner-forms' ) ),
+						// Entwurfsspeicherung: bewusst nur EIN Schalter (Entscheid
+						// Stefan 05.07.2026). Die Detail-Attribute restoreMode,
+						// draftTtlDays und showDraftReset bleiben im Schema und
+						// wirken mit ihren Defaults (auto, 7 Tage, Button an);
+						// sie sind über das Block-Markup weiterhin setzbar.
 						el( ToggleControl, {
 							label: __( 'Lokale Entwurfsspeicherung aktivieren', 'blitz-donner-forms' ),
+							help: __( 'Eingaben werden im Browser der Besucherin zwischengespeichert und beim nächsten Besuch automatisch wiederhergestellt. Entwürfe verfallen nach 7 Tagen.', 'blitz-donner-forms' ),
 							checked: attributes.draftEnabled !== false,
 							onChange: function ( value ) {
 								setAttributes( { draftEnabled: value } );
 							},
-						} ),
-						el( SelectControl, {
-							label: __( 'Wiederherstellung', 'blitz-donner-forms' ),
-							value: attributes.restoreMode || 'auto',
-							options: [
-								{ label: __( 'Automatisch', 'blitz-donner-forms' ), value: 'auto' },
-								{ label: __( 'Nachfragen', 'blitz-donner-forms' ), value: 'prompt' },
-							],
-							onChange: function ( value ) {
-								setAttributes( { restoreMode: value } );
-							},
-							disabled: attributes.draftEnabled === false,
-						} ),
-						__experimentalNumberControl
-							? el( __experimentalNumberControl, {
-									label: __( 'Entwurf läuft ab nach (Tage)', 'blitz-donner-forms' ),
-									value: attributes.draftTtlDays || 7,
-									onChange: function ( value ) {
-										var parsed = parseInt( value, 10 );
-										if ( Number.isNaN( parsed ) ) {
-											return;
-										}
-										if ( parsed < 1 ) {
-											parsed = 1;
-										}
-										if ( parsed > 30 ) {
-											parsed = 30;
-										}
-										setAttributes( { draftTtlDays: parsed } );
-									},
-									min: 1,
-									max: 30,
-									disabled: attributes.draftEnabled === false,
-							  } )
-							: null,
-						el( ToggleControl, {
-							label: __( 'Button „Entwurf löschen“ anzeigen', 'blitz-donner-forms' ),
-							checked: attributes.showDraftReset !== false,
-							onChange: function ( value ) {
-								setAttributes( { showDraftReset: value } );
-							},
-							disabled: attributes.draftEnabled === false,
 						} ),
 						el( Notice, {
 							status: 'info',
