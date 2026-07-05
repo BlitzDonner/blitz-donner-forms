@@ -264,21 +264,23 @@ class BDFRMS_Admin_Settings {
 		$s = BDFRMS_Captcha::get_settings();
 		?>
 		<p class="description"><?php esc_html_e( 'Friendly Captcha ist ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen.', 'blitz-donner-forms' ); ?></p>
-		<h3><?php esc_html_e( 'So kommst du zu den beiden Schlüsseln', 'blitz-donner-forms' ); ?></h3>
-		<ol>
-			<li>
-				<?php esc_html_e( 'Erstelle ein Konto bei Friendly Captcha und melde dich im Dashboard an:', 'blitz-donner-forms' ); ?>
-				<a href="https://app.friendlycaptcha.eu/dashboard" target="_blank" rel="noopener noreferrer">app.friendlycaptcha.eu</a>
-			</li>
-			<li><?php esc_html_e( 'Lege unter «Applications» mit «+ New Application» eine Anwendung für deine Website an.', 'blitz-donner-forms' ); ?></li>
-			<li><?php esc_html_e( 'Den Site-Key findest du danach direkt unter dem Namen der Anwendung – er beginnt immer mit «FC». Trage ihn unten bei «Site-Key» ein.', 'blitz-donner-forms' ); ?></li>
-			<li><?php esc_html_e( 'Den API-Key erstellst du im Dashboard unter «Account → API Keys». Er authentifiziert die serverseitige Prüfung der Einsendungen und bleibt geheim – trage ihn unten bei «API-Key» ein und teile ihn nirgends.', 'blitz-donner-forms' ); ?></li>
-			<li><?php esc_html_e( 'Schalte «Aktiv» ein und speichere. Pro Formular kannst du das Captcha zusätzlich im Formular-Block übersteuern (Einstellung «Spam-Schutz»).', 'blitz-donner-forms' ); ?></li>
-		</ol>
-		<p class="description">
-			<?php esc_html_e( 'Ausführliche Anleitung des Anbieters:', 'blitz-donner-forms' ); ?>
-			<a href="https://developer.friendlycaptcha.com/docs/v2/getting-started/setup" target="_blank" rel="noopener noreferrer">developer.friendlycaptcha.com</a>
-		</p>
+		<details style="margin-top:12px;margin-bottom:12px;">
+			<summary><?php esc_html_e( 'Anleitung: So kommst du zu den beiden Schlüsseln', 'blitz-donner-forms' ); ?></summary>
+			<ol>
+				<li>
+					<?php esc_html_e( 'Erstelle ein Konto bei Friendly Captcha und melde dich im Dashboard an:', 'blitz-donner-forms' ); ?>
+					<a href="https://app.friendlycaptcha.eu/dashboard" target="_blank" rel="noopener noreferrer">app.friendlycaptcha.eu</a>
+				</li>
+				<li><?php esc_html_e( 'Lege unter «Applications» mit «+ New Application» eine Anwendung für deine Website an.', 'blitz-donner-forms' ); ?></li>
+				<li><?php esc_html_e( 'Den Site-Key findest du danach direkt unter dem Namen der Anwendung – er beginnt immer mit «FC». Trage ihn unten bei «Site-Key» ein.', 'blitz-donner-forms' ); ?></li>
+				<li><?php esc_html_e( 'Den API-Key erstellst du im Dashboard unter «Account → API Keys». Er authentifiziert die serverseitige Prüfung der Einsendungen und bleibt geheim – trage ihn unten bei «API-Key» ein und teile ihn nirgends.', 'blitz-donner-forms' ); ?></li>
+				<li><?php esc_html_e( 'Schalte «Aktiv» ein und speichere. Pro Formular kannst du das Captcha zusätzlich im Formular-Block übersteuern (Einstellung «Spam-Schutz»).', 'blitz-donner-forms' ); ?></li>
+			</ol>
+			<p class="description">
+				<?php esc_html_e( 'Ausführliche Anleitung des Anbieters:', 'blitz-donner-forms' ); ?>
+				<a href="https://developer.friendlycaptcha.com/docs/v2/getting-started/setup" target="_blank" rel="noopener noreferrer">developer.friendlycaptcha.com</a>
+			</p>
+		</details>
 		<table class="form-table" role="presentation">
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Aktiv', 'blitz-donner-forms' ); ?></th>

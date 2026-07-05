@@ -42,14 +42,26 @@ class BDFRMS_Admin_Submissions {
 	 * @return void
 	 */
 	public static function register_menu() {
+		// «BD Forms» statt generisch «Formulare», damit der Menüpunkt dem
+		// Plugin zuordenbar ist (Entscheid Stefan 05.07.2026).
 		add_menu_page(
-			__( 'Formulare', 'blitz-donner-forms' ),
-			__( 'Formulare', 'blitz-donner-forms' ),
+			__( 'BD Forms', 'blitz-donner-forms' ),
+			__( 'BD Forms', 'blitz-donner-forms' ),
 			BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS,
 			self::MENU_SLUG,
 			array( __CLASS__, 'render_page' ),
 			'dashicons-feedback',
 			26
+		);
+		// Erster Untermenü-Eintrag (gleicher Slug) heisst sonst wie das
+		// Hauptmenü – als «Einsendungen» ist er selbsterklärend.
+		add_submenu_page(
+			self::MENU_SLUG,
+			__( 'Einsendungen', 'blitz-donner-forms' ),
+			__( 'Einsendungen', 'blitz-donner-forms' ),
+			BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS,
+			self::MENU_SLUG,
+			array( __CLASS__, 'render_page' )
 		);
 	}
 
