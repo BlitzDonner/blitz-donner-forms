@@ -116,10 +116,9 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Textfeld",
-            "name": "sb_text",
-            "placeholder": "Beispiel …",
-            "required": false
+            "label": "Name",
+            "name": "name",
+            "placeholder": "Vor- und Nachname"
         }
     },
     "ancestor": [

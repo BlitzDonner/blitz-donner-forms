@@ -117,8 +117,7 @@
     "example": {
         "attributes": {
             "label": "Uhrzeit",
-            "name": "sb_time",
-            "required": false
+            "name": "uhrzeit"
         }
     },
     "ancestor": [

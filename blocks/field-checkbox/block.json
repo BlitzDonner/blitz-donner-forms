@@ -112,9 +112,8 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Ich stimme den Bedingungen zu",
-            "name": "sb_check",
-            "required": false
+            "label": "Ich stimme zu",
+            "name": "zustimmung"
         }
     },
     "ancestor": [

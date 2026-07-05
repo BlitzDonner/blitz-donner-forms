@@ -120,10 +120,9 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Radio",
-            "name": "sb_radio",
-            "options": "Wahl A\nWahl B",
-            "required": false
+            "label": "Anrede",
+            "name": "anrede",
+            "options": "Frau\nHerr\nKeine Angabe"
         }
     },
     "ancestor": [

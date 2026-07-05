@@ -68,7 +68,7 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Absenden"
+            "label": "Senden"
         }
     },
     "ancestor": [

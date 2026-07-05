@@ -117,9 +117,8 @@
     "example": {
         "attributes": {
             "label": "E-Mail",
-            "name": "sb_email",
-            "placeholder": "name@beispiel.de",
-            "required": false
+            "name": "email",
+            "required": true
         }
     },
     "ancestor": [

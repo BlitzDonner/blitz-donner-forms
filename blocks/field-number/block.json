@@ -128,13 +128,8 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Zahl",
-            "name": "sb_num",
-            "placeholder": "",
-            "min": "0",
-            "max": "100",
-            "step": "1",
-            "required": false
+            "label": "Anzahl",
+            "name": "anzahl"
         }
     },
     "ancestor": [

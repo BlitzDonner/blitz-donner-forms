@@ -125,8 +125,7 @@
     "example": {
         "attributes": {
             "label": "Datum",
-            "name": "sb_date",
-            "required": false
+            "name": "datum"
         }
     },
     "ancestor": [

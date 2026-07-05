@@ -117,9 +117,7 @@
     "example": {
         "attributes": {
             "label": "Telefon",
-            "name": "sb_tel",
-            "placeholder": "+41 …",
-            "required": false
+            "name": "telefon"
         }
     },
     "ancestor": [

@@ -117,9 +117,7 @@
     "example": {
         "attributes": {
             "label": "Website",
-            "name": "sb_url",
-            "placeholder": "https://",
-            "required": false
+            "name": "website"
         }
     },
     "ancestor": [

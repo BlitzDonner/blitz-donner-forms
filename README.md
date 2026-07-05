@@ -22,6 +22,26 @@ Die Basis ist eigenständig vollwertig und kennt ihre Add-ons nicht. Add-ons (Se
 
 Grundsatz: Jede Stelle, an der der Vorgänger Krypto, Audit-Log oder ClamAV aufruft, ist in der Basis ein Hook. Verschlüsselung, Audit und Virenscan liefert das Security-Add-on.
 
+## Theming über theme.json
+
+Die Formularfarben lassen sich site-weit über `settings.custom.bdfrms` in der theme.json setzen (Kaskade: Feld-Block → Formular-Block → theme.json → eingebauter Default). Token-Namen in Kebab-Schreibweise, je `light-*` und `dark-*`:
+
+```json
+{
+    "settings": {
+        "custom": {
+            "bdfrms": {
+                "light-label": "#6e6e73",
+                "light-border-focus": "#0071e3",
+                "dark-bg": "#2c2c2e"
+            }
+        }
+    }
+}
+```
+
+Verfügbare Tokens: `label`, `text`, `placeholder`, `bg`, `border`, `border-focus`, `submit-bg`, `submit-text`, `form-shell`. Die Blöcke deklarieren `example`-Vorschauen und erscheinen damit im Stilbuch des Site Editors. Über diese Schnittstelle kann auch ein Design-System-Werkzeug (z.B. der Design-System-Generator) die Formulare aus theme.json speisen.
+
 ## Entwicklung
 
 ```bash

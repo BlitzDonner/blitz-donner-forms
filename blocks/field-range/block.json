@@ -128,12 +128,8 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Schieberegler",
-            "name": "sb_range",
-            "min": "0",
-            "max": "100",
-            "step": "5",
-            "required": false
+            "label": "Bewertung",
+            "name": "bewertung"
         }
     },
     "ancestor": [

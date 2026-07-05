@@ -116,10 +116,9 @@
     "editorScript": "bdfrms-editor",
     "example": {
         "attributes": {
-            "label": "Auswahl",
-            "name": "sb_select",
-            "options": "Option A\nOption B\nOption C",
-            "required": false
+            "label": "Thema",
+            "name": "thema",
+            "options": "Beratung\nOfferte\nAnderes"
         }
     },
     "ancestor": [

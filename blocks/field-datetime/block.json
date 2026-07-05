@@ -117,8 +117,7 @@
     "example": {
         "attributes": {
             "label": "Termin",
-            "name": "sb_dt",
-            "required": false
+            "name": "termin"
         }
     },
     "ancestor": [

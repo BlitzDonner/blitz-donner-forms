@@ -117,9 +117,7 @@
     "example": {
         "attributes": {
             "label": "Nachricht",
-            "name": "sb_msg",
-            "placeholder": "Ihre Nachricht …",
-            "required": false
+            "name": "nachricht"
         }
     },
     "ancestor": [

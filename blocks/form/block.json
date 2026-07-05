@@ -1,136 +1,230 @@
 {
-  "$schema": "https://schemas.wp.org/trunk/block.json",
-  "apiVersion": 3,
-  "name": "bdfrms/form",
-  "version": "2.7.2",
-  "title": "Formular",
-  "category": "bdfrms-form",
-  "icon": {
-    "src": "feedback",
-    "foreground": "#1b2627"
-  },
-  "description": "Formular-Container für den seitenbasierten Formbuilder.",
-  "textdomain": "blitz-donner-forms",
-  "attributes": {
-    "formId": {
-      "type": "string"
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "bdfrms/form",
+    "version": "2.7.2",
+    "title": "Formular",
+    "category": "bdfrms-form",
+    "icon": {
+        "src": "feedback",
+        "foreground": "#1b2627"
     },
-    "formTitle": {
-      "type": "string",
-      "default": ""
+    "description": "Formular-Container für den seitenbasierten Formbuilder.",
+    "textdomain": "blitz-donner-forms",
+    "attributes": {
+        "formId": {
+            "type": "string"
+        },
+        "formTitle": {
+            "type": "string",
+            "default": ""
+        },
+        "blockInstanceId": {
+            "type": "string"
+        },
+        "draftEnabled": {
+            "type": "boolean",
+            "default": true
+        },
+        "draftTtlDays": {
+            "type": "number",
+            "default": 7
+        },
+        "restoreMode": {
+            "type": "string",
+            "default": "auto"
+        },
+        "showDraftReset": {
+            "type": "boolean",
+            "default": true
+        },
+        "thankYouPageId": {
+            "type": "number",
+            "default": 0
+        },
+        "emailNotificationEnabled": {
+            "type": "boolean",
+            "default": false
+        },
+        "emailRecipients": {
+            "type": "array",
+            "default": []
+        },
+        "emailSubject": {
+            "type": "string",
+            "default": ""
+        },
+        "emailFromField": {
+            "type": "string",
+            "default": ""
+        },
+        "emailFromCustom": {
+            "type": "string",
+            "default": ""
+        },
+        "emailFromName": {
+            "type": "string",
+            "default": ""
+        },
+        "appearanceMode": {
+            "type": "string",
+            "default": "auto"
+        },
+        "captchaMode": {
+            "type": "string",
+            "default": "inherit"
+        },
+        "colorLabel": {
+            "type": "string",
+            "default": ""
+        },
+        "colorText": {
+            "type": "string",
+            "default": ""
+        },
+        "colorPlaceholder": {
+            "type": "string",
+            "default": ""
+        },
+        "colorFieldBg": {
+            "type": "string",
+            "default": ""
+        },
+        "colorBorder": {
+            "type": "string",
+            "default": ""
+        },
+        "colorFocus": {
+            "type": "string",
+            "default": ""
+        },
+        "colorButtonBg": {
+            "type": "string",
+            "default": ""
+        },
+        "colorButtonText": {
+            "type": "string",
+            "default": ""
+        },
+        "colorFormShell": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorLabel": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorText": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorPlaceholder": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorFieldBg": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorBorder": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorFocus": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorButtonBg": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorButtonText": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorFormShell": {
+            "type": "string",
+            "default": ""
+        }
     },
-    "blockInstanceId": {
-      "type": "string"
+    "supports": {
+        "html": false,
+        "align": [
+            "wide",
+            "full"
+        ],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        },
+        "color": {
+            "background": true,
+            "text": true
+        },
+        "typography": {
+            "fontSize": true,
+            "lineHeight": true
+        },
+        "border": true
     },
-    "draftEnabled": {
-      "type": "boolean",
-      "default": true
+    "providesContext": {
+        "bdfrms/formId": "formId",
+        "bdfrms/appearanceMode": "appearanceMode",
+        "bdfrms/colorLabel": "colorLabel",
+        "bdfrms/colorText": "colorText",
+        "bdfrms/colorPlaceholder": "colorPlaceholder",
+        "bdfrms/colorFieldBg": "colorFieldBg",
+        "bdfrms/colorBorder": "colorBorder",
+        "bdfrms/colorFocus": "colorFocus",
+        "bdfrms/colorButtonBg": "colorButtonBg",
+        "bdfrms/colorButtonText": "colorButtonText",
+        "bdfrms/colorFormShell": "colorFormShell",
+        "bdfrms/darkColorLabel": "darkColorLabel",
+        "bdfrms/darkColorText": "darkColorText",
+        "bdfrms/darkColorPlaceholder": "darkColorPlaceholder",
+        "bdfrms/darkColorFieldBg": "darkColorFieldBg",
+        "bdfrms/darkColorBorder": "darkColorBorder",
+        "bdfrms/darkColorFocus": "darkColorFocus",
+        "bdfrms/darkColorButtonBg": "darkColorButtonBg",
+        "bdfrms/darkColorButtonText": "darkColorButtonText",
+        "bdfrms/darkColorFormShell": "darkColorFormShell"
     },
-    "draftTtlDays": {
-      "type": "number",
-      "default": 7
-    },
-    "restoreMode": {
-      "type": "string",
-      "default": "auto"
-    },
-    "showDraftReset": {
-      "type": "boolean",
-      "default": true
-    },
-    "thankYouPageId": {
-      "type": "number",
-      "default": 0
-    },
-    "emailNotificationEnabled": {
-      "type": "boolean",
-      "default": false
-    },
-    "emailRecipients": {
-      "type": "array",
-      "default": []
-    },
-    "emailSubject": {
-      "type": "string",
-      "default": ""
-    },
-    "emailFromField": {
-      "type": "string",
-      "default": ""
-    },
-    "emailFromCustom": {
-      "type": "string",
-      "default": ""
-    },
-    "emailFromName": {
-      "type": "string",
-      "default": ""
-    },
-    "appearanceMode": {
-      "type": "string",
-      "default": "auto"
-    },
-    "captchaMode": {
-      "type": "string",
-      "default": "inherit"
-    },
-    "colorLabel": { "type": "string", "default": "" },
-    "colorText": { "type": "string", "default": "" },
-    "colorPlaceholder": { "type": "string", "default": "" },
-    "colorFieldBg": { "type": "string", "default": "" },
-    "colorBorder": { "type": "string", "default": "" },
-    "colorFocus": { "type": "string", "default": "" },
-    "colorButtonBg": { "type": "string", "default": "" },
-    "colorButtonText": { "type": "string", "default": "" },
-    "colorFormShell": { "type": "string", "default": "" },
-    "darkColorLabel": { "type": "string", "default": "" },
-    "darkColorText": { "type": "string", "default": "" },
-    "darkColorPlaceholder": { "type": "string", "default": "" },
-    "darkColorFieldBg": { "type": "string", "default": "" },
-    "darkColorBorder": { "type": "string", "default": "" },
-    "darkColorFocus": { "type": "string", "default": "" },
-    "darkColorButtonBg": { "type": "string", "default": "" },
-    "darkColorButtonText": { "type": "string", "default": "" },
-    "darkColorFormShell": { "type": "string", "default": "" }
-  },
-  "supports": {
-    "html": false,
-    "align": ["wide", "full"],
-    "spacing": {
-      "margin": true,
-      "padding": true
-    },
-    "color": {
-      "background": true,
-      "text": true
-    },
-    "typography": {
-      "fontSize": true,
-      "lineHeight": true
-    },
-    "border": true
-  },
-  "providesContext": {
-    "bdfrms/formId": "formId",
-    "bdfrms/appearanceMode": "appearanceMode",
-    "bdfrms/colorLabel": "colorLabel",
-    "bdfrms/colorText": "colorText",
-    "bdfrms/colorPlaceholder": "colorPlaceholder",
-    "bdfrms/colorFieldBg": "colorFieldBg",
-    "bdfrms/colorBorder": "colorBorder",
-    "bdfrms/colorFocus": "colorFocus",
-    "bdfrms/colorButtonBg": "colorButtonBg",
-    "bdfrms/colorButtonText": "colorButtonText",
-    "bdfrms/colorFormShell": "colorFormShell",
-    "bdfrms/darkColorLabel": "darkColorLabel",
-    "bdfrms/darkColorText": "darkColorText",
-    "bdfrms/darkColorPlaceholder": "darkColorPlaceholder",
-    "bdfrms/darkColorFieldBg": "darkColorFieldBg",
-    "bdfrms/darkColorBorder": "darkColorBorder",
-    "bdfrms/darkColorFocus": "darkColorFocus",
-    "bdfrms/darkColorButtonBg": "darkColorButtonBg",
-    "bdfrms/darkColorButtonText": "darkColorButtonText",
-    "bdfrms/darkColorFormShell": "darkColorFormShell"
-  },
-  "editorScript": "bdfrms-editor"
+    "editorScript": "bdfrms-editor",
+    "example": {
+        "attributes": {
+            "formId": "stilbuch",
+            "formTitle": "Kontakt"
+        },
+        "innerBlocks": [
+            {
+                "name": "bdfrms/field-text",
+                "attributes": {
+                    "label": "Name",
+                    "name": "name",
+                    "placeholder": "Vor- und Nachname"
+                }
+            },
+            {
+                "name": "bdfrms/field-email",
+                "attributes": {
+                    "label": "E-Mail",
+                    "name": "email",
+                    "required": true
+                }
+            },
+            {
+                "name": "bdfrms/field-textarea",
+                "attributes": {
+                    "label": "Nachricht",
+                    "name": "nachricht"
+                }
+            },
+            {
+                "name": "bdfrms/field-submit",
+                "attributes": {
+                    "label": "Senden"
+                }
+            }
+        ]
+    }
 }

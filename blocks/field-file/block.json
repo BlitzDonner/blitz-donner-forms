@@ -121,10 +121,7 @@
     "example": {
         "attributes": {
             "label": "Datei",
-            "name": "sb_file",
-            "required": false,
-            "accept": ".pdf,image/*",
-            "maxSizeMb": 8
+            "name": "datei"
         }
     },
     "ancestor": [
