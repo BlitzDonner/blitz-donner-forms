@@ -6,12 +6,11 @@ Bei der Absender E-Mail. Wenn man das E-Mail-Feld wählt als Absender, muss eine
 Gibt es da eine Möglichkeit, diese Problematik zu umgehen? 
 
 
-2. Eindeutiger Feldnamen
-Wollen wir den eindeutigen Feldnamen wirklich eingeblendet lassen? Ich fürchte, dass da Leute unfug damit anstellen und versuchen zweimal denselben Namen einzugeben. Das könnte zu Problemen führen.
-
-3. Radio Buttons
+2. Radio Buttons
 Bei den Radiobuttons gehört die ausrichtung (untereinander / nebeneinander) m.E. in die Werkzeugleiste, nicht in die Sidebar
 
-4. Label können ja entfernt werden , wenn nichts drin steht soll die aria  dann aus dem Platzhalter benannt werden. Paltzhaltertext in den Feldern soll in der gleichen Farbe
+3. Label können ja entfernt werden , wenn nichts drin steht soll die aria  dann aus dem Platzhalter benannt werden. Paltzhaltertext in den Feldern soll in der gleichen Farbe wie der Hilfetext sein. 
 
-5. 
+4. Bei Pflichtfeldern ohne Label muss die Pflichtfeld-Markierung hinter dem Eingabefeld platziert werden. 
+
+5. Bei Datenfeldern muss mit einem Dropdown gewählt werden können, welche dateitypen hochgeladen werden können. 

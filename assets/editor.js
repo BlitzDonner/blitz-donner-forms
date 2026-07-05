@@ -934,7 +934,6 @@
 	 */
 	function GfbFieldNameInspector( props ) {
 		var attributes = props.attributes;
-		var setAttributes = props.setAttributes;
 		var clientId = props.clientId;
 		var name = attributes.name != null ? String( attributes.name ).trim() : '';
 		var isDuplicate = useSelect(
@@ -944,22 +943,31 @@
 			[ clientId, name ]
 		);
 
+		// Der technische Feldname wird automatisch verwaltet (Entscheid
+		// Stefan 05.07.2026): eindeutig pro Formular, stabil nach Vergabe,
+		// neu gebunden beim Duplizieren von Feld, Formular oder Vorlage.
+		// Anzeige nur lesend im Panel «Erweitert» – als Referenz für den
+		// Platzhalter {{feldname}} und spätere Add-on-Mappings.
 		return el(
-			wp.element.Fragment,
-			null,
+			InspectorControls,
+			{ group: 'advanced' },
 			el( TextControl, {
-				label: __( 'Eindeutiger Feldname', 'blitz-donner-forms' ),
-				value: attributes.name || '',
-				onChange: function ( value ) {
-					var next = bdfrmsSanitizeFieldNameInput( value );
-					setAttributes( { name: next, nameClientId: clientId } );
+				label: __( 'Technischer Feldname', 'blitz-donner-forms' ),
+				help: __( 'Wird automatisch vergeben und bleibt stabil. Dient als Spalte im CSV-Export und als Platzhalter im Rückmeldung-Block: {{feldname}}.', 'blitz-donner-forms' ),
+				value: name,
+				readOnly: true,
+				onChange: function () {},
+				onFocus: function ( event ) {
+					if ( event && event.target && event.target.select ) {
+						event.target.select();
+					}
 				},
 			} ),
 			isDuplicate
 				? el( Notice, {
 						status: 'error',
 						isDismissible: false,
-				  }, __( 'Dieser Feldname existiert in diesem Formular bereits. Bitte anpassen, sonst schlägt das Absenden fehl.', 'blitz-donner-forms' ) )
+				  }, __( 'Dieser Feldname existiert in diesem Formular bereits. Feld einmal duplizieren und das Original löschen, dann wird ein neuer Name vergeben.', 'blitz-donner-forms' ) )
 				: null
 		);
 	}
