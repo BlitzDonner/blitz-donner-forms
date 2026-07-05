@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.7.0
+Stable tag: 0.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,9 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.7.1 =
+* Changed: the feedback block no longer appears in the global block inserter; it is limited to the form block (parent) and can only be re-inserted inside a form.
 
 = 0.7.0 =
 * Added: interim self-hosted auto-updates from plugins.blitzdonner.ch until the WordPress.org listing is approved (public mode, Ed25519-signed packages, no licence token). The WordPress.org build ships without the update client.
