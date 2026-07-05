@@ -127,7 +127,7 @@ class BDFRMS_Admin_Settings {
 		}
 		$saved = isset( $_GET['bdfrms_saved'] ) ? '1' === sanitize_text_field( wp_unslash( $_GET['bdfrms_saved'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reine Anzeige einer Erfolgsmeldung.
 		?>
-		<div class="wrap bdfrms-settings">
+		<div class="wrap bdfrms-admin bdfrms-settings">
 			<h1><?php esc_html_e( 'Blitz & Donner Forms – Einstellungen', 'blitz-donner-forms' ); ?></h1>
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Einstellungen gespeichert.', 'blitz-donner-forms' ); ?></p></div>
