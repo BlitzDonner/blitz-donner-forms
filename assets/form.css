@@ -648,6 +648,15 @@
 	color: var(--bdfrms-label) !important;
 }
 
+/* Feld-Legende (Hilfetext): beginnt erst nach dem Feld-Radius und sitzt
+   näher am Eingabefeld als die übrigen Hinweise. */
+.bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-help,
+.bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-help,
+.bdfrms-form-wrapper[data-bdfrms-appearance="auto"] .bdfrms-field-help {
+	margin-top: 0.2rem !important;
+	padding-left: var(--bdfrms-radius, 10px) !important;
+}
+
 /* ---- Submit-Button ---- */
 .bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field-submit,
 .bdfrms-form-wrapper[data-bdfrms-appearance="dark"] .bdfrms-field-submit,
@@ -988,7 +997,8 @@
    Modi oben übersteuern gezielt). */
 .bdfrms-field-help {
 	display: block;
-	margin: 0.35rem 0 0;
+	margin: 0.2rem 0 0;
+	padding-left: var(--bdfrms-radius, 10px);
 	font-size: 0.8125rem;
 	line-height: 1.45;
 	opacity: 0.8;

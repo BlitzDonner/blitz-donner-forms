@@ -12,6 +12,6 @@ Wollen wir den eindeutigen Feldnamen wirklich eingeblendet lassen? Ich fürchte,
 3. Radio Buttons
 Bei den Radiobuttons gehört die ausrichtung (untereinander / nebeneinander) m.E. in die Werkzeugleiste, nicht in die Sidebar
 
-4. Label können ja entfernt werden , wenn nichts drin steht soll die aria  dann aus dem Platzhalter benannt werden. 
+4. Label können ja entfernt werden , wenn nichts drin steht soll die aria  dann aus dem Platzhalter benannt werden. Paltzhaltertext in den Feldern soll in der gleichen Farbe
 
 5. 
