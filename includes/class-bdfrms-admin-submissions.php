@@ -334,18 +334,18 @@ class BDFRMS_Admin_Submissions {
 		fwrite( $out, "\xEF\xBB\xBF" );
 
 		// Spalten: feste Metadaten + Vereinigungsmenge aller Payload-Felder.
-		$field_names = array();
-		$payloads    = array();
+		$payloads = array();
 		foreach ( $rows as $row ) {
 			$payload = json_decode( (string) $row['payload'], true );
 			$payload = is_array( $payload ) ? $payload : array();
 			unset( $payload['_bdfrms_labels'] );
 			$payloads[ (int) $row['id'] ] = $payload;
-			$field_names                  = array_merge( $field_names, array_keys( $payload ) );
 		}
-		$field_names = array_values( array_unique( $field_names ) );
 
-		fputcsv( $out, array_merge( array( 'id', 'created_at', 'form_title' ), $field_names ) );
+		$columns     = self::csv_columns( $rows );
+		$field_names = array_keys( $columns );
+
+		fputcsv( $out, array_merge( array( 'id', 'created_at', 'form_title' ), array_values( $columns ) ) );
 
 		foreach ( $rows as $row ) {
 			$line = array( (int) $row['id'], (string) $row['created_at'], (string) $row['form_title'] );
@@ -382,6 +382,46 @@ class BDFRMS_Admin_Submissions {
 
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Stream-Export.
 		exit;
+	}
+
+	/**
+	 * Spalten für den CSV-Export: technischer Feldname => Anzeigetitel.
+	 *
+	 * Der Anzeigetitel ist das Label aus dem Snapshot der Einsendung
+	 * (_bdfrms_labels) – neuere Einsendungen gewinnen. Tragen zwei
+	 * verschiedene Felder dasselbe Label, wird der technische Name in
+	 * Klammern angehängt, damit die Spalten unterscheidbar bleiben.
+	 *
+	 * @param array<int,array<string,mixed>> $rows Zeilen aus {prefix}bdfrms_submissions.
+	 * @return array<string,string> Feldname => Spaltentitel.
+	 */
+	public static function csv_columns( array $rows ) {
+		$columns = array();
+		foreach ( $rows as $row ) {
+			$payload = json_decode( (string) $row['payload'], true );
+			$payload = is_array( $payload ) ? $payload : array();
+			$labels  = array();
+			if ( isset( $payload['_bdfrms_labels'] ) && is_array( $payload['_bdfrms_labels'] ) ) {
+				$labels = $payload['_bdfrms_labels'];
+			}
+			unset( $payload['_bdfrms_labels'] );
+			foreach ( array_keys( $payload ) as $field_name ) {
+				$label = isset( $labels[ $field_name ] ) ? trim( (string) $labels[ $field_name ] ) : '';
+				// Neuere Zeilen (später in $rows) überschreiben den Titel;
+				// leere Labels fallen auf den technischen Namen zurück.
+				$columns[ $field_name ] = '' !== $label ? $label : (string) $field_name;
+			}
+		}
+
+		// Gleiche Labels für verschiedene Felder unterscheidbar machen.
+		$counts = array_count_values( $columns );
+		foreach ( $columns as $field_name => $label ) {
+			if ( $counts[ $label ] > 1 && $label !== $field_name ) {
+				$columns[ $field_name ] = $label . ' (' . $field_name . ')';
+			}
+		}
+
+		return $columns;
 	}
 
 	/**
