@@ -145,6 +145,14 @@
         "darkColorFormShell": {
             "type": "string",
             "default": ""
+        },
+        "colorHelp": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorHelp": {
+            "type": "string",
+            "default": ""
         }
     },
     "supports": {
@@ -187,7 +195,9 @@
         "bdfrms/darkColorFocus": "darkColorFocus",
         "bdfrms/darkColorButtonBg": "darkColorButtonBg",
         "bdfrms/darkColorButtonText": "darkColorButtonText",
-        "bdfrms/darkColorFormShell": "darkColorFormShell"
+        "bdfrms/darkColorFormShell": "darkColorFormShell",
+        "bdfrms/colorHelp": "colorHelp",
+        "bdfrms/darkColorHelp": "darkColorHelp"
     },
     "editorScript": "bdfrms-editor",
     "example": {

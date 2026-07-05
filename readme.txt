@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,9 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.6.1 =
+* Added: dedicated colour for the field help text (form level, per-field override and theme.json token help), defaulting to the label colour as before.
 
 = 0.6.0 =
 * Added: site-wide form colours via theme.json (settings.custom.bdfrms.*). Cascade: field block, form block, theme.json, built-in default.

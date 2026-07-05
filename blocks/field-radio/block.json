@@ -90,6 +90,14 @@
         "darkColorFocus": {
             "type": "string",
             "default": ""
+        },
+        "colorHelp": {
+            "type": "string",
+            "default": ""
+        },
+        "darkColorHelp": {
+            "type": "string",
+            "default": ""
         }
     },
     "supports": {
@@ -115,7 +123,9 @@
         "bdfrms/darkColorButtonBg",
         "bdfrms/darkColorButtonText",
         "bdfrms/colorFormShell",
-        "bdfrms/darkColorFormShell"
+        "bdfrms/darkColorFormShell",
+        "bdfrms/colorHelp",
+        "bdfrms/darkColorHelp"
     ],
     "editorScript": "bdfrms-editor",
     "example": {

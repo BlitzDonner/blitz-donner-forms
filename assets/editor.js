@@ -85,6 +85,7 @@
 			row( 'colorLabel', __( 'Label', 'blitz-donner-forms' ) ),
 			row( 'colorText', __( 'Eingabetext', 'blitz-donner-forms' ) ),
 			row( 'colorPlaceholder', __( 'Platzhalter', 'blitz-donner-forms' ) ),
+			row( 'colorHelp', __( 'Hilfetext', 'blitz-donner-forms' ) ),
 			row( 'colorFieldBg', __( 'Feldhintergrund', 'blitz-donner-forms' ) ),
 			row( 'colorBorder', __( 'Rahmen', 'blitz-donner-forms' ) ),
 			row( 'colorFocus', __( 'Fokus (Rahmen)', 'blitz-donner-forms' ) ),
@@ -1284,6 +1285,7 @@
 				colorLabel: pickTheme( 'colorLabel', 'bdfrms/colorLabel', 'bdfrms/darkColorLabel' ),
 				colorText: pickTheme( 'colorText', 'bdfrms/colorText', 'bdfrms/darkColorText' ),
 				colorPlaceholder: pickTheme( 'colorPlaceholder', 'bdfrms/colorPlaceholder', 'bdfrms/darkColorPlaceholder' ),
+				colorHelp: pickTheme( 'colorHelp', 'bdfrms/colorHelp', 'bdfrms/darkColorHelp' ),
 				colorFieldBg: pickTheme( 'colorFieldBg', 'bdfrms/colorFieldBg', 'bdfrms/darkColorFieldBg' ),
 				colorBorder: pickTheme( 'colorBorder', 'bdfrms/colorBorder', 'bdfrms/darkColorBorder' ),
 				colorFocus: pickTheme( 'colorFocus', 'bdfrms/colorFocus', 'bdfrms/darkColorFocus' ),
@@ -1317,6 +1319,7 @@
 			colorLabel: pick( 'colorLabel', 'bdfrms/colorLabel', 'bdfrms/darkColorLabel' ),
 			colorText: pick( 'colorText', 'bdfrms/colorText', 'bdfrms/darkColorText' ),
 			colorPlaceholder: pick( 'colorPlaceholder', 'bdfrms/colorPlaceholder', 'bdfrms/darkColorPlaceholder' ),
+			colorHelp: pick( 'colorHelp', 'bdfrms/colorHelp', 'bdfrms/darkColorHelp' ),
 			colorFieldBg: pick( 'colorFieldBg', 'bdfrms/colorFieldBg', 'bdfrms/darkColorFieldBg' ),
 			colorBorder: pick( 'colorBorder', 'bdfrms/colorBorder', 'bdfrms/darkColorBorder' ),
 			colorFocus: pick( 'colorFocus', 'bdfrms/colorFocus', 'bdfrms/darkColorFocus' ),
@@ -1335,6 +1338,9 @@
 		}
 		if ( attrs.colorPlaceholder && String( attrs.colorPlaceholder ).trim() !== '' ) {
 			o['--bdfrms-placeholder'] = attrs.colorPlaceholder;
+		}
+		if ( attrs.colorHelp && String( attrs.colorHelp ).trim() !== '' ) {
+			o['--bdfrms-help-color'] = attrs.colorHelp;
 		}
 		if ( attrs.colorFieldBg && String( attrs.colorFieldBg ).trim() !== '' ) {
 			o['--bdfrms-bg'] = attrs.colorFieldBg;
@@ -1615,6 +1621,13 @@
 				},
 			},
 			{
+				label: __( 'Hilfetext', 'blitz-donner-forms' ),
+				value: attributes.colorHelp || '',
+				onChange: function ( v ) {
+					setAttributes( { colorHelp: v || '' } );
+				},
+			},
+			{
 				label: __( 'Feldhintergrund', 'blitz-donner-forms' ),
 				value: attributes.colorFieldBg || '',
 				onChange: function ( v ) {
@@ -1684,6 +1697,13 @@
 				value: attributes.darkColorPlaceholder || '',
 				onChange: function ( v ) {
 					setAttributes( { darkColorPlaceholder: v || '' } );
+				},
+			},
+			{
+				label: __( 'Hilfetext', 'blitz-donner-forms' ),
+				value: attributes.darkColorHelp || '',
+				onChange: function ( v ) {
+					setAttributes( { darkColorHelp: v || '' } );
 				},
 			},
 			{

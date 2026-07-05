@@ -126,7 +126,7 @@ class BDFRMS_Plugin {
 				'editorChromeStylesUrl'     => BDFRMS_PLUGIN_URL . 'assets/bdfrms-editor.css',
 				'version'                   => BDFRMS_PLUGIN_VERSION,
 				'adminEmail'                => sanitize_email( (string) get_option( 'admin_email' ) ),
-				'sensitiveUi'               => BDFRMS_Plugin::sensitive_ui_active() ? '1' : '0',
+				'sensitiveUi'               => self::sensitive_ui_active() ? '1' : '0',
 			)
 		);
 
@@ -467,6 +467,7 @@ class BDFRMS_Plugin {
 			'colorFieldBg'         => '--bdfrms-light-bg',
 			'colorBorder'          => '--bdfrms-light-border',
 			'colorFocus'           => '--bdfrms-light-border-focus',
+			'colorHelp'            => '--bdfrms-light-help',
 			'colorButtonBg'        => '--bdfrms-light-submit-bg',
 			'colorButtonText'      => '--bdfrms-light-submit-text',
 			'darkColorLabel'       => '--bdfrms-dark-label',
@@ -475,6 +476,7 @@ class BDFRMS_Plugin {
 			'darkColorFieldBg'     => '--bdfrms-dark-bg',
 			'darkColorBorder'      => '--bdfrms-dark-border',
 			'darkColorFocus'       => '--bdfrms-dark-border-focus',
+			'darkColorHelp'        => '--bdfrms-dark-help',
 			'darkColorButtonBg'    => '--bdfrms-dark-submit-bg',
 			'darkColorButtonText'  => '--bdfrms-dark-submit-text',
 		);
@@ -501,6 +503,7 @@ class BDFRMS_Plugin {
 			'colorFieldBg'     => '--bdfrms-light-bg',
 			'colorBorder'      => '--bdfrms-light-border',
 			'colorFocus'       => '--bdfrms-light-border-focus',
+			'colorHelp'        => '--bdfrms-light-help',
 			'colorButtonBg'    => '--bdfrms-light-submit-bg',
 			'colorButtonText'  => '--bdfrms-light-submit-text',
 			'colorFormShell'   => '--bdfrms-light-form-shell',
@@ -512,6 +515,7 @@ class BDFRMS_Plugin {
 			'darkColorFieldBg'     => '--bdfrms-dark-bg',
 			'darkColorBorder'      => '--bdfrms-dark-border',
 			'darkColorFocus'       => '--bdfrms-dark-border-focus',
+			'darkColorHelp'        => '--bdfrms-dark-help',
 			'darkColorButtonBg'    => '--bdfrms-dark-submit-bg',
 			'darkColorButtonText'  => '--bdfrms-dark-submit-text',
 			'darkColorFormShell'   => '--bdfrms-dark-form-shell',
