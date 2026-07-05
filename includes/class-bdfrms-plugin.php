@@ -346,13 +346,6 @@ class BDFRMS_Plugin {
 	}
 
 	/**
-	 * Farbwert / Verlauf für style="--var: …" (Block-Editor: Hex, Alpha, Verläufe, moderne Farbräume).
-	 *
-	 * @param mixed $value Raw attribute.
-	 * @return string Sicherer CSS-Wert oder leer.
-	 */
-
-	/**
 	 * Konservative Säuberung für Grössenwerte (z. B. 0.9rem, 15px, 110%).
 	 *
 	 * @param mixed $value Rohwert.
@@ -363,6 +356,12 @@ class BDFRMS_Plugin {
 		return preg_match( '/^\d+(\.\d+)?(px|rem|em|%)$/', $v ) ? $v : '';
 	}
 
+	/**
+	 * Farbwert / Verlauf für style="--var: …" (Block-Editor: Hex, Alpha, Verläufe, moderne Farbräume).
+	 *
+	 * @param mixed $value Raw attribute.
+	 * @return string Sicherer CSS-Wert oder leer.
+	 */
 	public static function sanitize_bdfrms_color( $value ) {
 		if ( ! is_string( $value ) ) {
 			return '';
@@ -458,12 +457,6 @@ class BDFRMS_Plugin {
 	}
 
 	/**
-	 * CSS-Variablen für das Formular-Wrapper-Element (Theme-Farben).
-	 *
-	 * @param array<string,mixed> $attributes Block-Attribute.
-	 * @return string Semikolon-getrennte Deklarationen ohne abschliessendes Semikolon am Ende (für style=").
-	 */
-	/**
 	 * CSS-Variablen für Feld-Overrides (Stil-Tab der Feld-Blöcke). Gleiche
 	 * Variablennamen wie beim Formular, nur eine Ebene tiefer auf dem
 	 * Feld-Element gesetzt – leere Attribute erben die Formular-Farbe.
@@ -507,6 +500,13 @@ class BDFRMS_Plugin {
 		return implode( ';', $parts );
 	}
 
+	/**
+	 * CSS-Variablen für das Formular-Wrapper-Element (Farben plus
+	 * Schriftgrössen für Label/Hilfetext).
+	 *
+	 * @param array<string,mixed> $attributes Block-Attribute.
+	 * @return string Semikolon-getrennte Deklarationen für style=".
+	 */
 	private static function build_form_inline_color_style( $attributes ) {
 		$light_map = array(
 			'colorLabel'       => '--bdfrms-light-label',
