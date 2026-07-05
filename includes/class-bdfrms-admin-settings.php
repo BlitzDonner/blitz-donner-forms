@@ -59,15 +59,19 @@ class BDFRMS_Admin_Settings {
 				'render' => array( __CLASS__, 'render_card_captcha' ),
 				'save'   => array( __CLASS__, 'save_card_captcha' ),
 			),
-			'capabilities' => array(
-				'title'  => __( 'Berechtigungen', 'blitz-donner-forms' ),
-				'render' => array( __CLASS__, 'render_card_capabilities' ),
-				'save'   => array( __CLASS__, 'save_card_capabilities' ),
-			),
 			'extensions'   => array(
 				'title'  => __( 'Erweiterungen', 'blitz-donner-forms' ),
 				'render' => array( __CLASS__, 'render_card_extensions' ),
 				'save'   => null,
+			),
+			// Bewusst zuletzt und zugeklappt (Entscheid Stefan 05.07.2026):
+			// Solo-Betreiber brauchen die Karte nie, Agentur-Setups finden
+			// sie hier – und Add-on-Caps erscheinen automatisch mit drin.
+			'capabilities' => array(
+				'title'     => __( 'Berechtigungen', 'blitz-donner-forms' ),
+				'render'    => array( __CLASS__, 'render_card_capabilities' ),
+				'save'      => array( __CLASS__, 'save_card_capabilities' ),
+				'collapsed' => true,
 			),
 		);
 
@@ -75,10 +79,11 @@ class BDFRMS_Admin_Settings {
 		 * Karten der Einstellungsseite erweitern.
 		 *
 		 * Add-ons registrieren hier eigene Karten. Jeder Eintrag:
-		 * Karten-ID => array{title:string, render:callable, save:callable|null}.
-		 * `render` gibt das Karten-HTML aus; `save` verarbeitet den
-		 * zugehörigen POST-Teil beim zentralen Speichern (bereits nonce- und
-		 * berechtigungsgeprüft).
+		 * Karten-ID => array{title:string, render:callable, save:callable|null,
+		 * collapsed?:bool}. `render` gibt das Karten-HTML aus; `save`
+		 * verarbeitet den zugehörigen POST-Teil beim zentralen Speichern
+		 * (bereits nonce- und berechtigungsgeprüft). `collapsed` rendert die
+		 * Karte als zugeklapptes Aufklapp-Element.
 		 *
 		 * @since 0.1.0
 		 *
@@ -109,14 +114,25 @@ class BDFRMS_Admin_Settings {
 				<input type="hidden" name="action" value="bdfrms_save_settings" />
 				<?php wp_nonce_field( 'bdfrms_save_settings' ); ?>
 				<?php foreach ( self::cards() as $card_id => $card ) : ?>
-					<div class="card" style="max-width:720px;margin-bottom:16px;">
-						<h2><?php echo esc_html( (string) $card['title'] ); ?></h2>
-						<?php
-						if ( isset( $card['render'] ) && is_callable( $card['render'] ) ) {
-							call_user_func( $card['render'] );
-						}
-						?>
-					</div>
+					<?php if ( ! empty( $card['collapsed'] ) ) : ?>
+						<details class="card" style="max-width:720px;margin-bottom:16px;">
+							<summary style="cursor:pointer;"><h2 style="display:inline-block;margin:0;"><?php echo esc_html( (string) $card['title'] ); ?></h2></summary>
+							<?php
+							if ( isset( $card['render'] ) && is_callable( $card['render'] ) ) {
+								call_user_func( $card['render'] );
+							}
+							?>
+						</details>
+					<?php else : ?>
+						<div class="card" style="max-width:720px;margin-bottom:16px;">
+							<h2><?php echo esc_html( (string) $card['title'] ); ?></h2>
+							<?php
+							if ( isset( $card['render'] ) && is_callable( $card['render'] ) ) {
+								call_user_func( $card['render'] );
+							}
+							?>
+						</div>
+					<?php endif; ?>
 				<?php endforeach; ?>
 				<?php submit_button( __( 'Speichern', 'blitz-donner-forms' ) ); ?>
 			</form>
@@ -224,7 +240,7 @@ class BDFRMS_Admin_Settings {
 		}
 		$registry = BDFRMS_Capabilities::registry();
 		?>
-		<p class="description"><?php esc_html_e( 'Welche Rolle darf was? Administratoren behalten über manage_options immer vollen Zugriff.', 'blitz-donner-forms' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Damit können z.B. Redaktorinnen Einsendungen sehen oder exportieren, ohne Administratorrechte zu haben. Welche Rolle darf was? Administratoren behalten immer vollen Zugriff. Add-ons ergänzen hier eigene Berechtigungen.', 'blitz-donner-forms' ); ?></p>
 		<table class="widefat striped" style="max-width:700px;">
 			<thead>
 				<tr>
