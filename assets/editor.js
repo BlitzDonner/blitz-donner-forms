@@ -25,6 +25,60 @@
 		wp.blockEditor.PanelColorGradientSettings ||
 		wp.blockEditor.__experimentalPanelColorGradientSettings ||
 		null;
+	// ------------------------------------------------------------------
+	// Hilfetext-Anzeige im Canvas (WYSIWYG): Der Hilfetext wird in der
+	// Seitenleiste gepflegt und hier zentral als reine Anzeige in das
+	// Block-Element jedes Feld-Blocks eingehängt – innerhalb des
+	// Block-Rahmens, damit der Editor das Frontend-Layout zeigt. Reine
+	// Anzeige, kein Eingabefeld: keine Fokus- und Auswahlprobleme.
+	// Der Filter muss VOR den registerBlockType-Aufrufen stehen.
+	var BDFRMS_HELP_BLOCKS = [
+		'bdfrms/field-text',
+		'bdfrms/field-email',
+		'bdfrms/field-textarea',
+		'bdfrms/field-select',
+		'bdfrms/field-checkbox',
+		'bdfrms/field-number',
+		'bdfrms/field-tel',
+		'bdfrms/field-url',
+		'bdfrms/field-date',
+		'bdfrms/field-time',
+		'bdfrms/field-datetime',
+		'bdfrms/field-radio',
+		'bdfrms/field-range',
+		'bdfrms/field-file',
+	];
+
+	wp.hooks.addFilter(
+		'blocks.registerBlockType',
+		'bdfrms/field-help-display',
+		function ( settings, name ) {
+			if ( BDFRMS_HELP_BLOCKS.indexOf( name ) === -1 || typeof settings.edit !== 'function' ) {
+				return settings;
+			}
+			var OriginalEdit = settings.edit;
+			settings.edit = function ( props ) {
+				// Direktaufruf statt el(): läuft im selben Render-Kontext,
+				// damit die Hooks des Original-edit intakt bleiben.
+				var out  = OriginalEdit( props );
+				var text = props.attributes && props.attributes.helpText ? String( props.attributes.helpText ).trim() : '';
+				if ( '' === text || ! out || ! out.props ) {
+					return out;
+				}
+				var kids = wp.element.Children.toArray( out.props.children );
+				kids.push(
+					el(
+						'p',
+						{ className: 'bdfrms-help bdfrms-field-help', key: 'bdfrms-field-help' },
+						text
+					)
+				);
+				return wp.element.cloneElement.apply( null, [ out, {} ].concat( kids ) );
+			};
+			return settings;
+		}
+	);
+
 	/** Erkennt gespeicherte CSS-Verläufe (ein Wert pro Attribut). */
 	var BDFRMS_GRADIENT_VALUE_RE =
 		/^(?:linear|radial|conic|repeating-linear|repeating-radial|repeating-conic)-gradient\s*\(/i;

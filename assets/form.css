@@ -982,3 +982,14 @@
 		color: #aeaeb2;
 	}
 }
+
+/* Hilfetext-Legende: ungescopter Grund-Stil, damit sie auch im Modus
+   «Theme» und im Editor-Canvas sichtbar bleibt (die Erscheinungsbild-
+   Modi oben übersteuern gezielt). */
+.bdfrms-field-help {
+	display: block;
+	margin: 0.35rem 0 0;
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	opacity: 0.8;
+}

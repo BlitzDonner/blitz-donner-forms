@@ -113,7 +113,7 @@ class BDFRMS_Plugin {
 		wp_register_script(
 			'bdfrms-editor',
 			BDFRMS_PLUGIN_URL . 'assets/editor.js',
-			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-data', 'wp-core-data' ),
+			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-data', 'wp-core-data', 'wp-hooks' ),
 			BDFRMS_PLUGIN_VERSION,
 			true
 		);
