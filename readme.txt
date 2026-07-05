@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.7
+Stable tag: 0.6.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,9 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.6.8 =
+* Added: the spam protection card now includes a step-by-step guide for obtaining the Friendly Captcha site key and API key (dashboard, application, API keys page), plus per-field hints.
 
 = 0.6.7 =
 * Fixed: the settings cards rendered without their card styling – the admin stylesheet variables are scoped to the bdfrms-admin wrapper class, which the settings page was missing.
