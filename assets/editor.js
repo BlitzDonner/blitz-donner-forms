@@ -61,19 +61,36 @@
 				// Direktaufruf statt el(): läuft im selben Render-Kontext,
 				// damit die Hooks des Original-edit intakt bleiben.
 				var out  = OriginalEdit( props );
-				var text = props.attributes && props.attributes.helpText ? String( props.attributes.helpText ).trim() : '';
-				if ( '' === text || ! out || ! out.props ) {
+				var a    = props.attributes || {};
+				var text = a.helpText ? String( a.helpText ).trim() : '';
+				// Pflichtstern ohne Label: wie im Frontend schwebend am Feld.
+				var needsStar = !! a.required && '' === String( a.label || '' ).trim();
+				if ( ( '' === text && ! needsStar ) || ! out || ! out.props ) {
 					return out;
 				}
 				var kids = wp.element.Children.toArray( out.props.children );
-				kids.push(
-					el(
-						'p',
-						{ className: 'bdfrms-help bdfrms-field-help', key: 'bdfrms-field-help' },
-						text
-					)
-				);
-				return wp.element.cloneElement.apply( null, [ out, {} ].concat( kids ) );
+				if ( needsStar ) {
+					kids.push(
+						el(
+							'span',
+							{ className: 'bdfrms-required bdfrms-required--floating', 'aria-hidden': 'true', key: 'bdfrms-req-float' },
+							'*'
+						)
+					);
+				}
+				if ( '' !== text ) {
+					kids.push(
+						el(
+							'p',
+							{ className: 'bdfrms-help bdfrms-field-help', key: 'bdfrms-field-help' },
+							text
+						)
+					);
+				}
+				var extra = needsStar
+					? { className: String( out.props.className || '' ) + ' bdfrms-field--req-floating' }
+					: {};
+				return wp.element.cloneElement.apply( null, [ out, extra ].concat( kids ) );
 			};
 			return settings;
 		}
@@ -551,7 +568,7 @@
 						el( SelectControl, {
 							label: __( 'Absender-E-Mail', 'blitz-donner-forms' ),
 							help: __(
-								'Admin, feste Adresse oder Wert aus einem E-Mail-Feld der Einsendung (sonst Admin-E-Mail).',
+								'Wählst du ein E-Mail-Feld, wird dessen Adresse als Antwort-Adresse (Reply-To) gesetzt – «Antworten» geht dann direkt an die Absenderin. Technischer Absender bleibt immer eine Adresse deiner Website; ein fremdes From würde von vielen Mailservern als Fälschung abgewiesen (SPF/DKIM/DMARC).',
 								'blitz-donner-forms'
 							),
 							value: isCustomFrom ? BDFRMS_EMAIL_FROM_CUSTOM_SENDER : fromMode,
@@ -2856,6 +2873,30 @@
 			var radioGroupLabelText = bdfrmsTrimmedFieldLabel( attributes.label );
 			var previewName = 'bdfrms-preview-' + String( attributes.name || 'radio' );
 			var radioPreviewBody = [
+				// Anordnung gehört als Layout-Entscheid in die Werkzeugleiste
+				// (Entscheid Stefan 05.07.2026), nicht in die Seitenleiste.
+				el(
+					wp.blockEditor.BlockControls,
+					{ group: 'block' },
+					el( wp.components.ToolbarGroup, null,
+						el( wp.components.ToolbarButton, {
+							icon: 'menu-alt',
+							label: __( 'Optionen untereinander', 'blitz-donner-forms' ),
+							isPressed: radioLayout !== 'row',
+							onClick: function () {
+								setAttributes( { optionsLayout: 'column' } );
+							},
+						} ),
+						el( wp.components.ToolbarButton, {
+							icon: 'ellipsis',
+							label: __( 'Optionen nebeneinander', 'blitz-donner-forms' ),
+							isPressed: radioLayout === 'row',
+							onClick: function () {
+								setAttributes( { optionsLayout: 'row' } );
+							},
+						} )
+					)
+				),
 				el(
 					InspectorControls,
 					null,
@@ -2873,17 +2914,6 @@
 							value: attributes.options || '',
 							onChange: function ( value ) {
 								setAttributes( { options: value } );
-							},
-						} ),
-						el( SelectControl, {
-							label: __( 'Anordnung der Optionen', 'blitz-donner-forms' ),
-							value: radioLayout,
-							options: [
-								{ label: __( 'Untereinander', 'blitz-donner-forms' ), value: 'column' },
-								{ label: __( 'Nebeneinander', 'blitz-donner-forms' ), value: 'row' },
-							],
-							onChange: function ( value ) {
-								setAttributes( { optionsLayout: value === 'row' ? 'row' : 'column' } );
 							},
 						} )
 					)
@@ -3185,6 +3215,45 @@
 		},
 	} );
 
+	// Erlaubte Dateitypen als verständliche Gruppen (Entscheid Stefan
+	// 05.07.2026) statt freiem accept-String. Die Gruppen decken exakt die
+	// Server-Whitelist ab (BDFRMS_Security::default_allowed_mimes_map).
+	var BDFRMS_FILE_TYPE_GROUPS = [
+		{ key: 'images', label: __( 'Bilder (JPG, PNG, GIF, WebP)', 'blitz-donner-forms' ), exts: [ '.jpg', '.jpeg', '.png', '.gif', '.webp' ] },
+		{ key: 'pdf', label: __( 'PDF', 'blitz-donner-forms' ), exts: [ '.pdf' ] },
+		{ key: 'word', label: __( 'Word-Dokumente (DOC, DOCX)', 'blitz-donner-forms' ), exts: [ '.doc', '.docx' ] },
+		{ key: 'sheets', label: __( 'Tabellen (XLS, XLSX, CSV)', 'blitz-donner-forms' ), exts: [ '.xls', '.xlsx', '.csv' ] },
+		{ key: 'slides', label: __( 'Präsentationen (PPT, PPTX)', 'blitz-donner-forms' ), exts: [ '.ppt', '.pptx' ] },
+		{ key: 'text', label: __( 'Textdateien (TXT)', 'blitz-donner-forms' ), exts: [ '.txt' ] },
+		{ key: 'zip', label: __( 'ZIP-Archive', 'blitz-donner-forms' ), exts: [ '.zip' ] },
+	];
+
+	function bdfrmsAcceptList( accept ) {
+		return String( accept || '' )
+			.split( ',' )
+			.map( function ( s ) {
+				return s.trim().toLowerCase();
+			} )
+			.filter( Boolean );
+	}
+
+	function bdfrmsAcceptGroupChecked( accept, group ) {
+		var list = bdfrmsAcceptList( accept );
+		return group.exts.every( function ( e ) {
+			return list.indexOf( e ) !== -1;
+		} );
+	}
+
+	function bdfrmsToggleAcceptGroup( accept, group, on ) {
+		var list = bdfrmsAcceptList( accept ).filter( function ( e ) {
+			return group.exts.indexOf( e ) === -1;
+		} );
+		if ( on ) {
+			list = list.concat( group.exts );
+		}
+		return list.join( ',' );
+	}
+
 	registerBlockType( 'bdfrms/field-file', {
 		edit: function ( props ) {
 			var attributes = props.attributes;
@@ -3203,19 +3272,28 @@
 					el(
 						PanelBody,
 						{ title: __( 'Datei-Upload', 'blitz-donner-forms' ), initialOpen: true },
+						el( Notice, {
+							status: 'warning',
+							isDismissible: false,
+						}, __( 'Datei-Uploads können schädliche Dateien enthalten. Die Basis prüft Endung und Dateityp; Virenscan und verschlüsselte Ablage liefert das Security-Add-on.', 'blitz-donner-forms' ) ),
 						el( GfbFieldNameInspector, {
 							attributes: attributes,
 							setAttributes: setAttributes,
 							clientId: props.clientId,
 						} ),
 						buildFieldControls( attributes, setAttributes, false ),
-						el( TextControl, {
-							label: __( 'accept (z. B. .pdf,image/*)', 'blitz-donner-forms' ),
-							value: attributes.accept || '',
-							onChange: function ( value ) {
-								setAttributes( { accept: value } );
-							},
+						el( 'p', { className: 'components-base-control__label' }, __( 'Erlaubte Dateitypen', 'blitz-donner-forms' ) ),
+						BDFRMS_FILE_TYPE_GROUPS.map( function ( group ) {
+							return el( ToggleControl, {
+								key: group.key,
+								label: group.label,
+								checked: bdfrmsAcceptGroupChecked( attributes.accept, group ),
+								onChange: function ( on ) {
+									setAttributes( { accept: bdfrmsToggleAcceptGroup( attributes.accept, group, !! on ) } );
+								},
+							} );
 						} ),
+						el( 'p', { className: 'components-base-control__help' }, __( 'Nichts gewählt = alle sicheren Standardtypen. Gefährliche Typen (z. B. Programme, Skripte) blockiert der Server immer.', 'blitz-donner-forms' ) ),
 						__experimentalNumberControl
 							? el( __experimentalNumberControl, {
 									label: __( 'Max. Grösse (MB)', 'blitz-donner-forms' ),

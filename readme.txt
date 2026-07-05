@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.6
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,15 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.4.0 =
+* Changed: choosing an email field as sender now sets it as Reply-To; the technical From always stays a site address, so notifications no longer fail SPF/DKIM/DMARC checks.
+* Changed: radio option layout (stacked/inline) moved from the sidebar to the block toolbar.
+* Added: fields without a label get an aria-label from their placeholder; the technical field name already derives from the placeholder in that case.
+* Changed: placeholder text defaults to the same colour as labels and help text (custom placeholder colours still win).
+* Added: required fields without a label show the required marker floating at the right edge of the input, in the editor and on the frontend.
+* Changed: allowed upload types are now picked from predefined groups (images, PDF, Word, spreadsheets, presentations, text, ZIP) matching the server allowlist, instead of a free-text accept string.
+* Changed: the file field hint is honest in the free base (size limit only); the protection wording returns when the Security add-on is active. The editor shows a gentle warning about risky file uploads.
 
 = 0.3.6 =
 * Changed: CSV export columns now use the field labels (from the per-submission label snapshot) instead of technical field names. Identical labels are disambiguated with the technical name in brackets. The backend detail view already showed labels.

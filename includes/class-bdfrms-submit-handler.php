@@ -779,12 +779,21 @@ class BDFRMS_Submit_Handler {
 	 */
 	private static function build_notification_headers( array $form_attrs, array $payload, array $labels = array() ) {
 		$headers    = array( 'Content-Type: text/plain; charset=UTF-8' );
-		$from_email = self::resolve_notification_from_email( $form_attrs, $payload );
+		$from_email = self::resolve_notification_from_email( $form_attrs );
 		$from_name  = self::resolve_notification_from_name( $form_attrs, $payload, $labels );
 
 		$from_mailbox = self::format_mailbox_header( $from_name, $from_email );
 		if ( '' !== $from_mailbox ) {
 			$headers[] = 'From: ' . $from_mailbox;
+		}
+
+		// Die Besucher-Adresse aus einem E-Mail-Feld wird als Reply-To
+		// gesetzt, NIE als From: Ein From mit fremder Domain scheitert an
+		// SPF/DKIM/DMARC und landet im Spam oder wird abgewiesen. Mit
+		// Reply-To bleibt «Antworten» trotzdem an die Absenderin gerichtet.
+		$reply_to = self::resolve_notification_reply_to( $form_attrs, $payload );
+		if ( '' !== $reply_to && $reply_to !== $from_email ) {
+			$headers[] = 'Reply-To: ' . $reply_to;
 		}
 
 		return $headers;
@@ -794,34 +803,47 @@ class BDFRMS_Submit_Handler {
 	const EMAIL_FROM_CUSTOM_SENDER = 'bdfrms_custom_sender';
 
 	/**
-	 * From-Adresse: eigene Adresse, E-Mail-Feld der Einsendung oder Admin-E-Mail.
+	 * From-Adresse: eigene feste Adresse oder Admin-E-Mail – immer eine
+	 * Adresse der eigenen Website, nie ein Formularwert (DMARC).
 	 *
 	 * @param array<string,mixed> $form_attrs Block attributes.
-	 * @param array<string,mixed> $payload    Submission payload.
 	 * @return string
 	 */
-	private static function resolve_notification_from_email( array $form_attrs, array $payload ) {
+	private static function resolve_notification_from_email( array $form_attrs ) {
 		$field = isset( $form_attrs['emailFromField'] ) ? sanitize_key( (string) $form_attrs['emailFromField'] ) : '';
 		if ( self::EMAIL_FROM_CUSTOM_SENDER === $field ) {
 			$custom = isset( $form_attrs['emailFromCustom'] ) ? sanitize_email( (string) $form_attrs['emailFromCustom'] ) : '';
 			if ( '' !== $custom && is_email( $custom ) ) {
 				return $custom;
 			}
-		} elseif ( '' !== $field && isset( $payload[ $field ] ) ) {
-			$value = $payload[ $field ];
-			// Nur skalare Werte taugen als Adresse; Envelopes von Add-ons
-			// (Arrays) fallen automatisch auf die Admin-Adresse zurück.
-			if ( is_scalar( $value ) ) {
-				$email = sanitize_email( (string) $value );
-				if ( '' !== $email && is_email( $email ) ) {
-					return $email;
-				}
-			}
 		}
 
 		$admin = sanitize_email( (string) get_option( 'admin_email' ) );
 
 		return ( '' !== $admin && is_email( $admin ) ) ? $admin : '';
+	}
+
+	/**
+	 * Reply-To-Adresse: Wert des im Block gewählten E-Mail-Felds.
+	 *
+	 * @param array<string,mixed> $form_attrs Block attributes.
+	 * @param array<string,mixed> $payload    Submission payload.
+	 * @return string Leer, wenn kein Feld gewählt oder Wert unbrauchbar.
+	 */
+	private static function resolve_notification_reply_to( array $form_attrs, array $payload ) {
+		$field = isset( $form_attrs['emailFromField'] ) ? sanitize_key( (string) $form_attrs['emailFromField'] ) : '';
+		if ( '' === $field || self::EMAIL_FROM_CUSTOM_SENDER === $field || ! isset( $payload[ $field ] ) ) {
+			return '';
+		}
+		$value = $payload[ $field ];
+		// Nur skalare Werte taugen als Adresse; Envelopes von Add-ons
+		// (Arrays) liefern kein Reply-To.
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$email = sanitize_email( (string) $value );
+
+		return ( '' !== $email && is_email( $email ) ) ? $email : '';
 	}
 
 	/**

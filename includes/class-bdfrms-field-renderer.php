@@ -125,6 +125,25 @@ class BDFRMS_Field_Renderer {
 				. esc_html__( 'vertraulich', 'blitz-donner-forms' )
 				. '</span>'
 			: '';
+		// Pflichtfeld ohne Label: Stern schwebend am rechten Rand des
+		// Eingabefelds (im Label wäre er sonst verloren gegangen).
+		$star_after = '';
+		if ( ! empty( $common['required'] ) && '' === trim( $common['label'] ) ) {
+			$star_after = '<span class="bdfrms-required bdfrms-required--floating" aria-hidden="true">*</span>';
+			$cls       .= ' bdfrms-field--req-floating';
+		}
+
+		// Ohne sichtbares Label braucht das Eingabeelement einen zugänglichen
+		// Namen: aria-label aus dem Platzhalter (Screenreader-Fallback).
+		if ( '' === trim( $common['label'] ) && '' !== trim( $common['placeholder'] ) ) {
+			$inner = (string) preg_replace(
+				'/<(input|textarea|select)\b/',
+				'<$1 aria-label="' . esc_attr( trim( $common['placeholder'] ) ) . '"',
+				(string) $inner,
+				1
+			);
+		}
+
 		// Hilfetext als Legende unter dem Feld; das Eingabeelement erhält
 		// aria-describedby auf den Hilfetext (Screenreader-Verknüpfung).
 		$help_html = '';
@@ -146,6 +165,7 @@ class BDFRMS_Field_Renderer {
 			. $label_html
 			. $pill
 			. $inner
+			. $star_after
 			. $help_html
 			. '</div>';
 	}
@@ -706,8 +726,16 @@ class BDFRMS_Field_Renderer {
 		if ( $c['required'] ) {
 			$attr .= ' required';
 		}
-		/* translators: %d: maximale Dateigrösse in MB. */
-		$hint  = sprintf( esc_html__( 'Datei wird geschützt abgelegt, ohne öffentlichen Link (max. %d MB).', 'blitz-donner-forms' ), $max_mb );
+		// Der Schutz-Text erscheint nur, wenn das Security-Add-on die
+		// verschlüsselte Ablage tatsächlich liefert; die Basis verspricht
+		// nichts, was sie nicht hält (Entscheid Stefan 05.07.2026).
+		if ( BDFRMS_Plugin::sensitive_ui_active() ) {
+			/* translators: %d: maximale Dateigrösse in MB. */
+			$hint = sprintf( esc_html__( 'Datei wird verschlüsselt und geschützt gespeichert (max. %d MB).', 'blitz-donner-forms' ), $max_mb );
+		} else {
+			/* translators: %d: maximale Dateigrösse in MB. */
+			$hint = sprintf( esc_html__( 'Maximale Dateigrösse: %d MB.', 'blitz-donner-forms' ), $max_mb );
+		}
 		$inner = '<input' . $attr . ' />'
 			. '<div class="bdfrms-file-meta">'
 			. '<small class="bdfrms-help">' . $hint . '</small>'
