@@ -1908,10 +1908,14 @@
 				},
 				{
 					allowedBlocks: allowedInnerBlocks,
+					// Rückmeldung liegt standardmässig am Formularende
+					// (Entscheid Stefan 05.07.2026: im Inserter fand sie
+					// niemand). Leer bleibt sie im Frontend wirkungslos.
 					template: [
 						[ 'bdfrms/field-text' ],
 						[ 'bdfrms/field-email' ],
 						[ 'bdfrms/field-submit' ],
+						[ 'bdfrms/form-success' ],
 					],
 					templateLock: false,
 				}
@@ -1997,7 +2001,7 @@
 						el( Notice, {
 							status: 'info',
 							isDismissible: false,
-						}, __( 'Optional den Block „Rückmeldung“ einfügen: Bei Erfolg ohne Folgeseite erscheint sein Inhalt statt des Formulars. Platzhalter im Text: {{feldname}} (technischer Feldname).', 'blitz-donner-forms' ) ),
+						}, __( 'Der Bereich «Rückmeldung» am Ende des Formulars erscheint nach erfolgreichem Absenden ohne Folgeseite statt des Formulars. Leer gelassen zeigt das Formular die Standardmeldung. Platzhalter im Text: {{feldname}} (technischer Feldname).', 'blitz-donner-forms' ) ),
 						el( SelectControl, {
 							label: __( 'Folgeseite nach erfolgreichem Absenden', 'blitz-donner-forms' ),
 							help: __( 'Öffentlich sichtbare Seite. Ohne Auswahl bleibt die Besucherin auf der Formularseite (Hinweis oben).', 'blitz-donner-forms' ),

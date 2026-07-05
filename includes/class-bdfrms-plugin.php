@@ -1204,7 +1204,12 @@ class BDFRMS_Plugin {
 				continue;
 			}
 			if ( 'bdfrms/form-success' === ( $b['blockName'] ?? '' ) ) {
-				$success[] = $b;
+				// Leere Rückmeldung zählt nicht: Der Bereich liegt seit
+				// v0.6.10 standardmässig in jedem neuen Formular und wird
+				// nur wirksam, wenn tatsächlich Inhalt drinsteht.
+				if ( self::parsed_block_has_content( $b ) ) {
+					$success[] = $b;
+				}
 			} else {
 				$fields[] = $b;
 			}
@@ -1227,7 +1232,34 @@ class BDFRMS_Plugin {
 		unset( $attributes, $block );
 		$html = is_string( $content ) ? $content : '';
 		$safe = self::ksesed_success_inner_html( $html );
+		// Leerer Bereich: nichts ausgeben – dann greift nach dem Absenden
+		// die Standardmeldung statt eines leeren Panels.
+		if ( '' === trim( wp_strip_all_tags( $safe ) ) ) {
+			return '';
+		}
 		return '<section class="bdfrms-form-success-panel" data-bdfrms-success-panel="1">' . $safe . '</section>';
+	}
+
+	/**
+	 * Hat ein geparster Block sichtbaren Inhalt (Text oder Kind-Blöcke mit
+	 * Text)? Für die Leer-Erkennung des Rückmeldung-Bereichs.
+	 *
+	 * @param array<string,mixed> $block Geparster Block (parse_blocks-Format).
+	 * @return bool
+	 */
+	private static function parsed_block_has_content( array $block ) {
+		$inner = isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ? implode( '', array_filter( $block['innerContent'], 'is_string' ) ) : '';
+		if ( '' !== trim( wp_strip_all_tags( $inner ) ) ) {
+			return true;
+		}
+		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+			foreach ( $block['innerBlocks'] as $child ) {
+				if ( is_array( $child ) && self::parsed_block_has_content( $child ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
