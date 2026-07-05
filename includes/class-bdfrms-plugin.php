@@ -247,11 +247,11 @@ class BDFRMS_Plugin {
 	 * @return string theme|auto|light|dark
 	 */
 	private static function sanitize_appearance_mode( $value ) {
-		$v = is_string( $value ) ? sanitize_key( $value ) : 'theme';
+		$v = is_string( $value ) ? sanitize_key( $value ) : 'auto';
 		if ( in_array( $v, array( 'theme', 'auto', 'light', 'dark' ), true ) ) {
 			return $v;
 		}
-		return 'theme';
+		return 'auto';
 	}
 
 	/**
@@ -647,7 +647,7 @@ class BDFRMS_Plugin {
 			$draft_ttl_days = 30;
 		}
 
-		$appearance = self::sanitize_appearance_mode( isset( $attributes['appearanceMode'] ) ? $attributes['appearanceMode'] : 'theme' );
+		$appearance = self::sanitize_appearance_mode( isset( $attributes['appearanceMode'] ) ? $attributes['appearanceMode'] : 'auto' );
 
 		wp_enqueue_script( 'bdfrms-frontend' );
 		/* Immer laden: bei „Theme + eigene Farben“ verbinden die Regeln Inline-Variablen mit den Feldern; bei Hell/Dunkel/Auto über Tokens am Wrapper. */

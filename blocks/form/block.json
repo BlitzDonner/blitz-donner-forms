@@ -68,7 +68,7 @@
     },
     "appearanceMode": {
       "type": "string",
-      "default": "theme"
+      "default": "auto"
     },
     "captchaMode": {
       "type": "string",

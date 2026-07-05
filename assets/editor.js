@@ -1084,7 +1084,7 @@
 
 	function mergeFieldColorAttrs( fieldAttrs, ctx ) {
 		ctx = ctx || {};
-		var mode = ctx['bdfrms/appearanceMode'] || 'theme';
+		var mode = ctx['bdfrms/appearanceMode'] || 'auto';
 		function pickTheme( key, ctxLight, ctxDark ) {
 			var fv = fieldAttrs[ key ];
 			if ( fv && String( fv ).trim() !== '' ) {
@@ -1409,7 +1409,7 @@
 	}
 
 	function createFormColorSettings( attributes, setAttributes ) {
-		var appearance = attributes.appearanceMode || 'theme';
+		var appearance = attributes.appearanceMode || 'auto';
 		var rows = [
 			{
 				label: __( 'Label', 'blitz-donner-forms' ),
@@ -1481,7 +1481,7 @@
 	}
 
 	function createDarkFormColorSettings( attributes, setAttributes ) {
-		var appearance = attributes.appearanceMode || 'theme';
+		var appearance = attributes.appearanceMode || 'auto';
 		var rows = [
 			{
 				label: __( 'Label', 'blitz-donner-forms' ),
@@ -1556,7 +1556,7 @@
 		edit: function ( props ) {
 			var attributes = props.attributes;
 			var setAttributes = props.setAttributes;
-			var appearance = attributes.appearanceMode || 'theme';
+			var appearance = attributes.appearanceMode || 'auto';
 			var wrapperClassNames = [ 'bdfrms-form-wrapper' ];
 			if ( appearance === 'theme' && formHasCustomColors( attributes ) ) {
 				wrapperClassNames.push( 'bdfrms-form-colors-custom' );
@@ -1841,7 +1841,7 @@
 							{ label: __( 'Dunkel', 'blitz-donner-forms' ), value: 'dark' },
 						],
 						onChange: function ( value ) {
-							setAttributes( { appearanceMode: value || 'theme' } );
+							setAttributes( { appearanceMode: value || 'auto' } );
 						},
 					} ),
 					appearance !== 'theme'
