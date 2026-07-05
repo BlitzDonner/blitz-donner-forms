@@ -4,6 +4,9 @@
 
 	<file>.</file>
 	<exclude-pattern>/vendor/*</exclude-pattern>
+	<!-- Geteiltes BD-Modul, bewusst nah am Original des Vorgängers gehalten
+	     (eigene Textdomain bd-update-client); fehlt im WP.org-Build ohnehin. -->
+	<exclude-pattern>/includes/class-bdfrms-update-client\.php</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 
 	<arg value="sp"/>

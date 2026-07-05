@@ -42,6 +42,10 @@ Die Formularfarben lassen sich site-weit über `settings.custom.bdfrms` in der t
 
 Verfügbare Tokens: `label`, `text`, `placeholder`, `bg`, `border`, `border-focus`, `help`, `submit-bg`, `submit-text`, `form-shell` (je `light-*`/`dark-*`) sowie `label-size` und `help-size` (ohne Hell/Dunkel-Präfix). Die Blöcke deklarieren `example`-Vorschauen und erscheinen damit im Stilbuch des Site Editors. Über diese Schnittstelle kann auch ein Design-System-Werkzeug (z.B. der Design-System-Generator) die Formulare aus theme.json speisen.
 
+## Interims-Auslieferung und WordPress.org-Build
+
+Bis zur Freigabe im WordPress.org-Verzeichnis liefert plugins.blitzdonner.ch die Basis aus. Der Update-Client (`includes/class-bdfrms-update-client.php`, Public-Modus ohne Lizenz-Token, Ed25519-signiert) lädt nur, wenn seine Datei existiert. **Der WP.org-Einreichungs-Build entfernt genau diese eine Datei** – eigene Update-Mechanismen sind im Verzeichnis verboten. Versionsdisziplin: self-hosted bleibt unter 1.0, die WP.org-Erstversion wird 1.0.0; das letzte self-hosted Update liefert die client-lose 1.0.0 aus, danach übernimmt WordPress.org automatisch (gleicher Slug, höhere Version).
+
 ## Entwicklung
 
 ```bash
