@@ -1886,10 +1886,16 @@
 						onChange: function ( value ) {
 							setAttributes( { captchaMode: value || 'inherit' } );
 						},
-					} ) ),
+					} ) )
+				),
+				// Farben gehören in den Stil-Tab (Pinsel) – Gutenberg-
+				// Konvention (Entscheid Stefan 05.07.2026).
+				el(
+					InspectorControls,
+					{ group: 'styles' },
 					el( PanelBody, {
 						title: __( 'Erscheinungsbild', 'blitz-donner-forms' ),
-						initialOpen: false,
+						initialOpen: true,
 					},
 					el( SelectControl, {
 						label: __( 'Farbmodus', 'blitz-donner-forms' ),
