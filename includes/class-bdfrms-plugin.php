@@ -351,6 +351,18 @@ class BDFRMS_Plugin {
 	 * @param mixed $value Raw attribute.
 	 * @return string Sicherer CSS-Wert oder leer.
 	 */
+
+	/**
+	 * Konservative Säuberung für Grössenwerte (z. B. 0.9rem, 15px, 110%).
+	 *
+	 * @param mixed $value Rohwert.
+	 * @return string Gültige CSS-Länge oder leer.
+	 */
+	public static function sanitize_bdfrms_size( $value ) {
+		$v = is_string( $value ) ? trim( $value ) : '';
+		return preg_match( '/^\d+(\.\d+)?(px|rem|em|%)$/', $v ) ? $v : '';
+	}
+
 	public static function sanitize_bdfrms_color( $value ) {
 		if ( ! is_string( $value ) ) {
 			return '';
@@ -539,6 +551,22 @@ class BDFRMS_Plugin {
 				$parts[] = $var . ':' . $c;
 			}
 		}
+
+		// Schriftgrössen (Label/Hilfetext) – gelten für Hell und Dunkel.
+		$size_map = array(
+			'labelFontSize' => '--bdfrms-label-size',
+			'helpFontSize'  => '--bdfrms-help-size',
+		);
+		foreach ( $size_map as $attr => $var ) {
+			if ( empty( $attributes[ $attr ] ) ) {
+				continue;
+			}
+			$s = self::sanitize_bdfrms_size( $attributes[ $attr ] );
+			if ( '' !== $s ) {
+				$parts[] = $var . ':' . $s;
+			}
+		}
+
 		return implode( ';', $parts );
 	}
 

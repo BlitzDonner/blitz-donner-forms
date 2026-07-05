@@ -289,10 +289,10 @@
 	padding: 0 !important;
 	float: none !important;
 	font-family: var(--bdfrms-font) !important;
-	font-size: 0.9375rem !important;
+	font-size: var(--bdfrms-label-size, var(--wp--custom--bdfrms--label-size, 0.9375rem)) !important;
 	font-weight: 500 !important;
 	line-height: 1.3 !important;
-	color: var(--bdfrms-help-color, var(--bdfrms-label)) !important;
+	color: var(--bdfrms-label) !important;
 }
 
 /* Legend braucht im fieldset keinen Bottom-Gap doppelt (radio nutzt .bdfrms-radio-options-Abstand). */
@@ -647,9 +647,9 @@
 	display: block !important;
 	margin: 0.35rem 0 0 !important;
 	font-family: var(--bdfrms-font) !important;
-	font-size: 0.8125rem !important;
+	font-size: var(--bdfrms-help-size, var(--wp--custom--bdfrms--help-size, 0.8125rem)) !important;
 	line-height: 1.4 !important;
-	color: var(--bdfrms-label) !important;
+	color: var(--bdfrms-help-color, var(--bdfrms-label)) !important;
 }
 
 /* Feld-Legende (Hilfetext): beginnt erst nach dem Feld-Radius und sitzt
@@ -1004,7 +1004,7 @@
 	color: var(--bdfrms-help-color, inherit);
 	margin: 0.2rem 0 0;
 	padding-left: var(--bdfrms-radius, 10px);
-	font-size: 0.8125rem;
+	font-size: var(--bdfrms-help-size, var(--wp--custom--bdfrms--help-size, 0.8125rem));
 	line-height: 1.45;
 	opacity: 0.8;
 }

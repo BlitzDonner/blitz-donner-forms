@@ -1390,6 +1390,13 @@
 			[ 'darkColorButtonText', '--bdfrms-dark-submit-text' ],
 			[ 'darkColorFormShell', '--bdfrms-dark-form-shell' ],
 		];
+		// Schriftgrössen (gelten für Hell und Dunkel).
+		[ [ 'labelFontSize', '--bdfrms-label-size' ], [ 'helpFontSize', '--bdfrms-help-size' ] ].forEach( function ( pair ) {
+			var v = attrs[ pair[ 0 ] ];
+			if ( v && String( v ).trim() !== '' ) {
+				o[ pair[ 1 ] ] = v;
+			}
+		} );
 		lightPairs.forEach( function ( pair ) {
 			var v = attrs[ pair[ 0 ] ];
 			if ( v && String( v ).trim() !== '' ) {
@@ -2013,6 +2020,24 @@
 						],
 						onChange: function ( value ) {
 							setAttributes( { appearanceMode: value || 'auto' } );
+						},
+					} ),
+					el( TextControl, {
+						label: __( 'Schriftgrösse Label', 'blitz-donner-forms' ),
+						help: __( 'CSS-Wert wie 0.9375rem oder 15px. Leer = Standard.', 'blitz-donner-forms' ),
+						placeholder: '0.9375rem',
+						value: attributes.labelFontSize || '',
+						onChange: function ( v ) {
+							setAttributes( { labelFontSize: v == null ? '' : String( v ).trim() } );
+						},
+					} ),
+					el( TextControl, {
+						label: __( 'Schriftgrösse Hilfetext', 'blitz-donner-forms' ),
+						help: __( 'CSS-Wert wie 0.8125rem oder 13px. Leer = Standard.', 'blitz-donner-forms' ),
+						placeholder: '0.8125rem',
+						value: attributes.helpFontSize || '',
+						onChange: function ( v ) {
+							setAttributes( { helpFontSize: v == null ? '' : String( v ).trim() } );
 						},
 					} ),
 					appearance !== 'theme'

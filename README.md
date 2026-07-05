@@ -40,7 +40,7 @@ Die Formularfarben lassen sich site-weit über `settings.custom.bdfrms` in der t
 }
 ```
 
-Verfügbare Tokens: `label`, `text`, `placeholder`, `bg`, `border`, `border-focus`, `help`, `submit-bg`, `submit-text`, `form-shell`. Die Blöcke deklarieren `example`-Vorschauen und erscheinen damit im Stilbuch des Site Editors. Über diese Schnittstelle kann auch ein Design-System-Werkzeug (z.B. der Design-System-Generator) die Formulare aus theme.json speisen.
+Verfügbare Tokens: `label`, `text`, `placeholder`, `bg`, `border`, `border-focus`, `help`, `submit-bg`, `submit-text`, `form-shell` (je `light-*`/`dark-*`) sowie `label-size` und `help-size` (ohne Hell/Dunkel-Präfix). Die Blöcke deklarieren `example`-Vorschauen und erscheinen damit im Stilbuch des Site Editors. Über diese Schnittstelle kann auch ein Design-System-Werkzeug (z.B. der Design-System-Generator) die Formulare aus theme.json speisen.
 
 ## Entwicklung
 

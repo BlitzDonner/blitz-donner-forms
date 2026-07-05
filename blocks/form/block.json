@@ -153,6 +153,14 @@
         "darkColorHelp": {
             "type": "string",
             "default": ""
+        },
+        "labelFontSize": {
+            "type": "string",
+            "default": ""
+        },
+        "helpFontSize": {
+            "type": "string",
+            "default": ""
         }
     },
     "supports": {
