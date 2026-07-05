@@ -946,6 +946,24 @@
 			} )
 		);
 
+		// Hilfetext: erscheint im Frontend als Legende unter dem Feld
+		// (Entscheid Stefan 05.07.2026: Eingabe in der Seitenleiste, nicht
+		// im Canvas – eine Eingabe ausserhalb des Block-Rahmens verliert
+		// dort Auswahl und Fokus).
+		if ( typeof attributes.helpText !== 'undefined' ) {
+			controls.push(
+				el( TextareaControl, {
+					label: __( 'Hilfetext', 'blitz-donner-forms' ),
+					help: __( 'Erscheint als Legende unter dem Feld, wie eine Bildunterschrift.', 'blitz-donner-forms' ),
+					rows: 2,
+					value: attributes.helpText || '',
+					onChange: function ( value ) {
+						setAttributes( { helpText: value == null ? '' : String( value ) } );
+					},
+				} )
+			);
+		}
+
 		// Vertraulich-Flag: Der Toggle erscheint erst, wenn ein Add-on die
 		// Markierung auswertet (Filter bdfrms_sensitive_ui_active, via
 		// bdfrmsEditorAssets.sensitiveUi). Die Basis speichert Klartext.
@@ -3203,87 +3221,4 @@
 		}
 	}
 
-	// ------------------------------------------------------------------
-	// Hilfetext pro Feld – bedient wie die Bildbeschriftung: Der Knopf in
-	// der Werkzeugleiste blendet unter dem Feld eine Legenden-Eingabe ein
-	// (Attribut helpText, in den block.json der Feld-Blöcke deklariert).
-	// Zentral als editor.BlockEdit-Filter statt in jedem Block einzeln;
-	// das Frontend rendert BDFRMS_Field_Renderer serverseitig.
-	var BDFRMS_HELP_BLOCKS = [
-		'bdfrms/field-text',
-		'bdfrms/field-email',
-		'bdfrms/field-textarea',
-		'bdfrms/field-select',
-		'bdfrms/field-checkbox',
-		'bdfrms/field-number',
-		'bdfrms/field-tel',
-		'bdfrms/field-url',
-		'bdfrms/field-date',
-		'bdfrms/field-time',
-		'bdfrms/field-datetime',
-		'bdfrms/field-radio',
-		'bdfrms/field-range',
-		'bdfrms/field-file',
-	];
-
-	var bdfrmsWithFieldHelp = wp.compose.createHigherOrderComponent( function ( BlockEdit ) {
-		return function ( props ) {
-			// Hook-Regel: useState immer aufrufen, erst danach filtern.
-			var shownState = wp.element.useState( false );
-			var shown = shownState[ 0 ];
-			var setShown = shownState[ 1 ];
-
-			if ( BDFRMS_HELP_BLOCKS.indexOf( props.name ) === -1 ) {
-				return el( BlockEdit, props );
-			}
-
-			var attributes = props.attributes;
-			var setAttributes = props.setAttributes;
-			var hasText = !! ( attributes.helpText && String( attributes.helpText ).trim() );
-			// Sichtbar mit Inhalt immer, leer solange der Knopf gedrückt ist.
-			// Bewusst NICHT an props.isSelected gekoppelt: Die Eingabe liegt
-			// ausserhalb des Block-Rahmens, ein Klick hinein deselektiert den
-			// Block – an isSelected gekoppelt verschwände sie beim Anklicken.
-			var visible = hasText || shown;
-
-			return el(
-				wp.element.Fragment,
-				null,
-				el( BlockEdit, props ),
-				el(
-					wp.blockEditor.BlockControls,
-					{ group: 'block' },
-					el( wp.components.ToolbarButton, {
-						icon: 'editor-help',
-						label: hasText || shown
-							? __( 'Hilfetext entfernen', 'blitz-donner-forms' )
-							: __( 'Hilfetext hinzufügen', 'blitz-donner-forms' ),
-						isPressed: hasText || shown,
-						onClick: function () {
-							if ( hasText || shown ) {
-								setAttributes( { helpText: '' } );
-								setShown( false );
-							} else {
-								setShown( true );
-							}
-						},
-					} )
-				),
-				visible
-					? el( wp.blockEditor.RichText, {
-							tagName: 'p',
-							className: 'bdfrms-help bdfrms-field-help',
-							placeholder: __( 'Hilfetext hinzufügen …', 'blitz-donner-forms' ),
-							value: attributes.helpText || '',
-							allowedFormats: [],
-							onChange: function ( v ) {
-								setAttributes( { helpText: v == null ? '' : String( v ) } );
-							},
-					  } )
-					: null
-			);
-		};
-	}, 'bdfrmsWithFieldHelp' );
-
-	wp.hooks.addFilter( 'editor.BlockEdit', 'bdfrms/field-help', bdfrmsWithFieldHelp );
 } )( window.wp );

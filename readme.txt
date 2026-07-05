@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,7 +22,7 @@ Blitz & Donner Forms brings forms into the block editor – no shortcodes, no se
 * Optional spam protection with Friendly Captcha (privacy-friendly, no cookies, no tracking, proof-of-work, processed in the EU)
 * One email notification per submission with field placeholders
 * Local draft saving with a single switch: visitors' entries are kept in their browser, restored automatically and expire after 7 days
-* Per-field help text, handled like an image caption: toggle it from the field toolbar and write the hint right below the field; screen readers announce it via aria-describedby
+* Per-field help text: set it in the block sidebar and it renders like a caption below the field; screen readers announce it via aria-describedby
 * CSV export and per-submission ZIP download
 * Appearance system: light/dark/auto/theme, colours and gradients
 * Own capability model: decide per role who may view, delete or export submissions
@@ -64,6 +64,9 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.3.2 =
+* Changed: the help text is now edited in the block sidebar. The on-canvas caption input (added in 0.3.0) lost focus while typing because it sat outside the block wrapper; the sidebar control is reliable.
 
 = 0.3.1 =
 * Fixed: the help text input disappeared when clicking into it (its visibility was tied to block selection, but the input sits outside the block wrapper).
