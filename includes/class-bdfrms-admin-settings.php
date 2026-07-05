@@ -29,6 +29,25 @@ class BDFRMS_Admin_Settings {
 	public static function boot() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
 		add_action( 'admin_post_bdfrms_save_settings', array( __CLASS__, 'handle_save' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_assets' ) );
+	}
+
+	/**
+	 * Admin-Stylesheet auf den Plugin-Seiten laden (Karten-Cockpit, Listen).
+	 *
+	 * @param string $hook_suffix Aktueller Admin-Screen.
+	 * @return void
+	 */
+	public static function enqueue_admin_assets( $hook_suffix ) {
+		if ( false === strpos( (string) $hook_suffix, 'bdfrms' ) ) {
+			return;
+		}
+		wp_enqueue_style(
+			'bdfrms-admin',
+			BDFRMS_PLUGIN_URL . 'assets/admin-submissions.css',
+			array(),
+			BDFRMS_PLUGIN_VERSION
+		);
 	}
 
 	/**
@@ -58,36 +77,39 @@ class BDFRMS_Admin_Settings {
 				'title'  => __( 'Spam-Schutz', 'blitz-donner-forms' ),
 				'render' => array( __CLASS__, 'render_card_captcha' ),
 				'save'   => array( __CLASS__, 'save_card_captcha' ),
+				'status' => array( __CLASS__, 'status_card_captcha' ),
 			),
 			'extensions'   => array(
 				'title'  => __( 'Erweiterungen', 'blitz-donner-forms' ),
 				'render' => array( __CLASS__, 'render_card_extensions' ),
 				'save'   => null,
+				'status' => array( __CLASS__, 'status_card_extensions' ),
 			),
-			// Bewusst zuletzt und zugeklappt (Entscheid Stefan 05.07.2026):
-			// Solo-Betreiber brauchen die Karte nie, Agentur-Setups finden
-			// sie hier – und Add-on-Caps erscheinen automatisch mit drin.
+			// Bewusst zuletzt (Entscheid Stefan 05.07.2026): Solo-Betreiber
+			// brauchen die Karte nie; Add-on-Caps erscheinen automatisch drin.
 			'capabilities' => array(
-				'title'     => __( 'Berechtigungen', 'blitz-donner-forms' ),
-				'render'    => array( __CLASS__, 'render_card_capabilities' ),
-				'save'      => array( __CLASS__, 'save_card_capabilities' ),
-				'collapsed' => true,
+				'title'  => __( 'Berechtigungen', 'blitz-donner-forms' ),
+				'render' => array( __CLASS__, 'render_card_capabilities' ),
+				'save'   => array( __CLASS__, 'save_card_capabilities' ),
+				'status' => null,
 			),
 		);
 
 		/**
 		 * Karten der Einstellungsseite erweitern.
 		 *
-		 * Add-ons registrieren hier eigene Karten. Jeder Eintrag:
-		 * Karten-ID => array{title:string, render:callable, save:callable|null,
-		 * collapsed?:bool}. `render` gibt das Karten-HTML aus; `save`
-		 * verarbeitet den zugehörigen POST-Teil beim zentralen Speichern
-		 * (bereits nonce- und berechtigungsgeprüft). `collapsed` rendert die
-		 * Karte als zugeklapptes Aufklapp-Element.
+		 * Alle Karten rendern als zugeklappte Aufklapp-Elemente mit
+		 * Status-Etikette in der Titelzeile (Muster des Vorgänger-Plugins).
+		 * Jeder Eintrag: Karten-ID => array{title:string, render:callable,
+		 * save:callable|null, status:callable|null}. `render` gibt das
+		 * Karten-HTML aus; `save` verarbeitet den zugehörigen POST-Teil beim
+		 * zentralen Speichern (bereits nonce- und berechtigungsgeprüft);
+		 * `status` liefert array{state:'on'|'off'|'warn'|'neutral',
+		 * text:string} für die Etikette oder null (keine Etikette).
 		 *
 		 * @since 0.1.0
 		 *
-		 * @param array<string,array{title:string,render:callable,save:callable|null}> $cards Karten der Basis.
+		 * @param array<string,array{title:string,render:callable,save:callable|null,status:callable|null}> $cards Karten der Basis.
 		 */
 		$filtered = apply_filters( 'bdfrms_settings_cards', $cards );
 
@@ -105,7 +127,7 @@ class BDFRMS_Admin_Settings {
 		}
 		$saved = isset( $_GET['bdfrms_saved'] ) ? '1' === sanitize_text_field( wp_unslash( $_GET['bdfrms_saved'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reine Anzeige einer Erfolgsmeldung.
 		?>
-		<div class="wrap">
+		<div class="wrap bdfrms-settings">
 			<h1><?php esc_html_e( 'Blitz & Donner Forms – Einstellungen', 'blitz-donner-forms' ); ?></h1>
 			<?php if ( $saved ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Einstellungen gespeichert.', 'blitz-donner-forms' ); ?></p></div>
@@ -114,30 +136,91 @@ class BDFRMS_Admin_Settings {
 				<input type="hidden" name="action" value="bdfrms_save_settings" />
 				<?php wp_nonce_field( 'bdfrms_save_settings' ); ?>
 				<?php foreach ( self::cards() as $card_id => $card ) : ?>
-					<?php if ( ! empty( $card['collapsed'] ) ) : ?>
-						<details class="card" style="max-width:720px;margin-bottom:16px;">
-							<summary style="cursor:pointer;"><h2 style="display:inline-block;margin:0;"><?php echo esc_html( (string) $card['title'] ); ?></h2></summary>
-							<?php
-							if ( isset( $card['render'] ) && is_callable( $card['render'] ) ) {
-								call_user_func( $card['render'] );
-							}
-							?>
-						</details>
-					<?php else : ?>
-						<div class="card" style="max-width:720px;margin-bottom:16px;">
+					<details class="bdfrms-settings-card" id="bdfrms-<?php echo esc_attr( sanitize_key( (string) $card_id ) ); ?>">
+						<summary>
 							<h2><?php echo esc_html( (string) $card['title'] ); ?></h2>
 							<?php
-							if ( isset( $card['render'] ) && is_callable( $card['render'] ) ) {
-								call_user_func( $card['render'] );
+							if ( isset( $card['status'] ) && is_callable( $card['status'] ) ) {
+								$status = call_user_func( $card['status'] );
+								if ( is_array( $status ) && isset( $status['state'], $status['text'] ) ) {
+									echo wp_kses_post( self::summary_badge( (string) $status['state'], (string) $status['text'] ) );
+								}
 							}
 							?>
-						</div>
-					<?php endif; ?>
+						</summary>
+						<?php
+						if ( isset( $card['render'] ) && is_callable( $card['render'] ) ) {
+							call_user_func( $card['render'] );
+						}
+						?>
+					</details>
 				<?php endforeach; ?>
 				<?php submit_button( __( 'Speichern', 'blitz-donner-forms' ) ); ?>
 			</form>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Baut die Status-Etikette für die Titelzeile einer zugeklappten Karte
+	 * (Muster aus dem Vorgänger-Plugin).
+	 *
+	 * @param string $state on|off|warn|neutral (Farbe).
+	 * @param string $text  Sichtbarer Kurztext.
+	 * @return string HTML (escaped).
+	 */
+	private static function summary_badge( $state, $text ) {
+		$allowed = array( 'on', 'off', 'warn', 'neutral' );
+		if ( ! in_array( $state, $allowed, true ) ) {
+			$state = 'neutral';
+		}
+		return '<span class="bdfrms-card-badge bdfrms-card-badge--' . esc_attr( $state ) . '">' . esc_html( $text ) . '</span>';
+	}
+
+	/**
+	 * Status-Etikette der Spam-Schutz-Karte.
+	 *
+	 * @return array{state:string,text:string}
+	 */
+	public static function status_card_captcha() {
+		if ( BDFRMS_Captcha::is_configured() ) {
+			return array(
+				'state' => 'on',
+				'text'  => __( 'Aktiv', 'blitz-donner-forms' ),
+			);
+		}
+		if ( BDFRMS_Captcha::is_enabled_but_incomplete() ) {
+			return array(
+				'state' => 'warn',
+				'text'  => __( 'Unvollständig', 'blitz-donner-forms' ),
+			);
+		}
+		return array(
+			'state' => 'off',
+			'text'  => __( 'Nicht aktiv', 'blitz-donner-forms' ),
+		);
+	}
+
+	/**
+	 * Status-Etikette der Erweiterungen-Karte: zählt Add-on-Karten, die
+	 * sich über den Filter registriert haben.
+	 *
+	 * @return array{state:string,text:string}
+	 */
+	public static function status_card_extensions() {
+		$base  = array( 'captcha', 'extensions', 'capabilities' );
+		$extra = array_diff( array_keys( self::cards() ), $base );
+		if ( count( $extra ) > 0 ) {
+			return array(
+				'state' => 'on',
+				/* translators: %d: Anzahl installierter Add-ons. */
+				'text'  => sprintf( _n( '%d Add-on', '%d Add-ons', count( $extra ), 'blitz-donner-forms' ), count( $extra ) ),
+			);
+		}
+		return array(
+			'state' => 'neutral',
+			'text'  => __( 'Keine installiert', 'blitz-donner-forms' ),
+		);
 	}
 
 	/**
