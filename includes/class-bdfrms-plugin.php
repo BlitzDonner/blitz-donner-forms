@@ -81,6 +81,30 @@ class BDFRMS_Plugin {
 	}
 
 	/**
+	 * Ist die Vertraulich-Oberfläche aktiv? Die Basis speichert Klartext;
+	 * der Editor-Toggle und das Frontend-Pill erscheinen darum erst, wenn
+	 * ein Add-on die Markierung tatsächlich auswertet. Das Block-Attribut
+	 * `sensitive` bleibt unabhängig davon im Schema erhalten – bestehende
+	 * Markierungen gehen ohne Add-on nicht verloren.
+	 *
+	 * @return bool
+	 */
+	public static function sensitive_ui_active() {
+		/**
+		 * Vertraulich-Oberfläche freischalten.
+		 *
+		 * Das Security-Add-on gibt hier true zurück, sobald es installiert
+		 * ist. Erst dann zeigt der Editor den «Vertraulich»-Toggle und das
+		 * Frontend das zugehörige Pill.
+		 *
+		 * @since 0.2.0
+		 *
+		 * @param bool $active Default false (Basis ohne Add-on).
+		 */
+		return (bool) apply_filters( 'bdfrms_sensitive_ui_active', false );
+	}
+
+	/**
 	 * Register scripts/styles.
 	 *
 	 * @return void
@@ -102,6 +126,7 @@ class BDFRMS_Plugin {
 				'editorChromeStylesUrl'     => BDFRMS_PLUGIN_URL . 'assets/bdfrms-editor.css',
 				'version'                   => BDFRMS_PLUGIN_VERSION,
 				'adminEmail'                => sanitize_email( (string) get_option( 'admin_email' ) ),
+				'sensitiveUi'               => BDFRMS_Plugin::sensitive_ui_active() ? '1' : '0',
 			)
 		);
 

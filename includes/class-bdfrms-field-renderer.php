@@ -116,7 +116,9 @@ class BDFRMS_Field_Renderer {
 		if ( $common['sensitive'] ) {
 			$attrs = ' data-bdfrms-sensitive="1"';
 		}
-		$pill = $common['sensitive']
+		// Pill nur, wenn ein Add-on die Markierung auswertet – die Basis
+		// verspricht sonst eine Vertraulichkeit, die sie nicht liefert.
+		$pill = ( $common['sensitive'] && BDFRMS_Plugin::sensitive_ui_active() )
 			? '<span class="bdfrms-pill bdfrms-pill-sensitive" aria-label="' . esc_attr__( 'Als vertraulich markiert', 'blitz-donner-forms' ) . '">'
 				. esc_html__( 'vertraulich', 'blitz-donner-forms' )
 				. '</span>'
@@ -524,7 +526,8 @@ class BDFRMS_Field_Renderer {
 		if ( $c['sensitive'] ) {
 			$fs_attrs = ' data-bdfrms-sensitive="1"';
 		}
-		$pill     = $c['sensitive']
+		// Pill nur bei aktiver Vertraulich-Oberfläche (siehe wrap()).
+		$pill     = ( $c['sensitive'] && BDFRMS_Plugin::sensitive_ui_active() )
 			? '<span class="bdfrms-pill bdfrms-pill-sensitive" aria-label="' . esc_attr__( 'Als vertraulich markiert', 'blitz-donner-forms' ) . '">'
 				. esc_html__( 'vertraulich', 'blitz-donner-forms' )
 				. '</span>'

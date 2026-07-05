@@ -116,6 +116,12 @@ Nach der Basis-Installation (Tabellen, Storage-Verzeichnis, Default-Caps). Add-o
 
 Signatur: `do_action( 'bdfrms_activated' )` in `BDFRMS_Install::activate()`.
 
+### `bdfrms_sensitive_ui_active` (Filter)
+
+Schaltet die Vertraulich-Oberfläche frei. Die Basis speichert Klartext; darum zeigt sie den «Vertraulich»-Toggle im Editor und das Frontend-Pill erst, wenn ein Add-on die Markierung tatsächlich auswertet (das Security-Add-on gibt hier `true` zurück). Das Block-Attribut `sensitive` bleibt unabhängig davon im Schema erhalten – gesetzte Markierungen überstehen De-/Reaktivierung des Add-ons.
+
+Signatur: `apply_filters( 'bdfrms_sensitive_ui_active', false )` in `BDFRMS_Plugin::sensitive_ui_active()`.
+
 ### `bdfrms_security_event` (Action)
 
 Zentrales Sicherheits-Ereignis (jeder `BDFRMS_Security::log_event()`-Aufruf: Nonce-/Token-Fehler, Honeypot-Treffer, Rate-Limit, Captcha-Ergebnisse, Datei-Ablehnungen, `submission_insert`). Das Security-Add-on speist daraus sein tamper-evidentes Audit-Log.

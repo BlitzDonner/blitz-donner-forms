@@ -946,8 +946,12 @@
 			} )
 		);
 
-		// Vertraulich-Flag: die Basis markiert nur; Maskierung und Verschlüsselung liefert das Security-Add-on.
-		if ( typeof attributes.sensitive !== 'undefined' ) {
+		// Vertraulich-Flag: Der Toggle erscheint erst, wenn ein Add-on die
+		// Markierung auswertet (Filter bdfrms_sensitive_ui_active, via
+		// bdfrmsEditorAssets.sensitiveUi). Die Basis speichert Klartext.
+		var sensitiveUiActive =
+			typeof bdfrmsEditorAssets !== 'undefined' && '1' === String( bdfrmsEditorAssets.sensitiveUi );
+		if ( sensitiveUiActive && typeof attributes.sensitive !== 'undefined' ) {
 			controls.push(
 				el(
 					ToggleControl,
