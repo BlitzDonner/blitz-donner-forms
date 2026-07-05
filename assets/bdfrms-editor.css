@@ -57,3 +57,16 @@
 	line-height: 1.45;
 	color: color-mix(in srgb, CanvasText 82%, transparent);
 }
+
+/* Hilfetext-Legende unter Feld-Blöcken (RichText aus dem Toolbar-Knopf). */
+.bdfrms-field ~ p.bdfrms-field-help,
+p.bdfrms-field-help {
+	margin: 0.35rem 0 0;
+	font-size: 0.8125rem;
+	line-height: 1.45;
+	opacity: 0.8;
+}
+p.bdfrms-field-help:empty::before,
+p.bdfrms-field-help[data-is-placeholder-visible='true'] {
+	opacity: 0.55;
+}

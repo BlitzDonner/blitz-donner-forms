@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.2.1
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ Blitz & Donner Forms brings forms into the block editor – no shortcodes, no se
 * Optional spam protection with Friendly Captcha (privacy-friendly, no cookies, no tracking, proof-of-work, processed in the EU)
 * One email notification per submission with field placeholders
 * Local draft saving with a single switch: visitors' entries are kept in their browser, restored automatically and expire after 7 days
+* Per-field help text, handled like an image caption: toggle it from the field toolbar and write the hint right below the field; screen readers announce it via aria-describedby
 * CSV export and per-submission ZIP download
 * Appearance system: light/dark/auto/theme, colours and gradients
 * Own capability model: decide per role who may view, delete or export submissions
@@ -63,6 +64,10 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.3.0 =
+* New: per-field help text. Add it from the field block's toolbar – it behaves like an image caption and renders below the field, linked for screen readers via aria-describedby.
+* Fixed: aria attributes inside the form were silently stripped by the output filter (wp_kses supports wildcards for data-* only); they are now allowlisted explicitly.
 
 = 0.2.1 =
 * Simplified draft saving to a single on/off switch. Restore mode, expiry (7 days) and the reset button now use sensible defaults; the block attributes remain available for advanced use.

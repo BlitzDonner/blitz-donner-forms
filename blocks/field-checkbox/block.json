@@ -30,6 +30,10 @@
         "sensitive": {
             "type": "boolean",
             "default": false
+        },
+        "helpText": {
+            "type": "string",
+            "default": ""
         }
     },
     "supports": {

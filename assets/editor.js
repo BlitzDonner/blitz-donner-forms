@@ -3202,4 +3202,86 @@
 			} );
 		}
 	}
+
+	// ------------------------------------------------------------------
+	// Hilfetext pro Feld – bedient wie die Bildbeschriftung: Der Knopf in
+	// der Werkzeugleiste blendet unter dem Feld eine Legenden-Eingabe ein
+	// (Attribut helpText, in den block.json der Feld-Blöcke deklariert).
+	// Zentral als editor.BlockEdit-Filter statt in jedem Block einzeln;
+	// das Frontend rendert BDFRMS_Field_Renderer serverseitig.
+	var BDFRMS_HELP_BLOCKS = [
+		'bdfrms/field-text',
+		'bdfrms/field-email',
+		'bdfrms/field-textarea',
+		'bdfrms/field-select',
+		'bdfrms/field-checkbox',
+		'bdfrms/field-number',
+		'bdfrms/field-tel',
+		'bdfrms/field-url',
+		'bdfrms/field-date',
+		'bdfrms/field-time',
+		'bdfrms/field-datetime',
+		'bdfrms/field-radio',
+		'bdfrms/field-range',
+		'bdfrms/field-file',
+	];
+
+	var bdfrmsWithFieldHelp = wp.compose.createHigherOrderComponent( function ( BlockEdit ) {
+		return function ( props ) {
+			// Hook-Regel: useState immer aufrufen, erst danach filtern.
+			var shownState = wp.element.useState( false );
+			var shown = shownState[ 0 ];
+			var setShown = shownState[ 1 ];
+
+			if ( BDFRMS_HELP_BLOCKS.indexOf( props.name ) === -1 ) {
+				return el( BlockEdit, props );
+			}
+
+			var attributes = props.attributes;
+			var setAttributes = props.setAttributes;
+			var hasText = !! ( attributes.helpText && String( attributes.helpText ).trim() );
+			// Sichtbar wie bei der Bildbeschriftung: mit Inhalt immer, leer
+			// nur solange der Block ausgewählt und der Knopf gedrückt ist.
+			var visible = hasText || ( shown && props.isSelected );
+
+			return el(
+				wp.element.Fragment,
+				null,
+				el( BlockEdit, props ),
+				el(
+					wp.blockEditor.BlockControls,
+					{ group: 'block' },
+					el( wp.components.ToolbarButton, {
+						icon: 'editor-help',
+						label: hasText || shown
+							? __( 'Hilfetext entfernen', 'blitz-donner-forms' )
+							: __( 'Hilfetext hinzufügen', 'blitz-donner-forms' ),
+						isPressed: hasText || shown,
+						onClick: function () {
+							if ( hasText || shown ) {
+								setAttributes( { helpText: '' } );
+								setShown( false );
+							} else {
+								setShown( true );
+							}
+						},
+					} )
+				),
+				visible
+					? el( wp.blockEditor.RichText, {
+							tagName: 'p',
+							className: 'bdfrms-help bdfrms-field-help',
+							placeholder: __( 'Hilfetext hinzufügen …', 'blitz-donner-forms' ),
+							value: attributes.helpText || '',
+							allowedFormats: [],
+							onChange: function ( v ) {
+								setAttributes( { helpText: v == null ? '' : String( v ) } );
+							},
+					  } )
+					: null
+			);
+		};
+	}, 'bdfrmsWithFieldHelp' );
+
+	wp.hooks.addFilter( 'editor.BlockEdit', 'bdfrms/field-help', bdfrmsWithFieldHelp );
 } )( window.wp );

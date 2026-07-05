@@ -87,6 +87,8 @@ class BDFRMS_Field_Renderer {
 			'placeholder' => isset( $attrs['placeholder'] ) ? (string) $attrs['placeholder'] : '',
 			'required'    => ! empty( $attrs['required'] ),
 			'sensitive'   => ! empty( $attrs['sensitive'] ),
+			// Hilfetext (Legende) unterhalb des Felds, wie eine Bildunterschrift.
+			'help'        => isset( $attrs['helpText'] ) ? trim( wp_strip_all_tags( (string) $attrs['helpText'] ) ) : '',
 			// Gutenberg-Standard: «Zusätzliche CSS-Klasse(n)» aus dem Editor.
 			'_className'  => isset( $attrs['_className'] ) ? (string) $attrs['_className'] : '',
 		);
@@ -123,10 +125,28 @@ class BDFRMS_Field_Renderer {
 				. esc_html__( 'vertraulich', 'blitz-donner-forms' )
 				. '</span>'
 			: '';
+		// Hilfetext als Legende unter dem Feld; das Eingabeelement erhält
+		// aria-describedby auf den Hilfetext (Screenreader-Verknüpfung).
+		$help_html = '';
+		if ( '' !== $common['help'] ) {
+			$help_id   = '' !== $common['name'] ? 'bdfrms-help-' . sanitize_html_class( $common['name'] ) : '';
+			$help_html = '<p class="bdfrms-help bdfrms-field-help"' . ( '' !== $help_id ? ' id="' . esc_attr( $help_id ) . '"' : '' ) . '>'
+				. esc_html( $common['help'] )
+				. '</p>';
+			if ( '' !== $help_id ) {
+				$inner = (string) preg_replace(
+					'/<(input|textarea|select)\b/',
+					'<$1 aria-describedby="' . esc_attr( $help_id ) . '"',
+					(string) $inner,
+					1
+				);
+			}
+		}
 		return '<div class="' . esc_attr( $cls ) . '"' . $attrs . '>'
 			. $label_html
 			. $pill
 			. $inner
+			. $help_html
 			. '</div>';
 	}
 
@@ -550,10 +570,24 @@ class BDFRMS_Field_Renderer {
 			}
 		}
 
+		// Hilfetext als Legende am Ende der Gruppe; Verknüpfung über
+		// aria-describedby auf dem fieldset.
+		$help_html = '';
+		if ( '' !== $c['help'] ) {
+			$help_id   = '' !== $c['name'] ? 'bdfrms-help-' . sanitize_html_class( $c['name'] ) : '';
+			$help_html = '<p class="bdfrms-help bdfrms-field-help"' . ( '' !== $help_id ? ' id="' . esc_attr( $help_id ) . '"' : '' ) . '>'
+				. esc_html( $c['help'] )
+				. '</p>';
+			if ( '' !== $help_id ) {
+				$fs_attrs .= ' aria-describedby="' . esc_attr( $help_id ) . '"';
+			}
+		}
+
 		return '<fieldset class="' . esc_attr( $fs_cls ) . '"' . $fs_attrs . '>'
 			. $legend
 			. $pill
 			. $inner
+			. $help_html
 			. '</fieldset>';
 	}
 

@@ -113,7 +113,7 @@ class BDFRMS_Plugin {
 		wp_register_script(
 			'bdfrms-editor',
 			BDFRMS_PLUGIN_URL . 'assets/editor.js',
-			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-data', 'wp-core-data' ),
+			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-data', 'wp-core-data', 'wp-hooks', 'wp-compose' ),
 			BDFRMS_PLUGIN_VERSION,
 			true
 		);
@@ -861,17 +861,25 @@ class BDFRMS_Plugin {
 	 */
 	private static function ksesed_inner_blocks_html( $html ) {
 		$attr_global     = array(
-			'class'    => true,
-			'id'       => true,
-			'style'    => true,
-			'data-*'   => true,
-			'tabindex' => true,
-			'aria-*'   => true,
-			'role'     => true,
-			'hidden'   => true,
-			'title'    => true,
-			'lang'     => true,
-			'dir'      => true,
+			'class'            => true,
+			'id'               => true,
+			'style'            => true,
+			'data-*'           => true,
+			'tabindex'         => true,
+			// wp_kses kennt Wildcards nur für data-*; aria-Attribute müssen
+			// einzeln stehen, sonst werden sie stillschweigend entfernt.
+			'aria-label'       => true,
+			'aria-labelledby'  => true,
+			'aria-describedby' => true,
+			'aria-hidden'      => true,
+			'aria-required'    => true,
+			'aria-invalid'     => true,
+			'aria-live'        => true,
+			'role'             => true,
+			'hidden'           => true,
+			'title'            => true,
+			'lang'             => true,
+			'dir'              => true,
 		);
 		$attr_form_input = array_merge(
 			$attr_global,
