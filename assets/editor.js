@@ -1412,21 +1412,53 @@
 		return Object.keys( o ).length ? o : undefined;
 	}
 
+	/**
+	 * Feld-Overrides als Hell/Dunkel-Variablen – exakt wie PHP im Frontend
+	 * (BDFRMS_Plugin::build_field_inline_color_style). Der Canvas rendert
+	 * denselben .bdfrms-form-wrapper mit data-bdfrms-appearance, die
+	 * Palette-Zuordnung übernimmt form.css auf Feldebene. So ist die
+	 * Editor-Vorschau per Konstruktion identisch mit dem Frontend.
+	 *
+	 * @param {Object} fieldAttrs Feld-Attribute.
+	 * @return {Object|undefined}
+	 */
+	function bdfrmsFieldVarsStyleObject( fieldAttrs ) {
+		var pairs = [
+			[ 'colorLabel', '--bdfrms-light-label' ],
+			[ 'colorText', '--bdfrms-light-text' ],
+			[ 'colorPlaceholder', '--bdfrms-light-placeholder' ],
+			[ 'colorHelp', '--bdfrms-light-help' ],
+			[ 'colorFieldBg', '--bdfrms-light-bg' ],
+			[ 'colorBorder', '--bdfrms-light-border' ],
+			[ 'colorFocus', '--bdfrms-light-border-focus' ],
+			[ 'colorButtonBg', '--bdfrms-light-submit-bg' ],
+			[ 'colorButtonText', '--bdfrms-light-submit-text' ],
+			[ 'darkColorLabel', '--bdfrms-dark-label' ],
+			[ 'darkColorText', '--bdfrms-dark-text' ],
+			[ 'darkColorPlaceholder', '--bdfrms-dark-placeholder' ],
+			[ 'darkColorHelp', '--bdfrms-dark-help' ],
+			[ 'darkColorFieldBg', '--bdfrms-dark-bg' ],
+			[ 'darkColorBorder', '--bdfrms-dark-border' ],
+			[ 'darkColorFocus', '--bdfrms-dark-border-focus' ],
+			[ 'darkColorButtonBg', '--bdfrms-dark-submit-bg' ],
+			[ 'darkColorButtonText', '--bdfrms-dark-submit-text' ],
+		];
+		var o = {};
+		pairs.forEach( function ( pair ) {
+			var v = fieldAttrs[ pair[ 0 ] ];
+			if ( v && String( v ).trim() !== '' ) {
+				o[ pair[ 1 ] ] = v;
+			}
+		} );
+		return Object.keys( o ).length ? o : undefined;
+	}
+
 	function buildMergedFieldColorStyle( fieldAttrs, ctx ) {
-		return colorAttrsToStyleObject( mergeFieldColorAttrs( fieldAttrs, ctx ) );
+		return bdfrmsFieldVarsStyleObject( fieldAttrs );
 	}
 
 	function buildFieldColorOverrideStyle( fieldAttrs ) {
-		return colorAttrsToStyleObject( {
-			colorLabel: fieldAttrs.colorLabel || '',
-			colorText: fieldAttrs.colorText || '',
-			colorPlaceholder: fieldAttrs.colorPlaceholder || '',
-			colorFieldBg: fieldAttrs.colorFieldBg || '',
-			colorBorder: fieldAttrs.colorBorder || '',
-			colorFocus: fieldAttrs.colorFocus || '',
-			colorButtonBg: fieldAttrs.colorButtonBg || '',
-			colorButtonText: fieldAttrs.colorButtonText || '',
-		} );
+		return bdfrmsFieldVarsStyleObject( fieldAttrs );
 	}
 
 	/**

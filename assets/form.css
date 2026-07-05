@@ -1024,7 +1024,7 @@
 /* Feld-Overrides (Stil-Tab der Feld-Blöcke): Die Zuordnung der Hell/
    Dunkel-Variablen wird auf Feldebene erneut ausgewertet. Ohne eigene
    Inline-Werte erbt das Feld die Formular-Farben unverändert; setzt der
-   Block eigene --bdfrms-light-*/--bdfrms-dark-*-Werte, gewinnen sie –
+   Block eigene Hell- oder Dunkel-Variablen, gewinnen sie –
    pro Palette, exakt wie beim Formular-Wrapper. */
 .bdfrms-form-wrapper[data-bdfrms-appearance="light"] .bdfrms-field {
 	--bdfrms-text: var(--bdfrms-light-text, var(--wp--custom--bdfrms--light-text, #1d1d1f));
