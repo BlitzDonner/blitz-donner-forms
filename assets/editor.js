@@ -3240,9 +3240,11 @@
 			var attributes = props.attributes;
 			var setAttributes = props.setAttributes;
 			var hasText = !! ( attributes.helpText && String( attributes.helpText ).trim() );
-			// Sichtbar wie bei der Bildbeschriftung: mit Inhalt immer, leer
-			// nur solange der Block ausgewählt und der Knopf gedrückt ist.
-			var visible = hasText || ( shown && props.isSelected );
+			// Sichtbar mit Inhalt immer, leer solange der Knopf gedrückt ist.
+			// Bewusst NICHT an props.isSelected gekoppelt: Die Eingabe liegt
+			// ausserhalb des Block-Rahmens, ein Klick hinein deselektiert den
+			// Block – an isSelected gekoppelt verschwände sie beim Anklicken.
+			var visible = hasText || shown;
 
 			return el(
 				wp.element.Fragment,
