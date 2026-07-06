@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Blitz & Donner Forms
  * Description: Block-native forms for the WordPress editor. Build forms like any other content, manage submissions in the backend – with server-side validation, honeypot, rate limiting and optional Friendly Captcha.
- * Version: 0.7.1
+ * Version: 0.7.2
  * Plugin URI: https://plugins.blitzdonner.ch
  * Author: Blitz & Donner
  * Author URI: https://www.blitzdonner.ch
@@ -12,6 +12,7 @@
  * Requires PHP: 7.4
  * Text Domain: blitz-donner-forms
  * Domain Path: /languages
+ * Update URI: https://plugins.blitzdonner.ch/blitz-donner-forms
  *
  * @package Blitz_Donner_Forms
  */
@@ -23,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'BDFRMS_PLUGIN_FILE', __FILE__ );
 define( 'BDFRMS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BDFRMS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'BDFRMS_PLUGIN_VERSION', '0.7.1' );
+define( 'BDFRMS_PLUGIN_VERSION', '0.7.2' );
 
 // Reihenfolge wichtig: Capabilities und Security zuerst, dann alles, was sie nutzt.
 require_once BDFRMS_PLUGIN_DIR . 'includes/class-bdfrms-capabilities.php';

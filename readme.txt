@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.7.1
+Stable tag: 0.7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,9 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.7.2 =
+* Fixed: file downloads from the submissions screen worked only over an outdated action name; the download endpoint is now registered as `bdfrms_download` and matches the links.
 
 = 0.7.1 =
 * Changed: the feedback block no longer appears in the global block inserter; it is limited to the form block (parent) and can only be re-inserted inside a form.

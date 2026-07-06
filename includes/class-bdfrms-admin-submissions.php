@@ -289,7 +289,7 @@ class BDFRMS_Admin_Submissions {
 	}
 
 	/**
-	 * Einsendung löschen (admin_post_bdf_delete_submission).
+	 * Einsendung löschen (admin_post_bdfrms_delete_submission).
 	 *
 	 * @return void
 	 */
@@ -323,7 +323,7 @@ class BDFRMS_Admin_Submissions {
 	}
 
 	/**
-	 * CSV-Export aller Einsendungen (admin_post_bdf_export_csv).
+	 * CSV-Export aller Einsendungen (admin_post_bdfrms_export_csv).
 	 *
 	 * @return void
 	 */

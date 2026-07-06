@@ -35,7 +35,7 @@ class BDFRMS_File_Storage {
 	 * @return void
 	 */
 	public static function boot() {
-		add_action( 'admin_post_bdf_download', array( __CLASS__, 'handle_download' ) );
+		add_action( 'admin_post_bdfrms_download', array( __CLASS__, 'handle_download' ) );
 	}
 
 	// Abschnitt: Schema / Pfade.
@@ -252,7 +252,7 @@ class BDFRMS_File_Storage {
 	// Abschnitt: Download.
 
 	/**
-	 * Berechtigungsgeprüfter Datei-Download (admin_post_bdf_download).
+	 * Berechtigungsgeprüfter Datei-Download (admin_post_bdfrms_download).
 	 *
 	 * @return void
 	 */
