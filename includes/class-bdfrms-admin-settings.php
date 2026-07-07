@@ -493,7 +493,7 @@ class BDFRMS_Admin_Settings {
 				echo '<a class="bdfrms-ext-card-link" href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Produktseite', 'blitz-donner-forms' ) . ' &rarr;</a>';
 			}
 			echo '</div>';
-		}
+		}//end foreach
 		?>
 		<p class="bdfrms-ext-more">
 			<a href="https://plugins.blitzdonner.ch" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Alle Add-ons entdecken', 'blitz-donner-forms' ); ?> &rarr;</a>
