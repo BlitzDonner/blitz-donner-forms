@@ -130,6 +130,10 @@ class BDFRMS_Plugin {
 			true
 		);
 
+		// Editor-Strings übersetzen: Jed-JSON aus languages/ (Dateiname
+		// {domain}-{locale}-{md5('assets/editor.js')}.json).
+		wp_set_script_translations( 'bdfrms-editor', 'blitz-donner-forms', BDFRMS_PLUGIN_DIR . 'languages' );
+
 		wp_localize_script(
 			'bdfrms-editor',
 			'bdfrmsEditorAssets',

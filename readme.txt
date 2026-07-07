@@ -4,7 +4,7 @@ Tags: forms, block, contact form, spam protection, submissions
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.8.4
+Stable tag: 0.8.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,11 @@ In your own WordPress database, in dedicated tables. Nothing leaves your server.
 Submissions stay on your server. The optional Friendly Captcha service is operated from the EU, sets no cookies and does no tracking. The settings page provides a copyable privacy text snippet.
 
 == Changelog ==
+
+= 0.8.5 =
+* Fixed: completed the English, French and Italian translations – 266 strings that had accumulated since the port (backend, editor, frontend messages) are now translated, including plural forms.
+* Added: editor strings are now translatable at all – wp_set_script_translations with generated Jed JSON files per locale.
+* Added: tools/i18n-fehlende-strings.py detects untranslated strings before a release.
 
 = 0.8.4 =
 * Added: the spam protection card now explains the built-in, always-on defences in plain language (bot trap, time lock, rate brake, server-side checks) and positions Friendly Captcha as the optional extra layer. Translated into English, French and Italian.

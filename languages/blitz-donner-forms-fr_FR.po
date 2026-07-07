@@ -473,3 +473,792 @@ msgstr "Niveau supplémentaire : Friendly Captcha"
 
 msgid "Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen."
 msgstr "Contre le spam persistant et ciblé, nous recommandons d’ajouter Friendly Captcha – une protection sans cookies ni pistage (preuve de travail, traitement dans l’UE). Une fois activé, le service externe Friendly Captcha est appelé pour vérifier le contrôle."
+
+# Vollständige Nachführung aller fehlenden Strings (v0.8.5).
+
+msgid " nicht gefunden]"
+msgstr " introuvable]"
+
+msgid "(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "(Modèle sans engagement, pas un conseil juridique. Veuillez l’adapter à votre situation concrète et le faire vérifier juridiquement en cas de doute.)"
+
+msgid "1. Zweck / berechtigtes Interesse"
+msgstr "1. Finalité / intérêt légitime"
+
+msgid "2. Erforderlichkeit / kein milderes Mittel"
+msgstr "2. Nécessité / pas de moyen plus doux"
+
+msgid "3. Interessenabwägung"
+msgstr "3. Pesée des intérêts"
+
+msgid "4. Ergebnis"
+msgstr "4. Résultat"
+
+msgid "Ablageverzeichnis nicht beschreibbar."
+msgstr "Le répertoire de stockage n’est pas accessible en écriture."
+
+msgid "Absender"
+msgstr "Expéditeur"
+
+msgid "Aktionen"
+msgstr "Actions"
+
+msgid "Aktiv"
+msgstr "Actif"
+
+msgid "Alle Add-ons entdecken"
+msgstr "Découvrir toutes les extensions"
+
+msgid "Alle Formulare"
+msgstr "Tous les formulaires"
+
+msgid "Als CSV exportieren"
+msgstr "Exporter en CSV"
+
+msgid "Als vertraulich markiert"
+msgstr "Marqué comme confidentiel"
+
+msgid "Anleitung: So kommst du zu den beiden Schlüsseln"
+msgstr "Guide : comment obtenir les deux clés"
+
+msgid "Anmeldung erforderlich."
+msgstr "Connexion requise."
+
+msgid "Ansehen"
+msgstr "Voir"
+
+msgid "Anwenden"
+msgstr "Appliquer"
+
+msgid "Auftragsverarbeitung. Mit der Friendly Captcha GmbH besteht ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO (bzw. Art. 9 revDSG)."
+msgstr "Sous-traitance. Un contrat de sous-traitance selon l’art. 28 RGPD (ou l’art. 9 nLPD) existe avec Friendly Captcha GmbH."
+
+msgid "Ausführliche Anleitung des Anbieters:"
+msgstr "Guide détaillé du fournisseur :"
+
+msgid "Authentifizierung"
+msgstr "Authentification"
+
+msgid "BD Forms"
+msgstr "BD Forms"
+
+msgid "Beitrag"
+msgstr "Article"
+
+msgid "Beitrag #%d (nicht mehr vorhanden)"
+msgstr "Article n° %d (n’existe plus)"
+
+msgid "Berechtigung"
+msgstr "Autorisation"
+
+msgid "Berechtigungen"
+msgstr "Autorisations"
+
+msgid "Bitte zuerst ein Formular auswählen, um einen CSV-Export zu starten."
+msgstr "Veuillez d’abord choisir un formulaire pour lancer un export CSV."
+
+msgid "Blitz & Donner Forms lässt sich mit Add-ons erweitern – zum Beispiel um Verschlüsselung, Audit-Log und Virenscan (Security-Add-on)."
+msgstr "Blitz & Donner Forms peut être étendu par des extensions – par exemple chiffrement, journal d’audit et antivirus (extension Security)."
+
+msgid "Blitz & Donner Forms – Einstellungen"
+msgstr "Blitz & Donner Forms – Réglages"
+
+msgid "Blitz & Donner Formular"
+msgstr "Blitz & Donner Formular"
+
+msgid "CSV + Dateien (ZIP)"
+msgstr "CSV + fichiers (ZIP)"
+
+msgid "CSV-Export · %1$s (%2$d %3$s)"
+msgstr "Export CSV · %1$s (%2$d %3$s)"
+
+msgid "CSV-Puffer konnte nicht geöffnet werden."
+msgstr "Le tampon CSV n’a pas pu être ouvert."
+
+msgid "Damit können z.B. Redaktorinnen Einsendungen sehen oder exportieren, ohne Administratorrechte zu haben. Welche Rolle darf was? Administratoren behalten immer vollen Zugriff. Add-ons ergänzen hier eigene Berechtigungen."
+msgstr "Ainsi, des rédactrices peuvent par exemple consulter ou exporter des envois sans droits d’administrateur. Quel rôle peut faire quoi ? Les administrateurs gardent toujours l’accès complet. Les extensions ajoutent ici leurs propres autorisations."
+
+msgid "Datei herunterladen (entschlüsselt)"
+msgstr "Télécharger le fichier (déchiffré)"
+
+msgid "Datei konnte nicht abgelegt werden."
+msgstr "Le fichier n’a pas pu être enregistré."
+
+msgid "Datei nicht lesbar."
+msgstr "Fichier illisible."
+
+msgid "Datei wird verschlüsselt und geschützt gespeichert (max. %d MB)."
+msgstr "Le fichier est enregistré chiffré et protégé (max. %d Mo)."
+
+msgid "Datenbanktabelle nicht gefunden."
+msgstr "Table de base de données introuvable."
+
+msgid "Datum"
+msgstr "Date"
+
+msgid "Datum: [TT.MM.JJJJ]"
+msgstr "Date : [JJ.MM.AAAA]"
+
+msgid "Datum: neueste zuerst"
+msgstr "Date : plus récentes d’abord"
+
+msgid "Datum: älteste zuerst"
+msgstr "Date : plus anciennes d’abord"
+
+msgid "Den API-Key erstellst du im Dashboard unter «Account → API Keys». Er authentifiziert die serverseitige Prüfung der Einsendungen und bleibt geheim – trage ihn unten bei «API-Key» ein und teile ihn nirgends."
+msgstr "Créez la clé API dans le tableau de bord sous « Account → API Keys ». Elle authentifie la vérification côté serveur des envois et reste secrète – saisissez-la ci-dessous sous « Clé API » et ne la partagez nulle part."
+
+msgid "Den Site-Key findest du danach direkt unter dem Namen der Anwendung – er beginnt immer mit «FC». Trage ihn unten bei «Site-Key» ein."
+msgstr "Vous trouverez la clé de site juste sous le nom de l’application – elle commence toujours par « FC ». Saisissez-la ci-dessous sous « Clé de site »."
+
+msgid "Der Eingriff ist gering: Verarbeitet wird allein die IP-Adresse, es findet kein Profiling statt, die Verarbeitung erfolgt in der EU und nur kurz zur Verifikation. Besucherinnen und Besucher erwarten, dass Formulare gegen Spam geschützt sind. Dem geringen Eingriff steht ein legitimer Schutzbedarf gegenüber. Die Interessen der Betroffenen überwiegen nicht."
+msgstr "L’atteinte est minime : seule l’adresse IP est traitée, aucun profilage n’a lieu, le traitement se fait dans l’UE et brièvement, aux seules fins de vérification. Les visiteuses et visiteurs s’attendent à ce que les formulaires soient protégés contre le spam. À cette atteinte minime s’oppose un besoin de protection légitime. Les intérêts des personnes concernées ne prévalent pas."
+
+msgid "Der Einsatz von Friendly Captcha auf berechtigtem Interesse ist zulässig."
+msgstr "L’utilisation de Friendly Captcha sur la base de l’intérêt légitime est licite."
+
+msgid "Die Datenbanktabelle für Einsendungen fehlt. Bitte Plugin einmal deaktivieren und wieder aktivieren (oder die Aktivierung erneut ausführen), damit die Tabelle angelegt wird."
+msgstr "La table de base de données des envois est manquante. Veuillez désactiver puis réactiver le plugin (ou relancer l’activation) afin que la table soit créée."
+
+msgid "Diese Einsendung herunterladen (ZIP)"
+msgstr "Télécharger cet envoi (ZIP)"
+
+msgid "Diesen Eintrag wirklich löschen?"
+msgstr "Vraiment supprimer cette entrée ?"
+
+msgid "Einsendungen"
+msgstr "Envois"
+
+msgid "Einsendungen als CSV oder ZIP exportieren."
+msgstr "Exporter les envois en CSV ou ZIP."
+
+msgid "Einsendungen in Liste und Einzelansicht sehen."
+msgstr "Voir les envois dans la liste et la vue détaillée."
+
+msgid "Einsendungen löschen."
+msgstr "Supprimer les envois."
+
+msgid "Einsendungen sehen"
+msgstr "Voir les envois"
+
+msgid "Einstellungen"
+msgstr "Réglages"
+
+msgid "Einstellungen gespeichert."
+msgstr "Réglages enregistrés."
+
+msgid "Eintrag löschen"
+msgstr "Supprimer l’entrée"
+
+msgid "Eintrag nicht gefunden."
+msgstr "Entrée introuvable."
+
+msgid "Eintrag wurde gelöscht."
+msgstr "L’entrée a été supprimée."
+
+msgid "Entfernen"
+msgstr "Retirer"
+
+msgid "Erstelle ein Konto bei Friendly Captcha und melde dich im Dashboard an:"
+msgstr "Créez un compte chez Friendly Captcha et connectez-vous au tableau de bord :"
+
+msgid "Erweiterungen"
+msgstr "Extensions"
+
+msgid "Exportieren"
+msgstr "Exporter"
+
+msgid "Fehler"
+msgstr "Erreur"
+
+msgid "Felder entschlüsseln"
+msgstr "Déchiffrer les champs"
+
+msgid "Feldwerte entschlüsseln"
+msgstr "Déchiffrer les valeurs des champs"
+
+msgid "Formular"
+msgstr "Formulaire"
+
+msgid "Formular absenden"
+msgstr "Envoyer le formulaire"
+
+msgid "Formular-Einsendungen"
+msgstr "Envois de formulaires"
+
+msgid "Formular-Einträge"
+msgstr "Entrées de formulaire"
+
+msgid "Formular-ID"
+msgstr "ID du formulaire"
+
+msgid "Formular: Name A–Z"
+msgstr "Formulaire : nom A–Z"
+
+msgid "Formular: Name Z–A"
+msgstr "Formulaire : nom Z–A"
+
+msgid "Formularfelder"
+msgstr "Champs de formulaire"
+
+msgid "Formularname"
+msgstr "Nom du formulaire"
+
+msgid "Friendly Captcha global einschalten"
+msgstr "Activer Friendly Captcha globalement"
+
+msgid "Funktionsweise. Statt Ihr Verhalten zu beobachten, lässt Friendly Captcha Ihren Browser im Hintergrund eine kleine Rechenaufgabe lösen (Proof-of-Work). Diese Aufgabe ist für Menschen unbemerkbar, für massenhaft automatisierte Anfragen aber aufwendig – so werden Bots ausgebremst, ohne dass Sie verfolgt werden."
+msgstr "Fonctionnement. Au lieu d’observer votre comportement, Friendly Captcha fait résoudre à votre navigateur une petite tâche de calcul en arrière-plan (preuve de travail). Cette tâche est imperceptible pour les humains, mais coûteuse pour les requêtes automatisées massives – les robots sont freinés sans que vous soyez pisté."
+
+msgid "Geheimer Schlüssel für die serverseitige Prüfung («Account → API Keys»). Verlässt den Server nie und erscheint nirgends im Formular."
+msgstr "Clé secrète pour la vérification côté serveur (« Account → API Keys »). Ne quitte jamais le serveur et n’apparaît nulle part dans le formulaire."
+
+msgid "Hier erscheinen alle erfolgreich abgeschickten Formulare (serverseitig in der Datenbank gespeichert)."
+msgstr "Tous les formulaires envoyés avec succès apparaissent ici (enregistrés côté serveur dans la base de données)."
+
+msgid "ID"
+msgstr "ID"
+
+msgid "IP-Adresse"
+msgstr "Adresse IP"
+
+msgid "Ihre Rechte. Ihnen stehen die Rechte auf Auskunft, Berichtigung und Löschung zu sowie ein Beschwerderecht bei der zuständigen Aufsichtsbehörde."
+msgstr "Vos droits. Vous disposez des droits d’accès, de rectification et d’effacement, ainsi que d’un droit de réclamation auprès de l’autorité de contrôle compétente."
+
+msgid "Interessenabwägung (LIA) als interne Vorlage (kopierbar)"
+msgstr "Pesée des intérêts (LIA) comme modèle interne (copiable)"
+
+msgid "Interessenabwägung – Einsatz von Friendly Captcha"
+msgstr "Pesée des intérêts – utilisation de Friendly Captcha"
+
+msgid "Internes Dokument zur Dokumentation des berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO / Art. 31 revDSG)."
+msgstr "Document interne consignant l’intérêt légitime (art. 6, al. 1, let. f RGPD / art. 31 nLPD)."
+
+msgid "Kein Formular gewählt."
+msgstr "Aucun formulaire choisi."
+
+msgid "Keine Berechtigung zum Datei-Download."
+msgstr "Pas d’autorisation de télécharger des fichiers."
+
+msgid "Keine Berechtigung, diese Datei im Klartext herunterzuladen."
+msgstr "Pas d’autorisation de télécharger ce fichier en clair."
+
+msgid "Keine Berechtigung."
+msgstr "Pas d’autorisation."
+
+msgid "Keine Einsendung gewählt."
+msgstr "Aucun envoi choisi."
+
+msgid "Keine Einsendungen für dieses Formular."
+msgstr "Aucun envoi pour ce formulaire."
+
+msgid "Keine Felddaten."
+msgstr "Aucune donnée de champ."
+
+msgid "Keine installiert"
+msgstr "Aucune installée"
+
+msgid "Lege unter «Applications» mit «+ New Application» eine Anwendung für deine Website an."
+msgstr "Sous « Applications », créez une application pour votre site avec « + New Application »."
+
+msgid "Löschen"
+msgstr "Supprimer"
+
+msgid "Maximale Dateigrösse: %d MB."
+msgstr "Taille maximale de fichier : %d Mo."
+
+msgid "Metadaten"
+msgstr "Métadonnées"
+
+msgid "Modus"
+msgstr "Mode"
+
+msgid "Neues Formular: %1$s (%2$s), Beitrag %3$d"
+msgstr "Nouveau formulaire : %1$s (%2$s), article %3$d"
+
+msgid "Nicht aktiv"
+msgstr "Inactif"
+
+msgid "Noch keine Einsendungen."
+msgstr "Aucun envoi pour l’instant."
+
+msgid "Nonce"
+msgstr "Nonce"
+
+msgid "Plugin-Einstellungen und Berechtigungen ändern."
+msgstr "Modifier les réglages du plugin et les autorisations."
+
+msgid "Produktseite"
+msgstr "Page produit"
+
+msgid "Rechtsgrundlage. Die Verarbeitung stützt sich auf unser berechtigtes Interesse am Schutz unserer Formulare vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO; für die Schweiz Art. 31 revDSG)."
+msgstr "Base juridique. Le traitement repose sur notre intérêt légitime à protéger nos formulaires contre les abus (art. 6, al. 1, let. f RGPD ; pour la Suisse, art. 31 nLPD)."
+
+msgid "Reine serverseitige Massnahmen (Honeypot, Rate-Limit) fangen einfache Bots ab, aber nicht gezielten automatisierten Missbrauch. Ein Proof-of-Work-Captcha ohne Cookies und ohne Tracking ist das mildeste Mittel, das den Schutz spürbar erhöht, ohne das Verhalten der Besucher zu beobachten."
+msgstr "Les mesures purement côté serveur (honeypot, limitation de débit) arrêtent les robots simples, mais pas les abus automatisés ciblés. Un captcha à preuve de travail, sans cookies ni pistage, est le moyen le plus doux qui augmente sensiblement la protection sans observer le comportement des visiteurs."
+
+msgid "Schalte «Aktiv» ein und speichere. Pro Formular kannst du das Captcha zusätzlich im Formular-Block übersteuern (Einstellung «Spam-Schutz»)."
+msgstr "Activez « Actif » et enregistrez. Par formulaire, vous pouvez en outre surcharger le captcha dans le bloc de formulaire (réglage « Protection anti-spam »)."
+
+msgid "Seite"
+msgstr "Page"
+
+msgid "Seite / Beitrag"
+msgstr "Page / article"
+
+msgid "Seiten-ID"
+msgstr "ID de page"
+
+msgid "Sicherheitsprüfung fehlgeschlagen."
+msgstr "Échec du contrôle de sécurité."
+
+msgid "Soft – bei nicht erreichbarem Anbieter durchlassen"
+msgstr "Souple – laisser passer si le fournisseur est injoignable"
+
+msgid "Sortierung"
+msgstr "Tri"
+
+msgid "Spam-Schutz durch Friendly Captcha"
+msgstr "Protection anti-spam par Friendly Captcha"
+
+msgid "Speicherdauer. Die Daten werden nur zur Verifikation der Anfrage verarbeitet und nicht zur Profilbildung genutzt. [Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]"
+msgstr "Durée de conservation. Les données ne sont traitées que pour vérifier la demande et ne servent pas au profilage. [Durée concrète selon la documentation de Friendly Captcha]"
+
+msgid "Speichern"
+msgstr "Enregistrer"
+
+msgid "Speicherort. Die Verarbeitung erfolgt auf Servern in der Europäischen Union. Eine Übermittlung in Drittländer findet nicht statt."
+msgstr "Lieu de traitement. Le traitement a lieu sur des serveurs situés dans l’Union européenne. Aucun transfert vers des pays tiers n’a lieu."
+
+msgid "Strict – bei nicht erreichbarem Anbieter ablehnen"
+msgstr "Strict – refuser si le fournisseur est injoignable"
+
+msgid "Textbaustein für die Datenschutzerklärung (kopierbar)"
+msgstr "Bloc de texte pour la déclaration de confidentialité (copiable)"
+
+msgid "Unvollständig"
+msgstr "Incomplet"
+
+msgid "User-Agent"
+msgstr "User-Agent"
+
+msgid "Verantwortliche Person: [Name / Funktion]"
+msgstr "Personne responsable : [nom / fonction]"
+
+msgid "Verarbeitete Daten. Verarbeitet werden Ihre IP-Adresse sowie technische Angaben Ihres Geräts, die für den Berechnungsnachweis (Proof-of-Work) nötig sind. Friendly Captcha setzt dabei keine Cookies, nutzt kein Fingerprinting und kein Tracking."
+msgstr "Données traitées. Sont traitées votre adresse IP ainsi que des informations techniques de votre appareil nécessaires à la preuve de calcul (preuve de travail). Friendly Captcha n’utilise ni cookies, ni empreinte d’appareil, ni pistage."
+
+msgid "Widerspruchsrecht. Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen diese auf berechtigtem Interesse beruhende Verarbeitung Widerspruch einzulegen (Art. 21 DSGVO)."
+msgstr "Droit d’opposition. Vous avez le droit de vous opposer à tout moment, pour des raisons tenant à votre situation particulière, à ce traitement fondé sur l’intérêt légitime (art. 21 RGPD)."
+
+msgid "Wir schützen unsere Web-Formulare vor Spam und automatisiertem Missbrauch. Funktionierende Formulare ohne Bot-Flut sind die Grundlage für die Kommunikation mit unseren Besucherinnen und Besuchern."
+msgstr "Nous protégeons nos formulaires web contre le spam et les abus automatisés. Des formulaires fonctionnels, sans flot de robots, sont la base de la communication avec nos visiteuses et visiteurs."
+
+msgid "Wir setzen auf unseren Formularen den Dienst Friendly Captcha ein, einen Dienst der Friendly Captcha GmbH, Deutschland. [Firmenbezeichnung und Adresse]"
+msgstr "Sur nos formulaires, nous utilisons le service Friendly Captcha, un service de Friendly Captcha GmbH, Allemagne. [Raison sociale et adresse]"
+
+msgid "ZIP nicht verfügbar (PHP-ZipArchive fehlt)"
+msgstr "ZIP indisponible (PHP-ZipArchive manquant)"
+
+msgid "ZIP-Datei konnte nicht erstellt werden."
+msgstr "Le fichier ZIP n’a pas pu être créé."
+
+msgid "ZIP-Export nicht verfügbar: PHP-ZipArchive fehlt auf diesem Server."
+msgstr "Export ZIP indisponible : PHP-ZipArchive manque sur ce serveur."
+
+msgid "Zurück zur Übersicht"
+msgstr "Retour à l’aperçu"
+
+msgid "Zweck. Friendly Captcha schützt unsere Formulare vor Spam und automatisiertem Missbrauch (etwa durch Bots)."
+msgstr "Finalité. Friendly Captcha protège nos formulaires contre le spam et les abus automatisés (p. ex. par des robots)."
+
+msgid "[Datei #"
+msgstr "[Fichier n° "
+
+msgid "[E-Mail verschlüsselt]"
+msgstr "[e-mail chiffré]"
+
+msgid "[Name verschlüsselt]"
+msgstr "[nom chiffré]"
+
+msgid "[verschlüsselt]"
+msgstr "[chiffré]"
+
+msgid "d.m.Y H:i"
+msgstr "d/m/Y H:i"
+
+msgid "protokolliert"
+msgstr "journalisé"
+
+msgid "vertraulich"
+msgstr "confidentiel"
+
+msgid "Öffentlicher Schlüssel deiner Anwendung, beginnt mit «FC». Wird im Formular sichtbar ausgegeben."
+msgstr "Clé publique de votre application, commence par « FC ». Elle apparaît visiblement dans le formulaire."
+
+msgid "Übermittelte Felder"
+msgstr "Champs transmis"
+
+msgid "Übersicht der Add-ons"
+msgstr "Aperçu des extensions"
+
+msgid "Absenden-Button"
+msgstr "Bouton d’envoi"
+
+msgid "Absender-E-Mail"
+msgstr "E-mail de l’expéditeur"
+
+msgid "Absendername"
+msgstr "Nom de l’expéditeur"
+
+msgid "Admin-E-Mail der Website"
+msgstr "E-mail admin du site"
+
+msgid "Anzeigename (optional)"
+msgstr "Nom d’affichage (facultatif)"
+
+msgid "Auswahlfeld"
+msgstr "Liste déroulante"
+
+msgid "Automatisch (System)"
+msgstr "Automatique (système)"
+
+msgid "Betreff"
+msgstr "Objet"
+
+msgid "Bilder (JPG, PNG, GIF, WebP)"
+msgstr "Images (JPG, PNG, GIF, WebP)"
+
+msgid "Button-Farben (Dunkel)"
+msgstr "Couleurs du bouton (sombre)"
+
+msgid "Button-Farben (Hell)"
+msgstr "Couleurs du bouton (clair)"
+
+msgid "Button-Hintergrund"
+msgstr "Fond du bouton"
+
+msgid "Button-Text"
+msgstr "Texte du bouton"
+
+msgid "CAPTCHA für dieses Formular"
+msgstr "CAPTCHA pour ce formulaire"
+
+msgid "CSS-Wert wie 0.8125rem oder 13px. Leer = Standard."
+msgstr "Valeur CSS comme 0.8125rem ou 13px. Vide = par défaut."
+
+msgid "CSS-Wert wie 0.9375rem oder 15px. Leer = Standard."
+msgstr "Valeur CSS comme 0.9375rem ou 15px. Vide = par défaut."
+
+msgid "Checkbox"
+msgstr "Case à cocher"
+
+msgid "Datei-Upload"
+msgstr "Téléversement de fichier"
+
+msgid "Datei-Uploads können schädliche Dateien enthalten. Die Basis prüft Endung und Dateityp; Virenscan und verschlüsselte Ablage liefert das Security-Add-on."
+msgstr "Les fichiers téléversés peuvent contenir des fichiers nuisibles. La base vérifie l’extension et le type de fichier ; l’antivirus et le stockage chiffré sont fournis par l’extension Security."
+
+msgid "Datum und Uhrzeit"
+msgstr "Date et heure"
+
+msgid "Der Bereich «Rückmeldung» am Ende des Formulars erscheint nach erfolgreichem Absenden ohne Folgeseite statt des Formulars. Leer gelassen zeigt das Formular die Standardmeldung. Platzhalter im Text: {{feldname}} (technischer Feldname)."
+msgstr "La zone « Retour » à la fin du formulaire apparaît après un envoi réussi sans page de suite, à la place du formulaire. Laissée vide, le formulaire affiche le message standard. Espaces réservés dans le texte : {{nomdechamp}} (nom technique du champ)."
+
+msgid "Dieser Feldname existiert in diesem Formular bereits. Feld einmal duplizieren und das Original löschen, dann wird ein neuer Name vergeben."
+msgstr "Ce nom de champ existe déjà dans ce formulaire. Dupliquez le champ une fois et supprimez l’original – un nouveau nom sera attribué."
+
+msgid "Dieser Inhalt ersetzt nach erfolgreichem Absenden das Formular, sofern keine Folgeseite gewählt ist. Platzhalter: {{feldname}}; optional {{label_feldname}} (z. B. {{label_email}})."
+msgstr "Ce contenu remplace le formulaire après un envoi réussi si aucune page de suite n’est choisie. Espaces réservés : {{nomdechamp}} ; en option {{label_nomdechamp}} (p. ex. {{label_email}})."
+
+msgid "Dunkel"
+msgstr "Sombre"
+
+msgid "E-Mail nach Absenden senden"
+msgstr "Envoyer un e-mail après l’envoi"
+
+msgid "E-Mail-Adresse eingeben …"
+msgstr "Saisir l’adresse e-mail …"
+
+msgid "E-Mail-Benachrichtigung"
+msgstr "Notification par e-mail"
+
+msgid "E-Mail-Feld"
+msgstr "Champ e-mail"
+
+msgid "Eigene Absender-E-Mail"
+msgstr "E-mail d’expéditeur personnalisé"
+
+msgid "Eigene E-Mail-Adresse"
+msgstr "Adresse e-mail personnalisée"
+
+msgid "Eindeutige Kennung dieses Formulars (bei Duplizieren des Formularblocks neu). Einsendungen und Payload-Auswertung werden immer dieser ID zugeordnet."
+msgstr "Identifiant unique de ce formulaire (nouveau lors de la duplication du bloc). Les envois et l’évaluation des données sont toujours rattachés à cet ID."
+
+msgid "Eingaben werden im Browser der Besucherin zwischengespeichert und beim nächsten Besuch automatisch wiederhergestellt. Entwürfe verfallen nach 7 Tagen."
+msgstr "Les saisies sont mises en cache dans le navigateur de la visiteuse et restaurées automatiquement à la prochaine visite. Les brouillons expirent après 7 jours."
+
+msgid "Eingabetext"
+msgstr "Texte saisi"
+
+msgid "Empfänger"
+msgstr "Destinataire"
+
+msgid "Erlaubte Dateitypen"
+msgstr "Types de fichiers autorisés"
+
+msgid "Erscheint als Legende unter dem Feld, wie eine Bildunterschrift."
+msgstr "Apparaît comme légende sous le champ, comme une légende d’image."
+
+msgid "Erscheinungsbild"
+msgstr "Apparence"
+
+msgid "Farben und Karte kommen vollständig aus dem Theme. Eigene Formularfarben gibt es nur in den Modi Hell, Dunkel oder Automatisch."
+msgstr "Les couleurs et la carte proviennent entièrement du thème. Des couleurs de formulaire personnalisées n’existent que dans les modes clair, sombre ou automatique."
+
+msgid "Farbmodus"
+msgstr "Mode de couleur"
+
+msgid "Feld → Wert-Platzhalter einfügen"
+msgstr "Insérer l’espace réservé champ → valeur"
+
+msgid "Feldfarben (Dunkel)"
+msgstr "Couleurs de champ (sombre)"
+
+msgid "Feldfarben (Hell)"
+msgstr "Couleurs de champ (clair)"
+
+msgid "Feldhintergrund"
+msgstr "Fond de champ"
+
+msgid "Feldname wählen …"
+msgstr "Choisir le nom de champ …"
+
+msgid "Feste From-Adresse für diese Benachrichtigung (nicht aus dem Formular). Ungültig oder leer → Admin-E-Mail."
+msgstr "Adresse From fixe pour cette notification (pas issue du formulaire). Invalide ou vide → e-mail admin."
+
+msgid "Fokus"
+msgstr "Focus"
+
+msgid "Fokus (Rahmen)"
+msgstr "Focus (bordure)"
+
+msgid "Fokus (Rahmen, Schieberegler)"
+msgstr "Focus (bordure, curseur)"
+
+msgid "Folgeseite nach erfolgreichem Absenden"
+msgstr "Page de suite après un envoi réussi"
+
+msgid "Form-ID"
+msgstr "ID du formulaire"
+
+msgid "Formulareinstellungen"
+msgstr "Réglages du formulaire"
+
+msgid "Formularfarben (Dunkel)"
+msgstr "Couleurs du formulaire (sombre)"
+
+msgid "Formularfarben (Hell)"
+msgstr "Couleurs du formulaire (clair)"
+
+msgid "Formularseite mit Erfolgshinweis (Standard)"
+msgstr "Page du formulaire avec message de succès (par défaut)"
+
+msgid "Frühestes Datum"
+msgstr "Date la plus proche"
+
+msgid "Hell"
+msgstr "Clair"
+
+msgid "Hilfetext"
+msgstr "Texte d’aide"
+
+msgid "Hintergrund Formularbereich"
+msgstr "Fond de la zone de formulaire"
+
+msgid "Horizontal (nebeneinander)"
+msgstr "Horizontal (côte à côte)"
+
+msgid "Im Farbmodus «Theme» kommen alle Farben aus dem Theme. Feldfarben gibt es in den Modi Hell, Dunkel oder Automatisch (Stil-Tab des Formular-Blocks)."
+msgstr "Dans le mode de couleur « Thème », toutes les couleurs proviennent du thème. Les couleurs de champ existent dans les modes clair, sombre ou automatique (onglet Styles du bloc de formulaire)."
+
+msgid "Immer an"
+msgstr "Toujours activé"
+
+msgid "Immer aus"
+msgstr "Toujours désactivé"
+
+msgid "Keine Felder gefunden. Lege zuerst Felder im Formular ausserhalb dieser Rückmeldung an."
+msgstr "Aucun champ trouvé. Créez d’abord des champs dans le formulaire, hors de cette zone de retour."
+
+msgid "Keine gültige E-Mail-Adresse."
+msgstr "Adresse e-mail non valide."
+
+msgid "Label"
+msgstr "Libellé"
+
+msgid "Label (Hinweis)"
+msgstr "Libellé (indication)"
+
+msgid "Leer = Admin-E-Mail der Website."
+msgstr "Vide = e-mail admin du site."
+
+msgid "Leer = Standardbetreff. Platzhalter: {{feldname}} und {{label_feldname}} (technischer Feldname)."
+msgstr "Vide = objet standard. Espaces réservés : {{nomdechamp}} et {{label_nomdechamp}} (nom technique du champ)."
+
+msgid "Leer lassen für die Mitte zwischen Min und Max."
+msgstr "Laisser vide pour le milieu entre min et max."
+
+msgid "Liste der technischen Feldnamen (POST-Name). Nach der Auswahl wird der Wert-Platzhalter {{feldname}} an dieser Stelle als Absatz eingefügt."
+msgstr "Liste des noms techniques de champs (nom POST). Après la sélection, l’espace réservé de valeur {{nomdechamp}} est inséré ici comme paragraphe."
+
+msgid "Lokale Entwurfsspeicherung aktivieren"
+msgstr "Activer l’enregistrement local de brouillons"
+
+msgid "Markiert das Feld als vertraulich. Maskierung und Verschlüsselung übernimmt das Security-Add-on, falls installiert. Beim Versand per Mail bleibt der Wert sichtbar."
+msgstr "Marque le champ comme confidentiel. Le masquage et le chiffrement sont assurés par l’extension Security, si elle est installée. La valeur reste visible lors de l’envoi par e-mail."
+
+msgid "Max"
+msgstr "Max"
+
+msgid "Max. Grösse (MB)"
+msgstr "Taille max. (Mo)"
+
+msgid "Min"
+msgstr "Min"
+
+msgid "Nichts gewählt = alle sicheren Standardtypen. Gefährliche Typen (z. B. Programme, Skripte) blockiert der Server immer."
+msgstr "Rien de sélectionné = tous les types standards sûrs. Les types dangereux (p. ex. programmes, scripts) sont toujours bloqués par le serveur."
+
+msgid "Nur für die Backend-Übersicht und den Standard-E-Mail-Betreff (wenn kein eigener Betreff gesetzt ist); wird nicht im Formular dargestellt."
+msgstr "Uniquement pour l’aperçu du backend et l’objet d’e-mail standard (si aucun objet personnalisé n’est défini) ; n’apparaît pas dans le formulaire."
+
+msgid "Nur im Editor und in der Eintrags-Übersicht sichtbar; erscheint nicht im Formular."
+msgstr "Visible uniquement dans l’éditeur et dans l’aperçu des entrées ; n’apparaît pas dans le formulaire."
+
+msgid "Optional. Leer = Name der Website. Platzhalter: {{feldname}} und {{label_feldname}} (technischer Feldname)."
+msgstr "Facultatif. Vide = nom du site. Espaces réservés : {{nomdechamp}} et {{label_nomdechamp}} (nom technique du champ)."
+
+msgid "Optionen (eine pro Zeile)"
+msgstr "Options (une par ligne)"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "Pflichtfeld"
+msgstr "Champ obligatoire"
+
+msgid "Platzhalter"
+msgstr "Espace réservé"
+
+msgid "Präsentationen (PPT, PPTX)"
+msgstr "Présentations (PPT, PPTX)"
+
+msgid "Radio-Auswahl"
+msgstr "Choix radio"
+
+msgid "Rahmen"
+msgstr "Bordure"
+
+msgid "Schieberegler"
+msgstr "Curseur"
+
+msgid "Schriftgrösse Hilfetext"
+msgstr "Taille de police du texte d’aide"
+
+msgid "Schriftgrösse Label"
+msgstr "Taille de police du libellé"
+
+msgid "Schritt"
+msgstr "Pas"
+
+msgid "Spam-Schutz (CAPTCHA)"
+msgstr "Protection anti-spam (CAPTCHA)"
+
+msgid "Spätestes Datum"
+msgstr "Date la plus lointaine"
+
+msgid "Startwert (optional)"
+msgstr "Valeur initiale (facultatif)"
+
+msgid "Steuert, ob auf diesem Formular ein CAPTCHA erscheint. Voraussetzung: CAPTCHA ist unter «Sicherheit & Einstellungen» global aktiviert und konfiguriert."
+msgstr "Détermine si un CAPTCHA apparaît sur ce formulaire. Prérequis : le CAPTCHA est activé et configuré globalement sous « Sécurité & Réglages »."
+
+msgid "Tabellen (XLS, XLSX, CSV)"
+msgstr "Tableurs (XLS, XLSX, CSV)"
+
+msgid "Technischer Feldname"
+msgstr "Nom technique du champ"
+
+msgid "Telefon"
+msgstr "Téléphone"
+
+msgid "Textbereich"
+msgstr "Zone de texte"
+
+msgid "Textdateien (TXT)"
+msgstr "Fichiers texte (TXT)"
+
+msgid "Textfeld"
+msgstr "Champ texte"
+
+msgid "Theme (Standard)"
+msgstr "Thème (par défaut)"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Uhrzeit"
+msgstr "Heure"
+
+msgid "Verstecktes Feld"
+msgstr "Champ masqué"
+
+msgid "Verstecktes Feld (nur technischer Wert)"
+msgstr "Champ masqué (valeur technique uniquement)"
+
+msgid "Vertikal (untereinander)"
+msgstr "Vertical (superposé)"
+
+msgid "Vertraulich"
+msgstr "Confidentiel"
+
+msgid "Von globaler Einstellung übernehmen"
+msgstr "Hériter du réglage global"
+
+msgid "Wenn aktiv, wird der oben gesetzte Wert beim Absenden serverseitig gesetzt. Werte aus dem Browser werden ignoriert (Schutz gegen Manipulation)."
+msgstr "Si actif, la valeur définie ci-dessus est appliquée côté serveur lors de l’envoi. Les valeurs du navigateur sont ignorées (protection contre la manipulation)."
+
+msgid "Wert"
+msgstr "Valeur"
+
+msgid "Wert serverseitig erzwingen (empfohlen)"
+msgstr "Imposer la valeur côté serveur (recommandé)"
+
+msgid "Wird automatisch vergeben und bleibt stabil. Dient als Spalte im CSV-Export und als Platzhalter im Rückmeldung-Block: {{feldname}}."
+msgstr "Attribué automatiquement et reste stable. Sert de colonne dans l’export CSV et d’espace réservé dans le bloc Retour : {{nomdechamp}}."
+
+msgid "Word-Dokumente (DOC, DOCX)"
+msgstr "Documents Word (DOC, DOCX)"
+
+msgid "Wählst du ein E-Mail-Feld, wird dessen Adresse als Antwort-Adresse (Reply-To) gesetzt – «Antworten» geht dann direkt an die Absenderin. Technischer Absender bleibt immer eine Adresse deiner Website; ein fremdes From würde von vielen Mailservern als Fälschung abgewiesen (SPF/DKIM/DMARC)."
+msgstr "Si vous choisissez un champ e-mail, son adresse devient l’adresse de réponse (Reply-To) – « Répondre » va alors directement à l’expéditrice. L’expéditeur technique reste toujours une adresse de votre site ; un From étranger serait rejeté par de nombreux serveurs de messagerie comme falsification (SPF/DKIM/DMARC)."
+
+msgid "ZIP-Archive"
+msgstr "Archives ZIP"
+
+msgid "Zahl"
+msgstr "Nombre"
+
+msgid "Öffentlich sichtbare Seite. Ohne Auswahl bleibt die Besucherin auf der Formularseite (Hinweis oben)."
+msgstr "Page visible publiquement. Sans sélection, la visiteuse reste sur la page du formulaire (message en haut)."
+
+msgid "%d Add-on installiert"
+msgid_plural "%d Add-ons installiert"
+msgstr[0] "%d extension installée"
+msgstr[1] "%d extensions installées"
+
+msgid "Eintrag"
+msgid_plural "Einträge"
+msgstr[0] "entrée"
+msgstr[1] "entrées"

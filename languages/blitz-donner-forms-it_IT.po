@@ -473,3 +473,792 @@ msgstr "Livello aggiuntivo: Friendly Captcha"
 
 msgid "Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen."
 msgstr "Contro lo spam persistente e mirato consigliamo in aggiunta Friendly Captcha – una protezione senza cookie e senza tracciamento (proof of work, elaborazione nell’UE). Se attivato, per la verifica viene contattato il servizio esterno Friendly Captcha."
+
+# Vollständige Nachführung aller fehlenden Strings (v0.8.5).
+
+msgid " nicht gefunden]"
+msgstr " non trovato]"
+
+msgid "(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "(Modello non vincolante, non è una consulenza legale. Adattarlo alla propria situazione concreta e, in caso di dubbio, farlo verificare legalmente.)"
+
+msgid "1. Zweck / berechtigtes Interesse"
+msgstr "1. Finalità / interesse legittimo"
+
+msgid "2. Erforderlichkeit / kein milderes Mittel"
+msgstr "2. Necessità / nessun mezzo più mite"
+
+msgid "3. Interessenabwägung"
+msgstr "3. Bilanciamento degli interessi"
+
+msgid "4. Ergebnis"
+msgstr "4. Risultato"
+
+msgid "Ablageverzeichnis nicht beschreibbar."
+msgstr "La cartella di archiviazione non è scrivibile."
+
+msgid "Absender"
+msgstr "Mittente"
+
+msgid "Aktionen"
+msgstr "Azioni"
+
+msgid "Aktiv"
+msgstr "Attivo"
+
+msgid "Alle Add-ons entdecken"
+msgstr "Scopri tutte le estensioni"
+
+msgid "Alle Formulare"
+msgstr "Tutti i moduli"
+
+msgid "Als CSV exportieren"
+msgstr "Esporta come CSV"
+
+msgid "Als vertraulich markiert"
+msgstr "Contrassegnato come riservato"
+
+msgid "Anleitung: So kommst du zu den beiden Schlüsseln"
+msgstr "Guida: come ottenere le due chiavi"
+
+msgid "Anmeldung erforderlich."
+msgstr "Accesso richiesto."
+
+msgid "Ansehen"
+msgstr "Visualizza"
+
+msgid "Anwenden"
+msgstr "Applica"
+
+msgid "Auftragsverarbeitung. Mit der Friendly Captcha GmbH besteht ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO (bzw. Art. 9 revDSG)."
+msgstr "Responsabile del trattamento. Con Friendly Captcha GmbH esiste un contratto di trattamento dei dati ai sensi dell’art. 28 GDPR (o art. 9 nLPD)."
+
+msgid "Ausführliche Anleitung des Anbieters:"
+msgstr "Guida dettagliata del fornitore:"
+
+msgid "Authentifizierung"
+msgstr "Autenticazione"
+
+msgid "BD Forms"
+msgstr "BD Forms"
+
+msgid "Beitrag"
+msgstr "Articolo"
+
+msgid "Beitrag #%d (nicht mehr vorhanden)"
+msgstr "Articolo n. %d (non più disponibile)"
+
+msgid "Berechtigung"
+msgstr "Autorizzazione"
+
+msgid "Berechtigungen"
+msgstr "Autorizzazioni"
+
+msgid "Bitte zuerst ein Formular auswählen, um einen CSV-Export zu starten."
+msgstr "Seleziona prima un modulo per avviare un’esportazione CSV."
+
+msgid "Blitz & Donner Forms lässt sich mit Add-ons erweitern – zum Beispiel um Verschlüsselung, Audit-Log und Virenscan (Security-Add-on)."
+msgstr "Blitz & Donner Forms può essere ampliato con estensioni – ad esempio cifratura, registro di audit e antivirus (estensione Security)."
+
+msgid "Blitz & Donner Forms – Einstellungen"
+msgstr "Blitz & Donner Forms – Impostazioni"
+
+msgid "Blitz & Donner Formular"
+msgstr "Blitz & Donner Formular"
+
+msgid "CSV + Dateien (ZIP)"
+msgstr "CSV + file (ZIP)"
+
+msgid "CSV-Export · %1$s (%2$d %3$s)"
+msgstr "Esportazione CSV · %1$s (%2$d %3$s)"
+
+msgid "CSV-Puffer konnte nicht geöffnet werden."
+msgstr "Impossibile aprire il buffer CSV."
+
+msgid "Damit können z.B. Redaktorinnen Einsendungen sehen oder exportieren, ohne Administratorrechte zu haben. Welche Rolle darf was? Administratoren behalten immer vollen Zugriff. Add-ons ergänzen hier eigene Berechtigungen."
+msgstr "Così, ad esempio, le redattrici possono vedere o esportare gli invii senza diritti di amministratore. Quale ruolo può fare cosa? Gli amministratori mantengono sempre l’accesso completo. Le estensioni aggiungono qui le proprie autorizzazioni."
+
+msgid "Datei herunterladen (entschlüsselt)"
+msgstr "Scarica il file (decifrato)"
+
+msgid "Datei konnte nicht abgelegt werden."
+msgstr "Impossibile salvare il file."
+
+msgid "Datei nicht lesbar."
+msgstr "File non leggibile."
+
+msgid "Datei wird verschlüsselt und geschützt gespeichert (max. %d MB)."
+msgstr "Il file viene salvato cifrato e protetto (max. %d MB)."
+
+msgid "Datenbanktabelle nicht gefunden."
+msgstr "Tabella del database non trovata."
+
+msgid "Datum"
+msgstr "Data"
+
+msgid "Datum: [TT.MM.JJJJ]"
+msgstr "Data: [GG.MM.AAAA]"
+
+msgid "Datum: neueste zuerst"
+msgstr "Data: prima le più recenti"
+
+msgid "Datum: älteste zuerst"
+msgstr "Data: prima le più vecchie"
+
+msgid "Den API-Key erstellst du im Dashboard unter «Account → API Keys». Er authentifiziert die serverseitige Prüfung der Einsendungen und bleibt geheim – trage ihn unten bei «API-Key» ein und teile ihn nirgends."
+msgstr "Crea la chiave API nella dashboard sotto «Account → API Keys». Autentica la verifica lato server degli invii e resta segreta – inseriscila qui sotto in «Chiave API» e non condividerla da nessuna parte."
+
+msgid "Den Site-Key findest du danach direkt unter dem Namen der Anwendung – er beginnt immer mit «FC». Trage ihn unten bei «Site-Key» ein."
+msgstr "Troverai la chiave del sito subito sotto il nome dell’applicazione – inizia sempre con «FC». Inseriscila qui sotto in «Chiave del sito»."
+
+msgid "Der Eingriff ist gering: Verarbeitet wird allein die IP-Adresse, es findet kein Profiling statt, die Verarbeitung erfolgt in der EU und nur kurz zur Verifikation. Besucherinnen und Besucher erwarten, dass Formulare gegen Spam geschützt sind. Dem geringen Eingriff steht ein legitimer Schutzbedarf gegenüber. Die Interessen der Betroffenen überwiegen nicht."
+msgstr "L’ingerenza è minima: viene trattato solo l’indirizzo IP, non avviene alcuna profilazione, il trattamento si svolge nell’UE e solo brevemente per la verifica. Le visitatrici e i visitatori si aspettano che i moduli siano protetti dallo spam. All’ingerenza minima si contrappone una legittima esigenza di protezione. Gli interessi delle persone interessate non prevalgono."
+
+msgid "Der Einsatz von Friendly Captcha auf berechtigtem Interesse ist zulässig."
+msgstr "L’impiego di Friendly Captcha sulla base dell’interesse legittimo è lecito."
+
+msgid "Die Datenbanktabelle für Einsendungen fehlt. Bitte Plugin einmal deaktivieren und wieder aktivieren (oder die Aktivierung erneut ausführen), damit die Tabelle angelegt wird."
+msgstr "Manca la tabella del database per gli invii. Disattiva e riattiva il plugin una volta (o esegui di nuovo l’attivazione) affinché la tabella venga creata."
+
+msgid "Diese Einsendung herunterladen (ZIP)"
+msgstr "Scarica questo invio (ZIP)"
+
+msgid "Diesen Eintrag wirklich löschen?"
+msgstr "Eliminare davvero questa voce?"
+
+msgid "Einsendungen"
+msgstr "Invii"
+
+msgid "Einsendungen als CSV oder ZIP exportieren."
+msgstr "Esporta gli invii come CSV o ZIP."
+
+msgid "Einsendungen in Liste und Einzelansicht sehen."
+msgstr "Visualizza gli invii nell’elenco e nella vista di dettaglio."
+
+msgid "Einsendungen löschen."
+msgstr "Elimina gli invii."
+
+msgid "Einsendungen sehen"
+msgstr "Visualizza invii"
+
+msgid "Einstellungen"
+msgstr "Impostazioni"
+
+msgid "Einstellungen gespeichert."
+msgstr "Impostazioni salvate."
+
+msgid "Eintrag löschen"
+msgstr "Elimina voce"
+
+msgid "Eintrag nicht gefunden."
+msgstr "Voce non trovata."
+
+msgid "Eintrag wurde gelöscht."
+msgstr "La voce è stata eliminata."
+
+msgid "Entfernen"
+msgstr "Rimuovi"
+
+msgid "Erstelle ein Konto bei Friendly Captcha und melde dich im Dashboard an:"
+msgstr "Crea un account presso Friendly Captcha e accedi alla dashboard:"
+
+msgid "Erweiterungen"
+msgstr "Estensioni"
+
+msgid "Exportieren"
+msgstr "Esporta"
+
+msgid "Fehler"
+msgstr "Errore"
+
+msgid "Felder entschlüsseln"
+msgstr "Decifra i campi"
+
+msgid "Feldwerte entschlüsseln"
+msgstr "Decifra i valori dei campi"
+
+msgid "Formular"
+msgstr "Modulo"
+
+msgid "Formular absenden"
+msgstr "Invia il modulo"
+
+msgid "Formular-Einsendungen"
+msgstr "Invii dei moduli"
+
+msgid "Formular-Einträge"
+msgstr "Voci del modulo"
+
+msgid "Formular-ID"
+msgstr "ID del modulo"
+
+msgid "Formular: Name A–Z"
+msgstr "Modulo: nome A–Z"
+
+msgid "Formular: Name Z–A"
+msgstr "Modulo: nome Z–A"
+
+msgid "Formularfelder"
+msgstr "Campi del modulo"
+
+msgid "Formularname"
+msgstr "Nome del modulo"
+
+msgid "Friendly Captcha global einschalten"
+msgstr "Attiva Friendly Captcha globalmente"
+
+msgid "Funktionsweise. Statt Ihr Verhalten zu beobachten, lässt Friendly Captcha Ihren Browser im Hintergrund eine kleine Rechenaufgabe lösen (Proof-of-Work). Diese Aufgabe ist für Menschen unbemerkbar, für massenhaft automatisierte Anfragen aber aufwendig – so werden Bots ausgebremst, ohne dass Sie verfolgt werden."
+msgstr "Funzionamento. Invece di osservare il tuo comportamento, Friendly Captcha fa risolvere al tuo browser un piccolo compito di calcolo in background (proof of work). Questo compito è impercettibile per le persone, ma oneroso per le richieste automatizzate di massa – i bot vengono rallentati senza tracciarti."
+
+msgid "Geheimer Schlüssel für die serverseitige Prüfung («Account → API Keys»). Verlässt den Server nie und erscheint nirgends im Formular."
+msgstr "Chiave segreta per la verifica lato server («Account → API Keys»). Non lascia mai il server e non compare mai nel modulo."
+
+msgid "Hier erscheinen alle erfolgreich abgeschickten Formulare (serverseitig in der Datenbank gespeichert)."
+msgstr "Qui compaiono tutti i moduli inviati con successo (salvati lato server nel database)."
+
+msgid "ID"
+msgstr "ID"
+
+msgid "IP-Adresse"
+msgstr "Indirizzo IP"
+
+msgid "Ihre Rechte. Ihnen stehen die Rechte auf Auskunft, Berichtigung und Löschung zu sowie ein Beschwerderecht bei der zuständigen Aufsichtsbehörde."
+msgstr "I tuoi diritti. Hai diritto all’accesso, alla rettifica e alla cancellazione, nonché a presentare reclamo all’autorità di controllo competente."
+
+msgid "Interessenabwägung (LIA) als interne Vorlage (kopierbar)"
+msgstr "Bilanciamento degli interessi (LIA) come modello interno (copiabile)"
+
+msgid "Interessenabwägung – Einsatz von Friendly Captcha"
+msgstr "Bilanciamento degli interessi – impiego di Friendly Captcha"
+
+msgid "Internes Dokument zur Dokumentation des berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO / Art. 31 revDSG)."
+msgstr "Documento interno che attesta l’interesse legittimo (art. 6, par. 1, lett. f GDPR / art. 31 nLPD)."
+
+msgid "Kein Formular gewählt."
+msgstr "Nessun modulo selezionato."
+
+msgid "Keine Berechtigung zum Datei-Download."
+msgstr "Nessuna autorizzazione a scaricare file."
+
+msgid "Keine Berechtigung, diese Datei im Klartext herunterzuladen."
+msgstr "Nessuna autorizzazione a scaricare questo file in chiaro."
+
+msgid "Keine Berechtigung."
+msgstr "Nessuna autorizzazione."
+
+msgid "Keine Einsendung gewählt."
+msgstr "Nessun invio selezionato."
+
+msgid "Keine Einsendungen für dieses Formular."
+msgstr "Nessun invio per questo modulo."
+
+msgid "Keine Felddaten."
+msgstr "Nessun dato dei campi."
+
+msgid "Keine installiert"
+msgstr "Nessuna installata"
+
+msgid "Lege unter «Applications» mit «+ New Application» eine Anwendung für deine Website an."
+msgstr "Sotto «Applications» crea un’applicazione per il tuo sito con «+ New Application»."
+
+msgid "Löschen"
+msgstr "Elimina"
+
+msgid "Maximale Dateigrösse: %d MB."
+msgstr "Dimensione massima del file: %d MB."
+
+msgid "Metadaten"
+msgstr "Metadati"
+
+msgid "Modus"
+msgstr "Modalità"
+
+msgid "Neues Formular: %1$s (%2$s), Beitrag %3$d"
+msgstr "Nuovo modulo: %1$s (%2$s), articolo %3$d"
+
+msgid "Nicht aktiv"
+msgstr "Non attivo"
+
+msgid "Noch keine Einsendungen."
+msgstr "Ancora nessun invio."
+
+msgid "Nonce"
+msgstr "Nonce"
+
+msgid "Plugin-Einstellungen und Berechtigungen ändern."
+msgstr "Modificare le impostazioni del plugin e le autorizzazioni."
+
+msgid "Produktseite"
+msgstr "Pagina del prodotto"
+
+msgid "Rechtsgrundlage. Die Verarbeitung stützt sich auf unser berechtigtes Interesse am Schutz unserer Formulare vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO; für die Schweiz Art. 31 revDSG)."
+msgstr "Base giuridica. Il trattamento si fonda sul nostro interesse legittimo a proteggere i nostri moduli dagli abusi (art. 6, par. 1, lett. f GDPR; per la Svizzera art. 31 nLPD)."
+
+msgid "Reine serverseitige Massnahmen (Honeypot, Rate-Limit) fangen einfache Bots ab, aber nicht gezielten automatisierten Missbrauch. Ein Proof-of-Work-Captcha ohne Cookies und ohne Tracking ist das mildeste Mittel, das den Schutz spürbar erhöht, ohne das Verhalten der Besucher zu beobachten."
+msgstr "Le misure solo lato server (honeypot, limite di frequenza) fermano i bot semplici, ma non gli abusi automatizzati mirati. Un captcha proof-of-work senza cookie e senza tracciamento è il mezzo più mite che aumenta sensibilmente la protezione senza osservare il comportamento dei visitatori."
+
+msgid "Schalte «Aktiv» ein und speichere. Pro Formular kannst du das Captcha zusätzlich im Formular-Block übersteuern (Einstellung «Spam-Schutz»)."
+msgstr "Attiva «Attivo» e salva. Per ogni modulo puoi inoltre sovrascrivere il captcha nel blocco del modulo (impostazione «Protezione antispam»)."
+
+msgid "Seite"
+msgstr "Pagina"
+
+msgid "Seite / Beitrag"
+msgstr "Pagina / articolo"
+
+msgid "Seiten-ID"
+msgstr "ID pagina"
+
+msgid "Sicherheitsprüfung fehlgeschlagen."
+msgstr "Verifica di sicurezza non riuscita."
+
+msgid "Soft – bei nicht erreichbarem Anbieter durchlassen"
+msgstr "Morbido – lasciar passare se il fornitore non è raggiungibile"
+
+msgid "Sortierung"
+msgstr "Ordinamento"
+
+msgid "Spam-Schutz durch Friendly Captcha"
+msgstr "Protezione antispam con Friendly Captcha"
+
+msgid "Speicherdauer. Die Daten werden nur zur Verifikation der Anfrage verarbeitet und nicht zur Profilbildung genutzt. [Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]"
+msgstr "Durata di conservazione. I dati vengono trattati solo per verificare la richiesta e non vengono usati per la profilazione. [Durata concreta dalla documentazione di Friendly Captcha]"
+
+msgid "Speichern"
+msgstr "Salva"
+
+msgid "Speicherort. Die Verarbeitung erfolgt auf Servern in der Europäischen Union. Eine Übermittlung in Drittländer findet nicht statt."
+msgstr "Luogo del trattamento. Il trattamento avviene su server nell’Unione europea. Non ha luogo alcun trasferimento verso paesi terzi."
+
+msgid "Strict – bei nicht erreichbarem Anbieter ablehnen"
+msgstr "Rigoroso – rifiutare se il fornitore non è raggiungibile"
+
+msgid "Textbaustein für die Datenschutzerklärung (kopierbar)"
+msgstr "Blocco di testo per l’informativa sulla privacy (copiabile)"
+
+msgid "Unvollständig"
+msgstr "Incompleto"
+
+msgid "User-Agent"
+msgstr "User agent"
+
+msgid "Verantwortliche Person: [Name / Funktion]"
+msgstr "Persona responsabile: [nome / funzione]"
+
+msgid "Verarbeitete Daten. Verarbeitet werden Ihre IP-Adresse sowie technische Angaben Ihres Geräts, die für den Berechnungsnachweis (Proof-of-Work) nötig sind. Friendly Captcha setzt dabei keine Cookies, nutzt kein Fingerprinting und kein Tracking."
+msgstr "Dati trattati. Vengono trattati il tuo indirizzo IP e informazioni tecniche del tuo dispositivo necessarie per la prova di calcolo (proof of work). Friendly Captcha non usa cookie, fingerprinting né tracciamento."
+
+msgid "Widerspruchsrecht. Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen diese auf berechtigtem Interesse beruhende Verarbeitung Widerspruch einzulegen (Art. 21 DSGVO)."
+msgstr "Diritto di opposizione. Hai il diritto di opporti in qualsiasi momento, per motivi legati alla tua situazione particolare, a questo trattamento basato sull’interesse legittimo (art. 21 GDPR)."
+
+msgid "Wir schützen unsere Web-Formulare vor Spam und automatisiertem Missbrauch. Funktionierende Formulare ohne Bot-Flut sind die Grundlage für die Kommunikation mit unseren Besucherinnen und Besuchern."
+msgstr "Proteggiamo i nostri moduli web da spam e abusi automatizzati. Moduli funzionanti, senza ondate di bot, sono la base della comunicazione con le nostre visitatrici e i nostri visitatori."
+
+msgid "Wir setzen auf unseren Formularen den Dienst Friendly Captcha ein, einen Dienst der Friendly Captcha GmbH, Deutschland. [Firmenbezeichnung und Adresse]"
+msgstr "Sui nostri moduli utilizziamo il servizio Friendly Captcha, un servizio di Friendly Captcha GmbH, Germania. [Ragione sociale e indirizzo]"
+
+msgid "ZIP nicht verfügbar (PHP-ZipArchive fehlt)"
+msgstr "ZIP non disponibile (manca PHP-ZipArchive)"
+
+msgid "ZIP-Datei konnte nicht erstellt werden."
+msgstr "Impossibile creare il file ZIP."
+
+msgid "ZIP-Export nicht verfügbar: PHP-ZipArchive fehlt auf diesem Server."
+msgstr "Esportazione ZIP non disponibile: su questo server manca PHP-ZipArchive."
+
+msgid "Zurück zur Übersicht"
+msgstr "Torna alla panoramica"
+
+msgid "Zweck. Friendly Captcha schützt unsere Formulare vor Spam und automatisiertem Missbrauch (etwa durch Bots)."
+msgstr "Finalità. Friendly Captcha protegge i nostri moduli da spam e abusi automatizzati (ad es. da parte di bot)."
+
+msgid "[Datei #"
+msgstr "[File n. "
+
+msgid "[E-Mail verschlüsselt]"
+msgstr "[e-mail cifrata]"
+
+msgid "[Name verschlüsselt]"
+msgstr "[nome cifrato]"
+
+msgid "[verschlüsselt]"
+msgstr "[cifrato]"
+
+msgid "d.m.Y H:i"
+msgstr "d/m/Y H:i"
+
+msgid "protokolliert"
+msgstr "registrato"
+
+msgid "vertraulich"
+msgstr "riservato"
+
+msgid "Öffentlicher Schlüssel deiner Anwendung, beginnt mit «FC». Wird im Formular sichtbar ausgegeben."
+msgstr "Chiave pubblica della tua applicazione, inizia con «FC». Viene mostrata visibilmente nel modulo."
+
+msgid "Übermittelte Felder"
+msgstr "Campi trasmessi"
+
+msgid "Übersicht der Add-ons"
+msgstr "Panoramica delle estensioni"
+
+msgid "Absenden-Button"
+msgstr "Pulsante di invio"
+
+msgid "Absender-E-Mail"
+msgstr "E-mail del mittente"
+
+msgid "Absendername"
+msgstr "Nome del mittente"
+
+msgid "Admin-E-Mail der Website"
+msgstr "E-mail admin del sito"
+
+msgid "Anzeigename (optional)"
+msgstr "Nome visualizzato (facoltativo)"
+
+msgid "Auswahlfeld"
+msgstr "Campo di selezione"
+
+msgid "Automatisch (System)"
+msgstr "Automatico (sistema)"
+
+msgid "Betreff"
+msgstr "Oggetto"
+
+msgid "Bilder (JPG, PNG, GIF, WebP)"
+msgstr "Immagini (JPG, PNG, GIF, WebP)"
+
+msgid "Button-Farben (Dunkel)"
+msgstr "Colori del pulsante (scuro)"
+
+msgid "Button-Farben (Hell)"
+msgstr "Colori del pulsante (chiaro)"
+
+msgid "Button-Hintergrund"
+msgstr "Sfondo del pulsante"
+
+msgid "Button-Text"
+msgstr "Testo del pulsante"
+
+msgid "CAPTCHA für dieses Formular"
+msgstr "CAPTCHA per questo modulo"
+
+msgid "CSS-Wert wie 0.8125rem oder 13px. Leer = Standard."
+msgstr "Valore CSS come 0.8125rem o 13px. Vuoto = predefinito."
+
+msgid "CSS-Wert wie 0.9375rem oder 15px. Leer = Standard."
+msgstr "Valore CSS come 0.9375rem o 15px. Vuoto = predefinito."
+
+msgid "Checkbox"
+msgstr "Casella di controllo"
+
+msgid "Datei-Upload"
+msgstr "Caricamento file"
+
+msgid "Datei-Uploads können schädliche Dateien enthalten. Die Basis prüft Endung und Dateityp; Virenscan und verschlüsselte Ablage liefert das Security-Add-on."
+msgstr "I file caricati possono contenere file dannosi. La base verifica estensione e tipo di file; antivirus e archiviazione cifrata sono forniti dall’estensione Security."
+
+msgid "Datum und Uhrzeit"
+msgstr "Data e ora"
+
+msgid "Der Bereich «Rückmeldung» am Ende des Formulars erscheint nach erfolgreichem Absenden ohne Folgeseite statt des Formulars. Leer gelassen zeigt das Formular die Standardmeldung. Platzhalter im Text: {{feldname}} (technischer Feldname)."
+msgstr "L’area «Riscontro» alla fine del modulo compare dopo un invio riuscito senza pagina successiva, al posto del modulo. Se lasciata vuota, il modulo mostra il messaggio standard. Segnaposto nel testo: {{nomecampo}} (nome tecnico del campo)."
+
+msgid "Dieser Feldname existiert in diesem Formular bereits. Feld einmal duplizieren und das Original löschen, dann wird ein neuer Name vergeben."
+msgstr "Questo nome di campo esiste già in questo modulo. Duplica il campo una volta ed elimina l’originale – verrà assegnato un nuovo nome."
+
+msgid "Dieser Inhalt ersetzt nach erfolgreichem Absenden das Formular, sofern keine Folgeseite gewählt ist. Platzhalter: {{feldname}}; optional {{label_feldname}} (z. B. {{label_email}})."
+msgstr "Questo contenuto sostituisce il modulo dopo un invio riuscito, se non è selezionata alcuna pagina successiva. Segnaposto: {{nomecampo}}; facoltativo {{label_nomecampo}} (ad es. {{label_email}})."
+
+msgid "Dunkel"
+msgstr "Scuro"
+
+msgid "E-Mail nach Absenden senden"
+msgstr "Invia e-mail dopo l’invio"
+
+msgid "E-Mail-Adresse eingeben …"
+msgstr "Inserisci l’indirizzo e-mail …"
+
+msgid "E-Mail-Benachrichtigung"
+msgstr "Notifica e-mail"
+
+msgid "E-Mail-Feld"
+msgstr "Campo e-mail"
+
+msgid "Eigene Absender-E-Mail"
+msgstr "E-mail mittente personalizzata"
+
+msgid "Eigene E-Mail-Adresse"
+msgstr "Indirizzo e-mail personalizzato"
+
+msgid "Eindeutige Kennung dieses Formulars (bei Duplizieren des Formularblocks neu). Einsendungen und Payload-Auswertung werden immer dieser ID zugeordnet."
+msgstr "Identificativo univoco di questo modulo (nuovo se il blocco viene duplicato). Gli invii e l’analisi dei dati sono sempre legati a questo ID."
+
+msgid "Eingaben werden im Browser der Besucherin zwischengespeichert und beim nächsten Besuch automatisch wiederhergestellt. Entwürfe verfallen nach 7 Tagen."
+msgstr "I dati inseriti vengono salvati nel browser della visitatrice e ripristinati automaticamente alla visita successiva. Le bozze scadono dopo 7 giorni."
+
+msgid "Eingabetext"
+msgstr "Testo inserito"
+
+msgid "Empfänger"
+msgstr "Destinatario"
+
+msgid "Erlaubte Dateitypen"
+msgstr "Tipi di file consentiti"
+
+msgid "Erscheint als Legende unter dem Feld, wie eine Bildunterschrift."
+msgstr "Appare come didascalia sotto il campo, come la didascalia di un’immagine."
+
+msgid "Erscheinungsbild"
+msgstr "Aspetto"
+
+msgid "Farben und Karte kommen vollständig aus dem Theme. Eigene Formularfarben gibt es nur in den Modi Hell, Dunkel oder Automatisch."
+msgstr "Colori e riquadro provengono interamente dal tema. Colori del modulo personalizzati esistono solo nelle modalità chiaro, scuro o automatico."
+
+msgid "Farbmodus"
+msgstr "Modalità colore"
+
+msgid "Feld → Wert-Platzhalter einfügen"
+msgstr "Inserisci segnaposto campo → valore"
+
+msgid "Feldfarben (Dunkel)"
+msgstr "Colori del campo (scuro)"
+
+msgid "Feldfarben (Hell)"
+msgstr "Colori del campo (chiaro)"
+
+msgid "Feldhintergrund"
+msgstr "Sfondo del campo"
+
+msgid "Feldname wählen …"
+msgstr "Scegli il nome del campo …"
+
+msgid "Feste From-Adresse für diese Benachrichtigung (nicht aus dem Formular). Ungültig oder leer → Admin-E-Mail."
+msgstr "Indirizzo From fisso per questa notifica (non dal modulo). Non valido o vuoto → e-mail admin."
+
+msgid "Fokus"
+msgstr "Focus"
+
+msgid "Fokus (Rahmen)"
+msgstr "Focus (bordo)"
+
+msgid "Fokus (Rahmen, Schieberegler)"
+msgstr "Focus (bordo, cursore)"
+
+msgid "Folgeseite nach erfolgreichem Absenden"
+msgstr "Pagina successiva dopo l’invio riuscito"
+
+msgid "Form-ID"
+msgstr "ID del modulo"
+
+msgid "Formulareinstellungen"
+msgstr "Impostazioni del modulo"
+
+msgid "Formularfarben (Dunkel)"
+msgstr "Colori del modulo (scuro)"
+
+msgid "Formularfarben (Hell)"
+msgstr "Colori del modulo (chiaro)"
+
+msgid "Formularseite mit Erfolgshinweis (Standard)"
+msgstr "Pagina del modulo con messaggio di successo (predefinito)"
+
+msgid "Frühestes Datum"
+msgstr "Data più vicina"
+
+msgid "Hell"
+msgstr "Chiaro"
+
+msgid "Hilfetext"
+msgstr "Testo di aiuto"
+
+msgid "Hintergrund Formularbereich"
+msgstr "Sfondo dell’area del modulo"
+
+msgid "Horizontal (nebeneinander)"
+msgstr "Orizzontale (affiancati)"
+
+msgid "Im Farbmodus «Theme» kommen alle Farben aus dem Theme. Feldfarben gibt es in den Modi Hell, Dunkel oder Automatisch (Stil-Tab des Formular-Blocks)."
+msgstr "Nella modalità colore «Tema» tutti i colori provengono dal tema. I colori dei campi esistono nelle modalità chiaro, scuro o automatico (scheda Stili del blocco del modulo)."
+
+msgid "Immer an"
+msgstr "Sempre attivo"
+
+msgid "Immer aus"
+msgstr "Sempre disattivato"
+
+msgid "Keine Felder gefunden. Lege zuerst Felder im Formular ausserhalb dieser Rückmeldung an."
+msgstr "Nessun campo trovato. Crea prima i campi nel modulo, fuori da quest’area di riscontro."
+
+msgid "Keine gültige E-Mail-Adresse."
+msgstr "Indirizzo e-mail non valido."
+
+msgid "Label"
+msgstr "Etichetta"
+
+msgid "Label (Hinweis)"
+msgstr "Etichetta (nota)"
+
+msgid "Leer = Admin-E-Mail der Website."
+msgstr "Vuoto = e-mail admin del sito."
+
+msgid "Leer = Standardbetreff. Platzhalter: {{feldname}} und {{label_feldname}} (technischer Feldname)."
+msgstr "Vuoto = oggetto standard. Segnaposto: {{nomecampo}} e {{label_nomecampo}} (nome tecnico del campo)."
+
+msgid "Leer lassen für die Mitte zwischen Min und Max."
+msgstr "Lasciare vuoto per il punto medio tra min e max."
+
+msgid "Liste der technischen Feldnamen (POST-Name). Nach der Auswahl wird der Wert-Platzhalter {{feldname}} an dieser Stelle als Absatz eingefügt."
+msgstr "Elenco dei nomi tecnici dei campi (nome POST). Dopo la selezione, il segnaposto del valore {{nomecampo}} viene inserito qui come paragrafo."
+
+msgid "Lokale Entwurfsspeicherung aktivieren"
+msgstr "Attiva il salvataggio locale delle bozze"
+
+msgid "Markiert das Feld als vertraulich. Maskierung und Verschlüsselung übernimmt das Security-Add-on, falls installiert. Beim Versand per Mail bleibt der Wert sichtbar."
+msgstr "Contrassegna il campo come riservato. Mascheramento e cifratura sono gestiti dall’estensione Security, se installata. Il valore resta visibile nell’invio per e-mail."
+
+msgid "Max"
+msgstr "Max"
+
+msgid "Max. Grösse (MB)"
+msgstr "Dimensione max. (MB)"
+
+msgid "Min"
+msgstr "Min"
+
+msgid "Nichts gewählt = alle sicheren Standardtypen. Gefährliche Typen (z. B. Programme, Skripte) blockiert der Server immer."
+msgstr "Nessuna selezione = tutti i tipi standard sicuri. I tipi pericolosi (ad es. programmi, script) vengono sempre bloccati dal server."
+
+msgid "Nur für die Backend-Übersicht und den Standard-E-Mail-Betreff (wenn kein eigener Betreff gesetzt ist); wird nicht im Formular dargestellt."
+msgstr "Solo per la panoramica del backend e l’oggetto e-mail standard (se non è impostato un oggetto personalizzato); non viene mostrato nel modulo."
+
+msgid "Nur im Editor und in der Eintrags-Übersicht sichtbar; erscheint nicht im Formular."
+msgstr "Visibile solo nell’editor e nella panoramica delle voci; non compare nel modulo."
+
+msgid "Optional. Leer = Name der Website. Platzhalter: {{feldname}} und {{label_feldname}} (technischer Feldname)."
+msgstr "Facoltativo. Vuoto = nome del sito. Segnaposto: {{nomecampo}} e {{label_nomecampo}} (nome tecnico del campo)."
+
+msgid "Optionen (eine pro Zeile)"
+msgstr "Opzioni (una per riga)"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "Pflichtfeld"
+msgstr "Campo obbligatorio"
+
+msgid "Platzhalter"
+msgstr "Segnaposto"
+
+msgid "Präsentationen (PPT, PPTX)"
+msgstr "Presentazioni (PPT, PPTX)"
+
+msgid "Radio-Auswahl"
+msgstr "Scelta radio"
+
+msgid "Rahmen"
+msgstr "Bordo"
+
+msgid "Schieberegler"
+msgstr "Cursore"
+
+msgid "Schriftgrösse Hilfetext"
+msgstr "Dimensione carattere del testo di aiuto"
+
+msgid "Schriftgrösse Label"
+msgstr "Dimensione carattere dell’etichetta"
+
+msgid "Schritt"
+msgstr "Passo"
+
+msgid "Spam-Schutz (CAPTCHA)"
+msgstr "Protezione antispam (CAPTCHA)"
+
+msgid "Spätestes Datum"
+msgstr "Data più lontana"
+
+msgid "Startwert (optional)"
+msgstr "Valore iniziale (facoltativo)"
+
+msgid "Steuert, ob auf diesem Formular ein CAPTCHA erscheint. Voraussetzung: CAPTCHA ist unter «Sicherheit & Einstellungen» global aktiviert und konfiguriert."
+msgstr "Determina se su questo modulo compare un CAPTCHA. Prerequisito: il CAPTCHA è attivato e configurato globalmente sotto «Sicurezza e impostazioni»."
+
+msgid "Tabellen (XLS, XLSX, CSV)"
+msgstr "Fogli di calcolo (XLS, XLSX, CSV)"
+
+msgid "Technischer Feldname"
+msgstr "Nome tecnico del campo"
+
+msgid "Telefon"
+msgstr "Telefono"
+
+msgid "Textbereich"
+msgstr "Area di testo"
+
+msgid "Textdateien (TXT)"
+msgstr "File di testo (TXT)"
+
+msgid "Textfeld"
+msgstr "Campo di testo"
+
+msgid "Theme (Standard)"
+msgstr "Tema (predefinito)"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Uhrzeit"
+msgstr "Ora"
+
+msgid "Verstecktes Feld"
+msgstr "Campo nascosto"
+
+msgid "Verstecktes Feld (nur technischer Wert)"
+msgstr "Campo nascosto (solo valore tecnico)"
+
+msgid "Vertikal (untereinander)"
+msgstr "Verticale (impilati)"
+
+msgid "Vertraulich"
+msgstr "Riservato"
+
+msgid "Von globaler Einstellung übernehmen"
+msgstr "Eredita dall’impostazione globale"
+
+msgid "Wenn aktiv, wird der oben gesetzte Wert beim Absenden serverseitig gesetzt. Werte aus dem Browser werden ignoriert (Schutz gegen Manipulation)."
+msgstr "Se attivo, il valore impostato sopra viene applicato lato server all’invio. I valori dal browser vengono ignorati (protezione contro le manipolazioni)."
+
+msgid "Wert"
+msgstr "Valore"
+
+msgid "Wert serverseitig erzwingen (empfohlen)"
+msgstr "Impone il valore lato server (consigliato)"
+
+msgid "Wird automatisch vergeben und bleibt stabil. Dient als Spalte im CSV-Export und als Platzhalter im Rückmeldung-Block: {{feldname}}."
+msgstr "Assegnato automaticamente e resta stabile. Serve come colonna nell’esportazione CSV e come segnaposto nel blocco Riscontro: {{nomecampo}}."
+
+msgid "Word-Dokumente (DOC, DOCX)"
+msgstr "Documenti Word (DOC, DOCX)"
+
+msgid "Wählst du ein E-Mail-Feld, wird dessen Adresse als Antwort-Adresse (Reply-To) gesetzt – «Antworten» geht dann direkt an die Absenderin. Technischer Absender bleibt immer eine Adresse deiner Website; ein fremdes From würde von vielen Mailservern als Fälschung abgewiesen (SPF/DKIM/DMARC)."
+msgstr "Se scegli un campo e-mail, il suo indirizzo diventa l’indirizzo di risposta (Reply-To) – «Rispondi» va quindi direttamente alla mittente. Il mittente tecnico resta sempre un indirizzo del tuo sito; un From estraneo verrebbe respinto da molti server di posta come falsificazione (SPF/DKIM/DMARC)."
+
+msgid "ZIP-Archive"
+msgstr "Archivi ZIP"
+
+msgid "Zahl"
+msgstr "Numero"
+
+msgid "Öffentlich sichtbare Seite. Ohne Auswahl bleibt die Besucherin auf der Formularseite (Hinweis oben)."
+msgstr "Pagina visibile pubblicamente. Senza selezione la visitatrice resta sulla pagina del modulo (avviso in alto)."
+
+msgid "%d Add-on installiert"
+msgid_plural "%d Add-ons installiert"
+msgstr[0] "%d estensione installata"
+msgstr[1] "%d estensioni installate"
+
+msgid "Eintrag"
+msgid_plural "Einträge"
+msgstr[0] "voce"
+msgstr[1] "voci"

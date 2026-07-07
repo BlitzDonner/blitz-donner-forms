@@ -474,3 +474,792 @@ msgstr "Extra layer: Friendly Captcha"
 
 msgid "Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen."
 msgstr "Against persistent, targeted spam we recommend adding Friendly Captcha – spam protection without cookies and without tracking (proof of work, processed in the EU). When enabled, the external Friendly Captcha service is called to verify the check."
+
+# Vollständige Nachführung aller fehlenden Strings (v0.8.5).
+
+msgid " nicht gefunden]"
+msgstr " not found]"
+
+msgid "(Unverbindliche Vorlage, keine Rechtsberatung. Bitte an Ihre konkrete Situation anpassen und im Zweifel rechtlich prüfen lassen.)"
+msgstr "(Non-binding template, not legal advice. Please adapt it to your specific situation and have it reviewed legally if in doubt.)"
+
+msgid "1. Zweck / berechtigtes Interesse"
+msgstr "1. Purpose / legitimate interest"
+
+msgid "2. Erforderlichkeit / kein milderes Mittel"
+msgstr "2. Necessity / no milder means"
+
+msgid "3. Interessenabwägung"
+msgstr "3. Balancing of interests"
+
+msgid "4. Ergebnis"
+msgstr "4. Result"
+
+msgid "Ablageverzeichnis nicht beschreibbar."
+msgstr "Storage directory is not writable."
+
+msgid "Absender"
+msgstr "Sender"
+
+msgid "Aktionen"
+msgstr "Actions"
+
+msgid "Aktiv"
+msgstr "Active"
+
+msgid "Alle Add-ons entdecken"
+msgstr "Discover all add-ons"
+
+msgid "Alle Formulare"
+msgstr "All forms"
+
+msgid "Als CSV exportieren"
+msgstr "Export as CSV"
+
+msgid "Als vertraulich markiert"
+msgstr "Marked as confidential"
+
+msgid "Anleitung: So kommst du zu den beiden Schlüsseln"
+msgstr "Guide: how to get the two keys"
+
+msgid "Anmeldung erforderlich."
+msgstr "Login required."
+
+msgid "Ansehen"
+msgstr "View"
+
+msgid "Anwenden"
+msgstr "Apply"
+
+msgid "Auftragsverarbeitung. Mit der Friendly Captcha GmbH besteht ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO (bzw. Art. 9 revDSG)."
+msgstr "Data processing. A data processing agreement under Art. 28 GDPR (or Art. 9 revFADP) is in place with Friendly Captcha GmbH."
+
+msgid "Ausführliche Anleitung des Anbieters:"
+msgstr "Detailed guide by the provider:"
+
+msgid "Authentifizierung"
+msgstr "Authentication"
+
+msgid "BD Forms"
+msgstr "BD Forms"
+
+msgid "Beitrag"
+msgstr "Post"
+
+msgid "Beitrag #%d (nicht mehr vorhanden)"
+msgstr "Post #%d (no longer available)"
+
+msgid "Berechtigung"
+msgstr "Permission"
+
+msgid "Berechtigungen"
+msgstr "Permissions"
+
+msgid "Bitte zuerst ein Formular auswählen, um einen CSV-Export zu starten."
+msgstr "Please select a form first to start a CSV export."
+
+msgid "Blitz & Donner Forms lässt sich mit Add-ons erweitern – zum Beispiel um Verschlüsselung, Audit-Log und Virenscan (Security-Add-on)."
+msgstr "Blitz & Donner Forms can be extended with add-ons – for example encryption, audit log and virus scanning (Security add-on)."
+
+msgid "Blitz & Donner Forms – Einstellungen"
+msgstr "Blitz & Donner Forms – Settings"
+
+msgid "Blitz & Donner Formular"
+msgstr "Blitz & Donner Formular"
+
+msgid "CSV + Dateien (ZIP)"
+msgstr "CSV + files (ZIP)"
+
+msgid "CSV-Export · %1$s (%2$d %3$s)"
+msgstr "CSV export · %1$s (%2$d %3$s)"
+
+msgid "CSV-Puffer konnte nicht geöffnet werden."
+msgstr "CSV buffer could not be opened."
+
+msgid "Damit können z.B. Redaktorinnen Einsendungen sehen oder exportieren, ohne Administratorrechte zu haben. Welche Rolle darf was? Administratoren behalten immer vollen Zugriff. Add-ons ergänzen hier eigene Berechtigungen."
+msgstr "This lets editors, for example, view or export submissions without administrator rights. Which role may do what? Administrators always keep full access. Add-ons add their own permissions here."
+
+msgid "Datei herunterladen (entschlüsselt)"
+msgstr "Download file (decrypted)"
+
+msgid "Datei konnte nicht abgelegt werden."
+msgstr "File could not be stored."
+
+msgid "Datei nicht lesbar."
+msgstr "File not readable."
+
+msgid "Datei wird verschlüsselt und geschützt gespeichert (max. %d MB)."
+msgstr "File is stored encrypted and protected (max. %d MB)."
+
+msgid "Datenbanktabelle nicht gefunden."
+msgstr "Database table not found."
+
+msgid "Datum"
+msgstr "Date"
+
+msgid "Datum: [TT.MM.JJJJ]"
+msgstr "Date: [DD.MM.YYYY]"
+
+msgid "Datum: neueste zuerst"
+msgstr "Date: newest first"
+
+msgid "Datum: älteste zuerst"
+msgstr "Date: oldest first"
+
+msgid "Den API-Key erstellst du im Dashboard unter «Account → API Keys». Er authentifiziert die serverseitige Prüfung der Einsendungen und bleibt geheim – trage ihn unten bei «API-Key» ein und teile ihn nirgends."
+msgstr "Create the API key in the dashboard under “Account → API Keys”. It authenticates the server-side verification of submissions and stays secret – enter it below under “API key” and do not share it anywhere."
+
+msgid "Den Site-Key findest du danach direkt unter dem Namen der Anwendung – er beginnt immer mit «FC». Trage ihn unten bei «Site-Key» ein."
+msgstr "You will find the site key right below the name of the application – it always starts with “FC”. Enter it below under “Site key”."
+
+msgid "Der Eingriff ist gering: Verarbeitet wird allein die IP-Adresse, es findet kein Profiling statt, die Verarbeitung erfolgt in der EU und nur kurz zur Verifikation. Besucherinnen und Besucher erwarten, dass Formulare gegen Spam geschützt sind. Dem geringen Eingriff steht ein legitimer Schutzbedarf gegenüber. Die Interessen der Betroffenen überwiegen nicht."
+msgstr "The intrusion is minor: only the IP address is processed, no profiling takes place, processing happens in the EU and only briefly for verification. Visitors expect forms to be protected against spam. The minor intrusion is offset by a legitimate need for protection. The interests of the data subjects do not prevail."
+
+msgid "Der Einsatz von Friendly Captcha auf berechtigtem Interesse ist zulässig."
+msgstr "Using Friendly Captcha on the basis of legitimate interest is permissible."
+
+msgid "Die Datenbanktabelle für Einsendungen fehlt. Bitte Plugin einmal deaktivieren und wieder aktivieren (oder die Aktivierung erneut ausführen), damit die Tabelle angelegt wird."
+msgstr "The database table for submissions is missing. Please deactivate and reactivate the plugin once (or run the activation again) so the table is created."
+
+msgid "Diese Einsendung herunterladen (ZIP)"
+msgstr "Download this submission (ZIP)"
+
+msgid "Diesen Eintrag wirklich löschen?"
+msgstr "Really delete this entry?"
+
+msgid "Einsendungen"
+msgstr "Submissions"
+
+msgid "Einsendungen als CSV oder ZIP exportieren."
+msgstr "Export submissions as CSV or ZIP."
+
+msgid "Einsendungen in Liste und Einzelansicht sehen."
+msgstr "View submissions in list and detail view."
+
+msgid "Einsendungen löschen."
+msgstr "Delete submissions."
+
+msgid "Einsendungen sehen"
+msgstr "View submissions"
+
+msgid "Einstellungen"
+msgstr "Settings"
+
+msgid "Einstellungen gespeichert."
+msgstr "Settings saved."
+
+msgid "Eintrag löschen"
+msgstr "Delete entry"
+
+msgid "Eintrag nicht gefunden."
+msgstr "Entry not found."
+
+msgid "Eintrag wurde gelöscht."
+msgstr "Entry was deleted."
+
+msgid "Entfernen"
+msgstr "Remove"
+
+msgid "Erstelle ein Konto bei Friendly Captcha und melde dich im Dashboard an:"
+msgstr "Create an account with Friendly Captcha and sign in to the dashboard:"
+
+msgid "Erweiterungen"
+msgstr "Extensions"
+
+msgid "Exportieren"
+msgstr "Export"
+
+msgid "Fehler"
+msgstr "Error"
+
+msgid "Felder entschlüsseln"
+msgstr "Decrypt fields"
+
+msgid "Feldwerte entschlüsseln"
+msgstr "Decrypt field values"
+
+msgid "Formular"
+msgstr "Form"
+
+msgid "Formular absenden"
+msgstr "Submit form"
+
+msgid "Formular-Einsendungen"
+msgstr "Form submissions"
+
+msgid "Formular-Einträge"
+msgstr "Form entries"
+
+msgid "Formular-ID"
+msgstr "Form ID"
+
+msgid "Formular: Name A–Z"
+msgstr "Form: name A–Z"
+
+msgid "Formular: Name Z–A"
+msgstr "Form: name Z–A"
+
+msgid "Formularfelder"
+msgstr "Form fields"
+
+msgid "Formularname"
+msgstr "Form name"
+
+msgid "Friendly Captcha global einschalten"
+msgstr "Enable Friendly Captcha globally"
+
+msgid "Funktionsweise. Statt Ihr Verhalten zu beobachten, lässt Friendly Captcha Ihren Browser im Hintergrund eine kleine Rechenaufgabe lösen (Proof-of-Work). Diese Aufgabe ist für Menschen unbemerkbar, für massenhaft automatisierte Anfragen aber aufwendig – so werden Bots ausgebremst, ohne dass Sie verfolgt werden."
+msgstr "How it works. Instead of watching your behaviour, Friendly Captcha lets your browser solve a small computational task in the background (proof of work). This task is imperceptible for humans but costly for mass automated requests – bots are slowed down without tracking you."
+
+msgid "Geheimer Schlüssel für die serverseitige Prüfung («Account → API Keys»). Verlässt den Server nie und erscheint nirgends im Formular."
+msgstr "Secret key for the server-side check (“Account → API Keys”). Never leaves the server and never appears in the form."
+
+msgid "Hier erscheinen alle erfolgreich abgeschickten Formulare (serverseitig in der Datenbank gespeichert)."
+msgstr "All successfully submitted forms appear here (stored server-side in the database)."
+
+msgid "ID"
+msgstr "ID"
+
+msgid "IP-Adresse"
+msgstr "IP address"
+
+msgid "Ihre Rechte. Ihnen stehen die Rechte auf Auskunft, Berichtigung und Löschung zu sowie ein Beschwerderecht bei der zuständigen Aufsichtsbehörde."
+msgstr "Your rights. You have the right to access, rectification and erasure, as well as the right to lodge a complaint with the competent supervisory authority."
+
+msgid "Interessenabwägung (LIA) als interne Vorlage (kopierbar)"
+msgstr "Balancing of interests (LIA) as an internal template (copyable)"
+
+msgid "Interessenabwägung – Einsatz von Friendly Captcha"
+msgstr "Balancing of interests – use of Friendly Captcha"
+
+msgid "Internes Dokument zur Dokumentation des berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO / Art. 31 revDSG)."
+msgstr "Internal document recording the legitimate interest (Art. 6(1)(f) GDPR / Art. 31 revFADP)."
+
+msgid "Kein Formular gewählt."
+msgstr "No form selected."
+
+msgid "Keine Berechtigung zum Datei-Download."
+msgstr "No permission to download files."
+
+msgid "Keine Berechtigung, diese Datei im Klartext herunterzuladen."
+msgstr "No permission to download this file in plain text."
+
+msgid "Keine Berechtigung."
+msgstr "No permission."
+
+msgid "Keine Einsendung gewählt."
+msgstr "No submission selected."
+
+msgid "Keine Einsendungen für dieses Formular."
+msgstr "No submissions for this form."
+
+msgid "Keine Felddaten."
+msgstr "No field data."
+
+msgid "Keine installiert"
+msgstr "None installed"
+
+msgid "Lege unter «Applications» mit «+ New Application» eine Anwendung für deine Website an."
+msgstr "Under “Applications”, create an application for your website with “+ New Application”."
+
+msgid "Löschen"
+msgstr "Delete"
+
+msgid "Maximale Dateigrösse: %d MB."
+msgstr "Maximum file size: %d MB."
+
+msgid "Metadaten"
+msgstr "Metadata"
+
+msgid "Modus"
+msgstr "Mode"
+
+msgid "Neues Formular: %1$s (%2$s), Beitrag %3$d"
+msgstr "New form: %1$s (%2$s), post %3$d"
+
+msgid "Nicht aktiv"
+msgstr "Not active"
+
+msgid "Noch keine Einsendungen."
+msgstr "No submissions yet."
+
+msgid "Nonce"
+msgstr "Nonce"
+
+msgid "Plugin-Einstellungen und Berechtigungen ändern."
+msgstr "Change plugin settings and permissions."
+
+msgid "Produktseite"
+msgstr "Product page"
+
+msgid "Rechtsgrundlage. Die Verarbeitung stützt sich auf unser berechtigtes Interesse am Schutz unserer Formulare vor Missbrauch (Art. 6 Abs. 1 lit. f DSGVO; für die Schweiz Art. 31 revDSG)."
+msgstr "Legal basis. Processing is based on our legitimate interest in protecting our forms against abuse (Art. 6(1)(f) GDPR; for Switzerland Art. 31 revFADP)."
+
+msgid "Reine serverseitige Massnahmen (Honeypot, Rate-Limit) fangen einfache Bots ab, aber nicht gezielten automatisierten Missbrauch. Ein Proof-of-Work-Captcha ohne Cookies und ohne Tracking ist das mildeste Mittel, das den Schutz spürbar erhöht, ohne das Verhalten der Besucher zu beobachten."
+msgstr "Purely server-side measures (honeypot, rate limit) catch simple bots but not targeted automated abuse. A proof-of-work captcha without cookies and without tracking is the mildest means that noticeably increases protection without observing visitor behaviour."
+
+msgid "Schalte «Aktiv» ein und speichere. Pro Formular kannst du das Captcha zusätzlich im Formular-Block übersteuern (Einstellung «Spam-Schutz»)."
+msgstr "Switch “Active” on and save. Per form you can additionally override the captcha in the form block (setting “Spam protection”)."
+
+msgid "Seite"
+msgstr "Page"
+
+msgid "Seite / Beitrag"
+msgstr "Page / post"
+
+msgid "Seiten-ID"
+msgstr "Page ID"
+
+msgid "Sicherheitsprüfung fehlgeschlagen."
+msgstr "Security check failed."
+
+msgid "Soft – bei nicht erreichbarem Anbieter durchlassen"
+msgstr "Soft – let submissions through if the provider is unreachable"
+
+msgid "Sortierung"
+msgstr "Sorting"
+
+msgid "Spam-Schutz durch Friendly Captcha"
+msgstr "Spam protection by Friendly Captcha"
+
+msgid "Speicherdauer. Die Daten werden nur zur Verifikation der Anfrage verarbeitet und nicht zur Profilbildung genutzt. [Konkrete Speicherdauer aus der Dokumentation von Friendly Captcha]"
+msgstr "Retention period. The data is processed solely to verify the request and is not used for profiling. [Specific retention period from the Friendly Captcha documentation]"
+
+msgid "Speichern"
+msgstr "Save"
+
+msgid "Speicherort. Die Verarbeitung erfolgt auf Servern in der Europäischen Union. Eine Übermittlung in Drittländer findet nicht statt."
+msgstr "Storage location. Processing takes place on servers within the European Union. No transfer to third countries takes place."
+
+msgid "Strict – bei nicht erreichbarem Anbieter ablehnen"
+msgstr "Strict – reject if the provider is unreachable"
+
+msgid "Textbaustein für die Datenschutzerklärung (kopierbar)"
+msgstr "Text snippet for the privacy policy (copyable)"
+
+msgid "Unvollständig"
+msgstr "Incomplete"
+
+msgid "User-Agent"
+msgstr "User agent"
+
+msgid "Verantwortliche Person: [Name / Funktion]"
+msgstr "Responsible person: [name / role]"
+
+msgid "Verarbeitete Daten. Verarbeitet werden Ihre IP-Adresse sowie technische Angaben Ihres Geräts, die für den Berechnungsnachweis (Proof-of-Work) nötig sind. Friendly Captcha setzt dabei keine Cookies, nutzt kein Fingerprinting und kein Tracking."
+msgstr "Data processed. Your IP address and technical details of your device required for the computational proof (proof of work) are processed. Friendly Captcha sets no cookies, uses no fingerprinting and no tracking."
+
+msgid "Widerspruchsrecht. Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen diese auf berechtigtem Interesse beruhende Verarbeitung Widerspruch einzulegen (Art. 21 DSGVO)."
+msgstr "Right to object. You have the right to object at any time, on grounds relating to your particular situation, to this processing based on legitimate interest (Art. 21 GDPR)."
+
+msgid "Wir schützen unsere Web-Formulare vor Spam und automatisiertem Missbrauch. Funktionierende Formulare ohne Bot-Flut sind die Grundlage für die Kommunikation mit unseren Besucherinnen und Besuchern."
+msgstr "We protect our web forms against spam and automated abuse. Working forms without a flood of bots are the basis for communicating with our visitors."
+
+msgid "Wir setzen auf unseren Formularen den Dienst Friendly Captcha ein, einen Dienst der Friendly Captcha GmbH, Deutschland. [Firmenbezeichnung und Adresse]"
+msgstr "On our forms we use the Friendly Captcha service, a service of Friendly Captcha GmbH, Germany. [Company name and address]"
+
+msgid "ZIP nicht verfügbar (PHP-ZipArchive fehlt)"
+msgstr "ZIP not available (PHP ZipArchive missing)"
+
+msgid "ZIP-Datei konnte nicht erstellt werden."
+msgstr "ZIP file could not be created."
+
+msgid "ZIP-Export nicht verfügbar: PHP-ZipArchive fehlt auf diesem Server."
+msgstr "ZIP export not available: PHP ZipArchive is missing on this server."
+
+msgid "Zurück zur Übersicht"
+msgstr "Back to the overview"
+
+msgid "Zweck. Friendly Captcha schützt unsere Formulare vor Spam und automatisiertem Missbrauch (etwa durch Bots)."
+msgstr "Purpose. Friendly Captcha protects our forms against spam and automated abuse (e.g. by bots)."
+
+msgid "[Datei #"
+msgstr "[File #"
+
+msgid "[E-Mail verschlüsselt]"
+msgstr "[email encrypted]"
+
+msgid "[Name verschlüsselt]"
+msgstr "[name encrypted]"
+
+msgid "[verschlüsselt]"
+msgstr "[encrypted]"
+
+msgid "d.m.Y H:i"
+msgstr "M j, Y H:i"
+
+msgid "protokolliert"
+msgstr "logged"
+
+msgid "vertraulich"
+msgstr "confidential"
+
+msgid "Öffentlicher Schlüssel deiner Anwendung, beginnt mit «FC». Wird im Formular sichtbar ausgegeben."
+msgstr "Public key of your application, starts with “FC”. It is output visibly in the form."
+
+msgid "Übermittelte Felder"
+msgstr "Submitted fields"
+
+msgid "Übersicht der Add-ons"
+msgstr "Add-on overview"
+
+msgid "Absenden-Button"
+msgstr "Submit button"
+
+msgid "Absender-E-Mail"
+msgstr "Sender email"
+
+msgid "Absendername"
+msgstr "Sender name"
+
+msgid "Admin-E-Mail der Website"
+msgstr "Site admin email"
+
+msgid "Anzeigename (optional)"
+msgstr "Display name (optional)"
+
+msgid "Auswahlfeld"
+msgstr "Select field"
+
+msgid "Automatisch (System)"
+msgstr "Automatic (system)"
+
+msgid "Betreff"
+msgstr "Subject"
+
+msgid "Bilder (JPG, PNG, GIF, WebP)"
+msgstr "Images (JPG, PNG, GIF, WebP)"
+
+msgid "Button-Farben (Dunkel)"
+msgstr "Button colours (dark)"
+
+msgid "Button-Farben (Hell)"
+msgstr "Button colours (light)"
+
+msgid "Button-Hintergrund"
+msgstr "Button background"
+
+msgid "Button-Text"
+msgstr "Button text"
+
+msgid "CAPTCHA für dieses Formular"
+msgstr "CAPTCHA for this form"
+
+msgid "CSS-Wert wie 0.8125rem oder 13px. Leer = Standard."
+msgstr "CSS value like 0.8125rem or 13px. Empty = default."
+
+msgid "CSS-Wert wie 0.9375rem oder 15px. Leer = Standard."
+msgstr "CSS value like 0.9375rem or 15px. Empty = default."
+
+msgid "Checkbox"
+msgstr "Checkbox"
+
+msgid "Datei-Upload"
+msgstr "File upload"
+
+msgid "Datei-Uploads können schädliche Dateien enthalten. Die Basis prüft Endung und Dateityp; Virenscan und verschlüsselte Ablage liefert das Security-Add-on."
+msgstr "File uploads can contain harmful files. The base plugin checks extension and file type; virus scanning and encrypted storage are provided by the Security add-on."
+
+msgid "Datum und Uhrzeit"
+msgstr "Date and time"
+
+msgid "Der Bereich «Rückmeldung» am Ende des Formulars erscheint nach erfolgreichem Absenden ohne Folgeseite statt des Formulars. Leer gelassen zeigt das Formular die Standardmeldung. Platzhalter im Text: {{feldname}} (technischer Feldname)."
+msgstr "The “Feedback” area at the end of the form appears after successful submission without a follow-up page, replacing the form. Left empty, the form shows the standard message. Placeholders in the text: {{fieldname}} (technical field name)."
+
+msgid "Dieser Feldname existiert in diesem Formular bereits. Feld einmal duplizieren und das Original löschen, dann wird ein neuer Name vergeben."
+msgstr "This field name already exists in this form. Duplicate the field once and delete the original – a new name will be assigned."
+
+msgid "Dieser Inhalt ersetzt nach erfolgreichem Absenden das Formular, sofern keine Folgeseite gewählt ist. Platzhalter: {{feldname}}; optional {{label_feldname}} (z. B. {{label_email}})."
+msgstr "This content replaces the form after successful submission if no follow-up page is selected. Placeholders: {{fieldname}}; optionally {{label_fieldname}} (e.g. {{label_email}})."
+
+msgid "Dunkel"
+msgstr "Dark"
+
+msgid "E-Mail nach Absenden senden"
+msgstr "Send email after submission"
+
+msgid "E-Mail-Adresse eingeben …"
+msgstr "Enter email address …"
+
+msgid "E-Mail-Benachrichtigung"
+msgstr "Email notification"
+
+msgid "E-Mail-Feld"
+msgstr "Email field"
+
+msgid "Eigene Absender-E-Mail"
+msgstr "Custom sender email"
+
+msgid "Eigene E-Mail-Adresse"
+msgstr "Custom email address"
+
+msgid "Eindeutige Kennung dieses Formulars (bei Duplizieren des Formularblocks neu). Einsendungen und Payload-Auswertung werden immer dieser ID zugeordnet."
+msgstr "Unique identifier of this form (new when the form block is duplicated). Submissions and payload evaluation are always tied to this ID."
+
+msgid "Eingaben werden im Browser der Besucherin zwischengespeichert und beim nächsten Besuch automatisch wiederhergestellt. Entwürfe verfallen nach 7 Tagen."
+msgstr "Entries are cached in the visitor's browser and restored automatically on the next visit. Drafts expire after 7 days."
+
+msgid "Eingabetext"
+msgstr "Input text"
+
+msgid "Empfänger"
+msgstr "Recipient"
+
+msgid "Erlaubte Dateitypen"
+msgstr "Allowed file types"
+
+msgid "Erscheint als Legende unter dem Feld, wie eine Bildunterschrift."
+msgstr "Appears as a caption below the field, like an image caption."
+
+msgid "Erscheinungsbild"
+msgstr "Appearance"
+
+msgid "Farben und Karte kommen vollständig aus dem Theme. Eigene Formularfarben gibt es nur in den Modi Hell, Dunkel oder Automatisch."
+msgstr "Colours and card come entirely from the theme. Custom form colours are only available in the light, dark or automatic modes."
+
+msgid "Farbmodus"
+msgstr "Colour mode"
+
+msgid "Feld → Wert-Platzhalter einfügen"
+msgstr "Insert field → value placeholder"
+
+msgid "Feldfarben (Dunkel)"
+msgstr "Field colours (dark)"
+
+msgid "Feldfarben (Hell)"
+msgstr "Field colours (light)"
+
+msgid "Feldhintergrund"
+msgstr "Field background"
+
+msgid "Feldname wählen …"
+msgstr "Choose field name …"
+
+msgid "Feste From-Adresse für diese Benachrichtigung (nicht aus dem Formular). Ungültig oder leer → Admin-E-Mail."
+msgstr "Fixed From address for this notification (not taken from the form). Invalid or empty → admin email."
+
+msgid "Fokus"
+msgstr "Focus"
+
+msgid "Fokus (Rahmen)"
+msgstr "Focus (border)"
+
+msgid "Fokus (Rahmen, Schieberegler)"
+msgstr "Focus (border, slider)"
+
+msgid "Folgeseite nach erfolgreichem Absenden"
+msgstr "Follow-up page after successful submission"
+
+msgid "Form-ID"
+msgstr "Form ID"
+
+msgid "Formulareinstellungen"
+msgstr "Form settings"
+
+msgid "Formularfarben (Dunkel)"
+msgstr "Form colours (dark)"
+
+msgid "Formularfarben (Hell)"
+msgstr "Form colours (light)"
+
+msgid "Formularseite mit Erfolgshinweis (Standard)"
+msgstr "Form page with success message (default)"
+
+msgid "Frühestes Datum"
+msgstr "Earliest date"
+
+msgid "Hell"
+msgstr "Light"
+
+msgid "Hilfetext"
+msgstr "Help text"
+
+msgid "Hintergrund Formularbereich"
+msgstr "Form area background"
+
+msgid "Horizontal (nebeneinander)"
+msgstr "Horizontal (side by side)"
+
+msgid "Im Farbmodus «Theme» kommen alle Farben aus dem Theme. Feldfarben gibt es in den Modi Hell, Dunkel oder Automatisch (Stil-Tab des Formular-Blocks)."
+msgstr "In the “Theme” colour mode all colours come from the theme. Field colours are available in the light, dark or automatic modes (Styles tab of the form block)."
+
+msgid "Immer an"
+msgstr "Always on"
+
+msgid "Immer aus"
+msgstr "Always off"
+
+msgid "Keine Felder gefunden. Lege zuerst Felder im Formular ausserhalb dieser Rückmeldung an."
+msgstr "No fields found. First create fields in the form outside this feedback area."
+
+msgid "Keine gültige E-Mail-Adresse."
+msgstr "Not a valid email address."
+
+msgid "Label"
+msgstr "Label"
+
+msgid "Label (Hinweis)"
+msgstr "Label (hint)"
+
+msgid "Leer = Admin-E-Mail der Website."
+msgstr "Empty = site admin email."
+
+msgid "Leer = Standardbetreff. Platzhalter: {{feldname}} und {{label_feldname}} (technischer Feldname)."
+msgstr "Empty = default subject. Placeholders: {{fieldname}} and {{label_fieldname}} (technical field name)."
+
+msgid "Leer lassen für die Mitte zwischen Min und Max."
+msgstr "Leave empty for the midpoint between min and max."
+
+msgid "Liste der technischen Feldnamen (POST-Name). Nach der Auswahl wird der Wert-Platzhalter {{feldname}} an dieser Stelle als Absatz eingefügt."
+msgstr "List of technical field names (POST name). After selection, the value placeholder {{fieldname}} is inserted here as a paragraph."
+
+msgid "Lokale Entwurfsspeicherung aktivieren"
+msgstr "Enable local draft saving"
+
+msgid "Markiert das Feld als vertraulich. Maskierung und Verschlüsselung übernimmt das Security-Add-on, falls installiert. Beim Versand per Mail bleibt der Wert sichtbar."
+msgstr "Marks the field as confidential. Masking and encryption are handled by the Security add-on, if installed. The value remains visible when sent by email."
+
+msgid "Max"
+msgstr "Max"
+
+msgid "Max. Grösse (MB)"
+msgstr "Max. size (MB)"
+
+msgid "Min"
+msgstr "Min"
+
+msgid "Nichts gewählt = alle sicheren Standardtypen. Gefährliche Typen (z. B. Programme, Skripte) blockiert der Server immer."
+msgstr "Nothing selected = all safe standard types. Dangerous types (e.g. programs, scripts) are always blocked by the server."
+
+msgid "Nur für die Backend-Übersicht und den Standard-E-Mail-Betreff (wenn kein eigener Betreff gesetzt ist); wird nicht im Formular dargestellt."
+msgstr "Only for the backend overview and the default email subject (if no custom subject is set); not displayed in the form."
+
+msgid "Nur im Editor und in der Eintrags-Übersicht sichtbar; erscheint nicht im Formular."
+msgstr "Only visible in the editor and the entries overview; does not appear in the form."
+
+msgid "Optional. Leer = Name der Website. Platzhalter: {{feldname}} und {{label_feldname}} (technischer Feldname)."
+msgstr "Optional. Empty = site name. Placeholders: {{fieldname}} and {{label_fieldname}} (technical field name)."
+
+msgid "Optionen (eine pro Zeile)"
+msgstr "Options (one per line)"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "Pflichtfeld"
+msgstr "Required field"
+
+msgid "Platzhalter"
+msgstr "Placeholder"
+
+msgid "Präsentationen (PPT, PPTX)"
+msgstr "Presentations (PPT, PPTX)"
+
+msgid "Radio-Auswahl"
+msgstr "Radio choice"
+
+msgid "Rahmen"
+msgstr "Border"
+
+msgid "Schieberegler"
+msgstr "Slider"
+
+msgid "Schriftgrösse Hilfetext"
+msgstr "Help text font size"
+
+msgid "Schriftgrösse Label"
+msgstr "Label font size"
+
+msgid "Schritt"
+msgstr "Step"
+
+msgid "Spam-Schutz (CAPTCHA)"
+msgstr "Spam protection (CAPTCHA)"
+
+msgid "Spätestes Datum"
+msgstr "Latest date"
+
+msgid "Startwert (optional)"
+msgstr "Initial value (optional)"
+
+msgid "Steuert, ob auf diesem Formular ein CAPTCHA erscheint. Voraussetzung: CAPTCHA ist unter «Sicherheit & Einstellungen» global aktiviert und konfiguriert."
+msgstr "Controls whether a CAPTCHA appears on this form. Prerequisite: the CAPTCHA is globally enabled and configured under “Security & Settings”."
+
+msgid "Tabellen (XLS, XLSX, CSV)"
+msgstr "Spreadsheets (XLS, XLSX, CSV)"
+
+msgid "Technischer Feldname"
+msgstr "Technical field name"
+
+msgid "Telefon"
+msgstr "Phone"
+
+msgid "Textbereich"
+msgstr "Text area"
+
+msgid "Textdateien (TXT)"
+msgstr "Text files (TXT)"
+
+msgid "Textfeld"
+msgstr "Text field"
+
+msgid "Theme (Standard)"
+msgstr "Theme (default)"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Uhrzeit"
+msgstr "Time"
+
+msgid "Verstecktes Feld"
+msgstr "Hidden field"
+
+msgid "Verstecktes Feld (nur technischer Wert)"
+msgstr "Hidden field (technical value only)"
+
+msgid "Vertikal (untereinander)"
+msgstr "Vertical (stacked)"
+
+msgid "Vertraulich"
+msgstr "Confidential"
+
+msgid "Von globaler Einstellung übernehmen"
+msgstr "Inherit from global setting"
+
+msgid "Wenn aktiv, wird der oben gesetzte Wert beim Absenden serverseitig gesetzt. Werte aus dem Browser werden ignoriert (Schutz gegen Manipulation)."
+msgstr "If active, the value set above is applied server-side on submission. Values from the browser are ignored (protection against manipulation)."
+
+msgid "Wert"
+msgstr "Value"
+
+msgid "Wert serverseitig erzwingen (empfohlen)"
+msgstr "Enforce value server-side (recommended)"
+
+msgid "Wird automatisch vergeben und bleibt stabil. Dient als Spalte im CSV-Export und als Platzhalter im Rückmeldung-Block: {{feldname}}."
+msgstr "Assigned automatically and stays stable. Serves as the column in the CSV export and as the placeholder in the feedback block: {{fieldname}}."
+
+msgid "Word-Dokumente (DOC, DOCX)"
+msgstr "Word documents (DOC, DOCX)"
+
+msgid "Wählst du ein E-Mail-Feld, wird dessen Adresse als Antwort-Adresse (Reply-To) gesetzt – «Antworten» geht dann direkt an die Absenderin. Technischer Absender bleibt immer eine Adresse deiner Website; ein fremdes From würde von vielen Mailservern als Fälschung abgewiesen (SPF/DKIM/DMARC)."
+msgstr "If you choose an email field, its address is set as the reply-to address – “Reply” then goes straight to the sender. The technical sender always remains an address of your website; a foreign From would be rejected by many mail servers as forgery (SPF/DKIM/DMARC)."
+
+msgid "ZIP-Archive"
+msgstr "ZIP archives"
+
+msgid "Zahl"
+msgstr "Number"
+
+msgid "Öffentlich sichtbare Seite. Ohne Auswahl bleibt die Besucherin auf der Formularseite (Hinweis oben)."
+msgstr "Publicly visible page. Without a selection the visitor stays on the form page (notice at the top)."
+
+msgid "%d Add-on installiert"
+msgid_plural "%d Add-ons installiert"
+msgstr[0] "%d add-on installed"
+msgstr[1] "%d add-ons installed"
+
+msgid "Eintrag"
+msgid_plural "Einträge"
+msgstr[0] "entry"
+msgstr[1] "entries"
