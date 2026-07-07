@@ -3049,7 +3049,7 @@
 					el( wp.components.ToolbarGroup, null,
 						el( wp.components.ToolbarButton, {
 							icon: 'menu-alt',
-							label: __( 'Optionen untereinander', 'blitz-donner-forms' ),
+							label: __( 'Vertikal (untereinander)', 'blitz-donner-forms' ),
 							isPressed: radioLayout !== 'row',
 							onClick: function () {
 								setAttributes( { optionsLayout: 'column' } );
@@ -3057,7 +3057,7 @@
 						} ),
 						el( wp.components.ToolbarButton, {
 							icon: 'ellipsis',
-							label: __( 'Optionen nebeneinander', 'blitz-donner-forms' ),
+							label: __( 'Horizontal (nebeneinander)', 'blitz-donner-forms' ),
 							isPressed: radioLayout === 'row',
 							onClick: function () {
 								setAttributes( { optionsLayout: 'row' } );
