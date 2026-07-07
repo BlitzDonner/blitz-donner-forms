@@ -82,7 +82,7 @@ class BDFRMS_Admin_Settings {
 			'extensions'   => array(
 				'title'  => __( 'Erweiterungen', 'blitz-donner-forms' ),
 				'render' => array( __CLASS__, 'render_card_extensions' ),
-				'save'   => null,
+				'save'   => array( __CLASS__, 'save_card_extensions' ),
 				'status' => array( __CLASS__, 'status_card_extensions' ),
 			),
 			// Bewusst zuletzt (Entscheid Stefan 05.07.2026): Solo-Betreiber
@@ -202,19 +202,44 @@ class BDFRMS_Admin_Settings {
 	}
 
 	/**
-	 * Status-Etikette der Erweiterungen-Karte: zählt Add-on-Karten, die
-	 * sich über den Filter registriert haben.
+	 * Registry der installierten Erweiterungen.
+	 *
+	 * Add-ons registrieren sich hier – EIN Ort für Bestand, Lizenz und
+	 * Updates statt verstreuter eigener Karten. Jeder Eintrag:
+	 * Slug => array{
+	 *   name:string, version:string,
+	 *   license:callable|null        Status-Etikette {state,text},
+	 *   render_license:callable|null Formularteil (z. B. Token-Feld),
+	 *   save:callable|null           POST-Verarbeitung beim zentralen Speichern
+	 * }.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public static function extensions() {
+		/**
+		 * Installierte Erweiterungen für die Erweiterungen-Karte melden.
+		 *
+		 * @since 0.8.1
+		 *
+		 * @param array<string,array<string,mixed>> $extensions Registry (leer in der Basis).
+		 */
+		$extensions = apply_filters( 'bdfrms_extensions', array() );
+
+		return is_array( $extensions ) ? $extensions : array();
+	}
+
+	/**
+	 * Status-Etikette der Erweiterungen-Karte: Anzahl registrierter Add-ons.
 	 *
 	 * @return array{state:string,text:string}
 	 */
 	public static function status_card_extensions() {
-		$base  = array( 'captcha', 'extensions', 'capabilities' );
-		$extra = array_diff( array_keys( self::cards() ), $base );
-		if ( count( $extra ) > 0 ) {
+		$count = count( self::extensions() );
+		if ( $count > 0 ) {
 			return array(
 				'state' => 'on',
 				/* translators: %d: Anzahl installierter Add-ons. */
-				'text'  => sprintf( _n( '%d Add-on', '%d Add-ons', count( $extra ), 'blitz-donner-forms' ), count( $extra ) ),
+				'text'  => sprintf( _n( '%d Add-on installiert', '%d Add-ons installiert', $count, 'blitz-donner-forms' ), $count ),
 			);
 		}
 		return array(
@@ -403,17 +428,64 @@ class BDFRMS_Admin_Settings {
 	// Abschnitt: Karte: Erweiterungen.
 
 	/**
-	 * Dezenter Hinweis auf die Add-ons (WP.org-Guideline 5: keine gesperrten
-	 * Dummy-Funktionen, kein Upsell-Druck – eine Karte, ein Link).
+	 * Erweiterungen-Karte: installierte Add-ons mit Version, Lizenzstatus
+	 * und Lizenz-Verwaltung an EINEM Ort. Ohne Add-ons bleibt der dezente
+	 * Hinweis (WP.org-Guideline 5: kein Upsell-Druck – ein Satz, ein Link).
 	 *
 	 * @return void
 	 */
 	public static function render_card_extensions() {
+		$extensions = self::extensions();
+
+		if ( empty( $extensions ) ) {
+			?>
+			<p>
+				<?php esc_html_e( 'Blitz & Donner Forms lässt sich mit Add-ons erweitern – zum Beispiel um Verschlüsselung, Audit-Log und Virenscan (Security-Add-on).', 'blitz-donner-forms' ); ?>
+				<a href="https://plugins.blitzdonner.ch" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Übersicht der Add-ons', 'blitz-donner-forms' ); ?></a>
+			</p>
+			<?php
+			return;
+		}
+
+		foreach ( $extensions as $slug => $ext ) {
+			$name    = isset( $ext['name'] ) ? (string) $ext['name'] : (string) $slug;
+			$version = isset( $ext['version'] ) ? (string) $ext['version'] : '';
+			$license = isset( $ext['license'] ) && is_callable( $ext['license'] ) ? call_user_func( $ext['license'] ) : null;
+
+			echo '<div class="bdfrms-admin-extension" style="padding:0.6rem 0;border-bottom:1px solid #eee;">';
+			echo '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">';
+			echo '<strong>' . esc_html( $name ) . '</strong>';
+			if ( '' !== $version ) {
+				echo '<code style="font-size:11px;">v' . esc_html( $version ) . '</code>';
+			}
+			if ( is_array( $license ) && isset( $license['state'], $license['text'] ) ) {
+				echo self::summary_badge( (string) $license['state'], (string) $license['text'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- summary_badge escaped.
+			}
+			echo '</div>';
+			if ( isset( $ext['render_license'] ) && is_callable( $ext['render_license'] ) ) {
+				call_user_func( $ext['render_license'] );
+			}
+			echo '</div>';
+		}
 		?>
-		<p>
-			<?php esc_html_e( 'Blitz & Donner Forms lässt sich mit Add-ons erweitern – zum Beispiel um Verschlüsselung, Audit-Log und Virenscan (Security-Add-on).', 'blitz-donner-forms' ); ?>
-			<a href="https://plugins.blitzdonner.ch" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Übersicht der Add-ons', 'blitz-donner-forms' ); ?></a>
+		<p class="description" style="margin-top:0.6rem;">
+			<a href="https://plugins.blitzdonner.ch" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Weitere Add-ons', 'blitz-donner-forms' ); ?></a>
 		</p>
 		<?php
+	}
+
+	/**
+	 * Speichern der Erweiterungen-Karte: reicht den POST an die
+	 * save-Callables der registrierten Add-ons weiter (Nonce und
+	 * Berechtigung prüft handle_save zentral).
+	 *
+	 * @return void
+	 */
+	public static function save_card_extensions() {
+		foreach ( self::extensions() as $ext ) {
+			if ( isset( $ext['save'] ) && is_callable( $ext['save'] ) ) {
+				call_user_func( $ext['save'] );
+			}
+		}
 	}
 }

@@ -102,6 +102,12 @@ Aktionsknöpfe der Einzelansicht: `Aktions-ID => array{label:string, url:string,
 
 Signatur: `apply_filters( 'bdfrms_submission_actions', array $actions, array $row )` in `BDFRMS_Admin_Submissions::render_detail()`.
 
+### `bdfrms_extensions` (Filter)
+
+Registry der installierten Erweiterungen für die Erweiterungen-Karte – EIN Ort für Bestand, Lizenzstatus und Lizenz-Verwaltung. Add-ons registrieren KEINE eigene Lizenz-Karte mehr. Jeder Eintrag: Slug => `array{name:string, version:string, license:callable|null` (liefert `{state,text}` für die Status-Pille)`, render_license:callable|null` (z. B. Token-Feld)`, save:callable|null}`. Die save-Callables laufen beim zentralen Speichern der Einstellungen (nonce- und berechtigungsgeprüft).
+
+Signatur: `apply_filters( 'bdfrms_extensions', array() )` in `BDFRMS_Admin_Settings::extensions()`.
+
 ### `bdfrms_capabilities` (Filter)
 
 Capability-Registry: `Cap-Slug => array{title:string, description:string}`. Add-on-Caps erscheinen automatisch in der Berechtigungs-Matrix der Einstellungsseite. Basis-Caps: `bdfrms_view_submissions`, `bdfrms_delete_submissions`, `bdfrms_export_submissions`, `bdfrms_manage_settings`.
