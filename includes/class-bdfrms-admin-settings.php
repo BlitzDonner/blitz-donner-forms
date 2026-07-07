@@ -292,7 +292,16 @@ class BDFRMS_Admin_Settings {
 	public static function render_card_captcha() {
 		$s = BDFRMS_Captcha::get_settings();
 		?>
-		<p class="description"><?php esc_html_e( 'Friendly Captcha ist ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen.', 'blitz-donner-forms' ); ?></p>
+		<h3 style="margin:0.2rem 0 0.4rem;"><?php esc_html_e( 'Eingebauter Schutz – immer aktiv', 'blitz-donner-forms' ); ?></h3>
+		<p class="description"><?php esc_html_e( 'Jedes Formular ist automatisch geschützt, ohne dass du etwas einrichten musst:', 'blitz-donner-forms' ); ?></p>
+		<ul style="list-style:disc;padding-left:1.4em;margin-top:0.4rem;">
+			<li><?php esc_html_e( 'Bot-Falle: Ein für Menschen unsichtbares Feld. Füllt es jemand aus, war es ein Programm – die Einsendung wird verworfen.', 'blitz-donner-forms' ); ?></li>
+			<li><?php esc_html_e( 'Zeitschloss: Absenden zählt erst nach zwei Sekunden – schneller füllt kein Mensch ein Formular aus. Nach einer Stunde läuft das Formular ab und muss neu geladen werden.', 'blitz-donner-forms' ); ?></li>
+			<li><?php esc_html_e( 'Mengenbremse: Wer in kurzer Zeit viele Einsendungen schickt, wird vorübergehend gestoppt.', 'blitz-donner-forms' ); ?></li>
+			<li><?php esc_html_e( 'Serverprüfung: Jede Eingabe wird beim Empfang noch einmal streng geprüft – unabhängig davon, was der Browser behauptet.', 'blitz-donner-forms' ); ?></li>
+		</ul>
+		<h3 style="margin:1rem 0 0.4rem;"><?php esc_html_e( 'Zusätzliche Stufe: Friendly Captcha', 'blitz-donner-forms' ); ?></h3>
+		<p class="description"><?php esc_html_e( 'Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen.', 'blitz-donner-forms' ); ?></p>
 		<details style="margin-top:12px;margin-bottom:12px;">
 			<summary><?php esc_html_e( 'Anleitung: So kommst du zu den beiden Schlüsseln', 'blitz-donner-forms' ); ?></summary>
 			<ol>

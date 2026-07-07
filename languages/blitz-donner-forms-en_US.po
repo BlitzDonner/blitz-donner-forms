@@ -448,3 +448,29 @@ msgstr "Test token: update server unreachable – please try again later."
 msgid "Token testen: Kein Token hinterlegt."
 msgstr "Test token: no token stored."
 
+
+# Spam-Schutz-Karte: eingebaute Schutzstufen (v0.8.4).
+
+msgid "Eingebauter Schutz – immer aktiv"
+msgstr "Built-in protection – always on"
+
+msgid "Jedes Formular ist automatisch geschützt, ohne dass du etwas einrichten musst:"
+msgstr "Every form is protected automatically, with nothing to set up:"
+
+msgid "Bot-Falle: Ein für Menschen unsichtbares Feld. Füllt es jemand aus, war es ein Programm – die Einsendung wird verworfen."
+msgstr "Bot trap: a field invisible to humans. If it gets filled in, it was a program – the submission is discarded."
+
+msgid "Zeitschloss: Absenden zählt erst nach zwei Sekunden – schneller füllt kein Mensch ein Formular aus. Nach einer Stunde läuft das Formular ab und muss neu geladen werden."
+msgstr "Time lock: a submission only counts after two seconds – no human fills in a form faster. After one hour the form expires and must be reloaded."
+
+msgid "Mengenbremse: Wer in kurzer Zeit viele Einsendungen schickt, wird vorübergehend gestoppt."
+msgstr "Rate brake: anyone sending many submissions in a short time is stopped temporarily."
+
+msgid "Serverprüfung: Jede Eingabe wird beim Empfang noch einmal streng geprüft – unabhängig davon, was der Browser behauptet."
+msgstr "Server-side checks: every entry is strictly validated again on arrival – regardless of what the browser claims."
+
+msgid "Zusätzliche Stufe: Friendly Captcha"
+msgstr "Extra layer: Friendly Captcha"
+
+msgid "Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen."
+msgstr "Against persistent, targeted spam we recommend adding Friendly Captcha – spam protection without cookies and without tracking (proof of work, processed in the EU). When enabled, the external Friendly Captcha service is called to verify the check."

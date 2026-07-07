@@ -447,3 +447,29 @@ msgstr "Tester le jeton : serveur de mises à jour injoignable – veuillez rée
 msgid "Token testen: Kein Token hinterlegt."
 msgstr "Tester le jeton : aucun jeton enregistré."
 
+
+# Spam-Schutz-Karte: eingebaute Schutzstufen (v0.8.4).
+
+msgid "Eingebauter Schutz – immer aktiv"
+msgstr "Protection intégrée – toujours active"
+
+msgid "Jedes Formular ist automatisch geschützt, ohne dass du etwas einrichten musst:"
+msgstr "Chaque formulaire est protégé automatiquement, sans aucun réglage :"
+
+msgid "Bot-Falle: Ein für Menschen unsichtbares Feld. Füllt es jemand aus, war es ein Programm – die Einsendung wird verworfen."
+msgstr "Piège à robots : un champ invisible pour les humains. S’il est rempli, c’était un programme – l’envoi est rejeté."
+
+msgid "Zeitschloss: Absenden zählt erst nach zwei Sekunden – schneller füllt kein Mensch ein Formular aus. Nach einer Stunde läuft das Formular ab und muss neu geladen werden."
+msgstr "Verrou temporel : l’envoi ne compte qu’après deux secondes – aucun humain ne remplit un formulaire plus vite. Après une heure, le formulaire expire et doit être rechargé."
+
+msgid "Mengenbremse: Wer in kurzer Zeit viele Einsendungen schickt, wird vorübergehend gestoppt."
+msgstr "Frein de volume : quiconque envoie de nombreux formulaires en peu de temps est temporairement bloqué."
+
+msgid "Serverprüfung: Jede Eingabe wird beim Empfang noch einmal streng geprüft – unabhängig davon, was der Browser behauptet."
+msgstr "Contrôle côté serveur : chaque saisie est de nouveau vérifiée strictement à la réception – quoi qu’en dise le navigateur."
+
+msgid "Zusätzliche Stufe: Friendly Captcha"
+msgstr "Niveau supplémentaire : Friendly Captcha"
+
+msgid "Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen."
+msgstr "Contre le spam persistant et ciblé, nous recommandons d’ajouter Friendly Captcha – une protection sans cookies ni pistage (preuve de travail, traitement dans l’UE). Une fois activé, le service externe Friendly Captcha est appelé pour vérifier le contrôle."

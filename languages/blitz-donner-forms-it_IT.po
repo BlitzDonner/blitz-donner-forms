@@ -447,3 +447,29 @@ msgstr "Prova token: server di aggiornamento non raggiungibile – riprova più 
 msgid "Token testen: Kein Token hinterlegt."
 msgstr "Prova token: nessun token salvato."
 
+
+# Spam-Schutz-Karte: eingebaute Schutzstufen (v0.8.4).
+
+msgid "Eingebauter Schutz – immer aktiv"
+msgstr "Protezione integrata – sempre attiva"
+
+msgid "Jedes Formular ist automatisch geschützt, ohne dass du etwas einrichten musst:"
+msgstr "Ogni modulo è protetto automaticamente, senza alcuna configurazione:"
+
+msgid "Bot-Falle: Ein für Menschen unsichtbares Feld. Füllt es jemand aus, war es ein Programm – die Einsendung wird verworfen."
+msgstr "Trappola per bot: un campo invisibile alle persone. Se viene compilato, era un programma – l’invio viene scartato."
+
+msgid "Zeitschloss: Absenden zählt erst nach zwei Sekunden – schneller füllt kein Mensch ein Formular aus. Nach einer Stunde läuft das Formular ab und muss neu geladen werden."
+msgstr "Blocco temporale: l’invio conta solo dopo due secondi – nessuna persona compila un modulo più in fretta. Dopo un’ora il modulo scade e va ricaricato."
+
+msgid "Mengenbremse: Wer in kurzer Zeit viele Einsendungen schickt, wird vorübergehend gestoppt."
+msgstr "Freno al volume: chi invia molti moduli in poco tempo viene bloccato temporaneamente."
+
+msgid "Serverprüfung: Jede Eingabe wird beim Empfang noch einmal streng geprüft – unabhängig davon, was der Browser behauptet."
+msgstr "Controllo lato server: ogni dato viene ricontrollato rigorosamente alla ricezione – indipendentemente da ciò che afferma il browser."
+
+msgid "Zusätzliche Stufe: Friendly Captcha"
+msgstr "Livello aggiuntivo: Friendly Captcha"
+
+msgid "Gegen hartnäckigen, gezielten Spam empfiehlt sich zusätzlich Friendly Captcha – ein Spam-Schutz ohne Cookies und ohne Tracking (Proof-of-Work, Verarbeitung in der EU). Bei Aktivierung wird zur Prüfung der Eingabe der externe Dienst Friendly Captcha aufgerufen."
+msgstr "Contro lo spam persistente e mirato consigliamo in aggiunta Friendly Captcha – una protezione senza cookie e senza tracciamento (proof of work, elaborazione nell’UE). Se attivato, per la verifica viene contattato il servizio esterno Friendly Captcha."
