@@ -270,7 +270,7 @@ class BDFRMS_Submit_Handler {
 				BDFRMS_Security::log_event( 'submit_upload_precondition_fail' );
 				self::redirect_with_state( $post_id, $form_id, self::STATUS_ERR_FILE, $pre->get_error_message() );
 			}
-		}
+		}//end if
 
 		$payload          = array();
 		$pending_file_ids = array();
@@ -531,7 +531,7 @@ class BDFRMS_Submit_Handler {
 			if ( count( $cleaned ) >= 8 ) {
 				break;
 			}
-		}
+		}//end foreach
 		$out = implode( ' ', $cleaned );
 		if ( $append_file_reject_hint ) {
 			$out = trim( $out . ' ' . self::file_rejection_form_not_sent_suffix() );
@@ -703,7 +703,7 @@ class BDFRMS_Submit_Handler {
 				);
 			}
 			$subject = '[' . $blogname . '] ' . $subj_base;
-		}
+		}//end if
 
 		$subject = preg_replace( "/[\r\n]+/", ' ', (string) $subject );
 		$subject = wp_strip_all_tags( (string) $subject );
@@ -1031,7 +1031,7 @@ class BDFRMS_Submit_Handler {
 				);
 			}
 			$value = $url;
-		}
+		}//end if
 
 		if ( 'number' === $type && '' !== $value ) {
 			if ( ! is_numeric( $value ) ) {

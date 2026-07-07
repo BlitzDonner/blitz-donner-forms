@@ -81,6 +81,18 @@ class BDFRMS_Plugin {
 	}
 
 	/**
+	 * Ist ein Wert ein Erweiterungs-Envelope (von einem Add-on ersetzter
+	 * Feldwert, z. B. verschlüsselt)? Die Basis erkennt nur die Form,
+	 * nie den Inhalt: ein Array mit einem _enc-Marker.
+	 *
+	 * @param mixed $value Gespeicherter Feldwert.
+	 * @return bool
+	 */
+	public static function is_extension_envelope( $value ) {
+		return is_array( $value ) && isset( $value['_enc'] );
+	}
+
+	/**
 	 * Ist die Vertraulich-Oberfläche aktiv? Die Basis speichert Klartext;
 	 * der Editor-Toggle und das Frontend-Pill erscheinen darum erst, wenn
 	 * ein Add-on die Markierung tatsächlich auswertet. Das Block-Attribut
@@ -778,7 +790,7 @@ class BDFRMS_Plugin {
 		} else {
 			// Status nicht zu unserem Formular oder ungültig -> kein Notice anzeigen.
 			$status = '';
-		}
+		}//end if
 
 		$inner_blocks_parsed = array();
 		if ( $block instanceof WP_Block && ! empty( $block->parsed_block['innerBlocks'] ) && is_array( $block->parsed_block['innerBlocks'] ) ) {
@@ -1523,7 +1535,7 @@ class BDFRMS_Plugin {
 						}
 					}
 				}
-			}
+			}//end if
 
 			if ( ! empty( $block['innerBlocks'] ) ) {
 				$found = self::find_form_block_recursive( $block['innerBlocks'], $form_id, $visited );
@@ -1531,7 +1543,7 @@ class BDFRMS_Plugin {
 					return $found;
 				}
 			}
-		}
+		}//end foreach
 		return null;
 	}
 

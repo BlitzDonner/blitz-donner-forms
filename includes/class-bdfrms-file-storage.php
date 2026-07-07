@@ -249,6 +249,41 @@ class BDFRMS_File_Storage {
 		}
 	}
 
+	/**
+	 * Metadaten-Zeile einer Datei.
+	 *
+	 * @param int $id Datei-ID.
+	 * @return object|null
+	 */
+	public static function get( $id ) {
+		global $wpdb;
+		$table = self::table_name();
+		if ( (int) $id <= 0 ) {
+			return null;
+		}
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- Tabellenname aus table_name().
+		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . $table . ' WHERE id = %d', (int) $id ) );
+	}
+
+	/**
+	 * Nonce-gesicherte Download-URL für den admin_post-Endpoint.
+	 *
+	 * @param int $file_id Datei-ID.
+	 * @return string
+	 */
+	public static function download_url( $file_id ) {
+		return wp_nonce_url(
+			add_query_arg(
+				array(
+					'action'  => 'bdfrms_download',
+					'file_id' => (int) $file_id,
+				),
+				admin_url( 'admin-post.php' )
+			),
+			'bdfrms_download_' . (int) $file_id
+		);
+	}
+
 	// Abschnitt: Download.
 
 	/**

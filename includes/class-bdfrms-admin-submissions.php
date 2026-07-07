@@ -1,519 +1,2209 @@
 <?php
 /**
- * Einsendungen im Backend: Liste, Einzelansicht, Löschen, CSV-Export.
- *
- * Etappe-1-Gerüst mit vollständiger Hook-Oberfläche:
- *  - `bdfrms_render_field_value`  Anzeige eines Feldwerts in der Einzelansicht
- *  - `bdfrms_submission_actions`  Aktionsknöpfe der Einzelansicht
- *  - `bdfrms_export_cell`         Zellwert im CSV-Export
- *
- * Die komfortable Liste (Filter, Suche, Spaltenwahl) folgt in Etappe 2 aus
- * dem Bestand.
- *
- * @package Blitz_Donner_Forms
+ * Admin: gespeicherte Formular-Einsendungen anzeigen und verwalten.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Backend für Einsendungen: Liste, Detail, Löschen, Export.
- */
 class BDFRMS_Admin_Submissions {
-
-	const MENU_SLUG = 'bdfrms-submissions';
+	const PAGE_SLUG = 'bdfrms-submissions';
 
 	/**
-	 * Hooks registrieren.
+	 * Kompatibilität: Einstellungen der Basis und Add-on-Seiten hängen
+	 * sich über diese Konstante unter das Menü.
+	 */
+	const MENU_SLUG = self::PAGE_SLUG;
+
+	/**
+	 * Aktuelle Zeile während eines CSV/ZIP-Exports – Kontext für den
+	 * Export-Filter bdfrms_export_cell (liefert form_id und payload,
+	 * damit Add-ons Werte entschlüsseln können).
 	 *
+	 * @var array<string,mixed>
+	 */
+	private static $current_export_row = array();
+
+	/**
 	 * @return void
 	 */
 	public static function boot() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
-		add_action( 'admin_post_bdfrms_delete_submission', array( __CLASS__, 'handle_delete' ) );
-		add_action( 'admin_post_bdfrms_export_csv', array( __CLASS__, 'handle_export_csv' ) );
-		add_action( 'admin_post_bdfrms_export_zip', array( __CLASS__, 'handle_export_zip' ) );
+		// CSS aus der Plugin-Datei einlesen und inline ausgeben (kein HTTP-Request; bei falscher WP_CONTENT_URL/Plugins-URL kein 404).
+		add_action( 'admin_head', array( __CLASS__, 'print_inline_admin_css' ), 5 );
+		// Vor jeglicher Admin-Ausgabe (sonst scheitert wp_safe_redirect nach Löschen).
+		add_action( 'load-toplevel_page_' . self::PAGE_SLUG, array( __CLASS__, 'handle_early_actions' ) );
+		// Export (CSV oder ZIP; kein nopriv-Pendant).
+		add_action( 'admin_post_bdfrms_export', array( __CLASS__, 'handle_export' ) );
+		// Einzel-Export einer Einsendung als ZIP (CSV + JSON + Anhänge; kein nopriv-Pendant).
+		add_action( 'admin_post_bdfrms_export_single', array( __CLASS__, 'handle_export_single' ) );
 	}
 
 	/**
-	 * Menüpunkt registrieren.
+	 * Löschen per GET früh abwickeln, damit noch keine Header gesendet sind.
 	 *
 	 * @return void
 	 */
+	public static function handle_early_actions() {
+		if ( ! isset( $_GET['action'], $_GET['submission'] ) || 'delete' !== $_GET['action'] ) {
+			return;
+		}
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
+			return;
+		}
+
+		$id    = absint( $_GET['submission'] );
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! $id || ! wp_verify_nonce( $nonce, 'bdfrms_delete_' . $id ) ) {
+			return;
+		}
+
+		/**
+		 * Vor dem Löschen einer Einsendung – Add-ons räumen ihre
+		 * Begleitdaten auf (z. B. Tresor-Dateien), solange die
+		 * Verknüpfungszeilen der Basis noch existieren.
+		 *
+		 * @since 0.8.0
+		 *
+		 * @param int $id Einsendungs-ID.
+		 */
+		do_action( 'bdfrms_submission_deleted', $id );
+
+		// Erst Files (Storage + DB-Reihen) löschen, dann Submission.
+		$files_deleted = BDFRMS_File_Storage::delete_for_submission( $id );
+
+		global $wpdb;
+		$wpdb->delete( self::table_name(), array( 'id' => $id ), array( '%d' ) );
+
+		do_action(
+			'bdfrms_security_event',
+			'submission_deleted',
+			'submission',
+			(string) $id,
+			array( 'files' => $files_deleted )
+		);
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => self::PAGE_SLUG,
+					'deleted' => '1',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Prüft, ob die aktuelle Anfrage die Seite „Formular-Einträge“ ist.
+	 *
+	 * Hinweis: In admin_init ist get_current_screen() oft noch nicht gesetzt – nur $_GET['page'] ist zuverlässig.
+	 *
+	 * @return bool
+	 */
+	private static function is_submissions_admin_screen() {
+		return is_admin()
+			&& isset( $_GET['page'] )
+			&& self::PAGE_SLUG === sanitize_key( wp_unslash( $_GET['page'] ) );
+	}
+
+	/**
+	 * Liest admin-submissions.css vom Dateisystem und gibt sie als &lt;style&gt; aus.
+	 *
+	 * @return void
+	 */
+	public static function print_inline_admin_css() {
+		// Auch auf der Seite «Sicherheit & Einstellungen» laden (gleiches Design-System).
+		$page               = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		$is_settings_screen = is_admin() && class_exists( 'BDFRMS_Admin_Settings' ) && BDFRMS_Admin_Settings::PAGE_SLUG === $page;
+		if ( ! self::is_submissions_admin_screen() && ! $is_settings_screen ) {
+			return;
+		}
+
+		$path = BDFRMS_PLUGIN_DIR . 'assets/admin-submissions.css';
+		if ( ! is_readable( $path ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- lokale Plugin-Datei.
+		$css = file_get_contents( $path );
+		if ( false === $css || '' === $css ) {
+			return;
+		}
+
+		echo '<style id="bdfrms-admin-submissions-inline">' . "\n";
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- statisches CSS aus eigener Datei.
+		echo $css;
+		echo "\n" . '</style>' . "\n";
+	}
+
+	/**
+	 * @return void
+	 */
 	public static function register_menu() {
-		// «BD Forms» statt generisch «Formulare», damit der Menüpunkt dem
-		// Plugin zuordenbar ist (Entscheid Stefan 05.07.2026).
 		add_menu_page(
 			__( 'BD Forms', 'blitz-donner-forms' ),
 			__( 'BD Forms', 'blitz-donner-forms' ),
 			BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS,
-			self::MENU_SLUG,
+			self::PAGE_SLUG,
 			array( __CLASS__, 'render_page' ),
 			'dashicons-feedback',
 			26
 		);
-		// Erster Untermenü-Eintrag (gleicher Slug) heisst sonst wie das
-		// Hauptmenü – als «Einsendungen» ist er selbsterklärend.
 		add_submenu_page(
-			self::MENU_SLUG,
+			self::PAGE_SLUG,
 			__( 'Einsendungen', 'blitz-donner-forms' ),
 			__( 'Einsendungen', 'blitz-donner-forms' ),
 			BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS,
-			self::MENU_SLUG,
+			self::PAGE_SLUG,
 			array( __CLASS__, 'render_page' )
 		);
 	}
 
 	/**
-	 * Tabellenname mit WP-Präfix.
-	 *
 	 * @return string
 	 */
-	public static function table_name() {
+	private static function table_name() {
 		global $wpdb;
 		return $wpdb->prefix . 'bdfrms_submissions';
 	}
 
 	/**
-	 * Router: Einzelansicht oder Liste.
-	 *
+	 * @return bool
+	 */
+	private static function table_exists() {
+		global $wpdb;
+		$table = self::table_name();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is controlled.
+		return $table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+	}
+
+	/**
 	 * @return void
 	 */
 	public static function render_page() {
 		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
+			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ) );
 		}
-		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reine Leseansicht, Berechtigung oben geprüft.
-		if ( $submission_id > 0 ) {
+
+		$submission_id = isset( $_GET['submission'] ) ? absint( $_GET['submission'] ) : 0;
+		if ( $submission_id ) {
 			self::render_detail( $submission_id );
 			return;
 		}
+
 		self::render_list();
 	}
 
 	/**
-	 * Liste der Einsendungen (neueste zuerst).
-	 *
+	 * @param int $submission_id Row id.
 	 * @return void
 	 */
-	protected static function render_list() {
+	private static function render_detail( $submission_id ) {
 		global $wpdb;
-		$table = self::table_name();
-		$rows  = $wpdb->get_results( "SELECT id, created_at, form_title, form_id, post_id FROM {$table} ORDER BY id DESC LIMIT 200", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name(), keine Nutzereingabe.
-		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'Einsendungen', 'blitz-donner-forms' ); ?></h1>
-			<?php if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) : ?>
-				<p>
-					<a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=bdfrms_export_csv' ), 'bdfrms_export_csv' ) ); ?>">
-						<?php esc_html_e( 'CSV-Export', 'blitz-donner-forms' ); ?>
-					</a>
-				</p>
-			<?php endif; ?>
-			<?php if ( empty( $rows ) ) : ?>
-				<p><?php esc_html_e( 'Noch keine Einsendungen.', 'blitz-donner-forms' ); ?></p>
-			<?php else : ?>
-				<table class="widefat striped">
-					<thead>
-						<tr>
-							<th><?php esc_html_e( 'Nr.', 'blitz-donner-forms' ); ?></th>
-							<th><?php esc_html_e( 'Eingang', 'blitz-donner-forms' ); ?></th>
-							<th><?php esc_html_e( 'Formular', 'blitz-donner-forms' ); ?></th>
-							<th><?php esc_html_e( 'Seite', 'blitz-donner-forms' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ( $rows as $row ) : ?>
-							<tr>
-								<td>
-									<a href="
-									<?php
-									echo esc_url(
-										add_query_arg(
-											array(
-												'page' => self::MENU_SLUG,
-												'submission' => (int) $row['id'],
-											),
-											admin_url( 'admin.php' )
-										)
-									);
-									?>
-												">
-										#<?php echo (int) $row['id']; ?>
-									</a>
-								</td>
-								<td><?php echo esc_html( (string) $row['created_at'] ); ?></td>
-								<td><?php echo esc_html( '' !== (string) $row['form_title'] ? (string) $row['form_title'] : (string) $row['form_id'] ); ?></td>
-								<td><?php echo esc_html( get_the_title( (int) $row['post_id'] ) ); ?></td>
-							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-			<?php endif; ?>
-		</div>
-		<?php
-	}
 
-	/**
-	 * Einzelansicht einer Einsendung.
-	 *
-	 * @param int $submission_id Zeilen-ID.
-	 * @return void
-	 */
-	protected static function render_detail( $submission_id ) {
-		global $wpdb;
-		$table = self::table_name();
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $submission_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
+		if ( ! self::table_exists() ) {
+			echo '<div class="wrap bdfrms-admin bdfrms-admin-submissions">';
+			echo '<h1>' . esc_html__( 'Formular-Einträge', 'blitz-donner-forms' ) . '</h1>';
+			self::render_missing_table_notice();
+			echo '</div>';
+			return;
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- Tabellenname aus table_name().
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', $submission_id ) );
 		if ( ! $row ) {
-			wp_die( esc_html__( 'Einsendung nicht gefunden.', 'blitz-donner-forms' ), 404 );
+			echo '<div class="wrap bdfrms-admin bdfrms-admin-submissions">';
+			echo '<h1>' . esc_html__( 'Formular-Einträge', 'blitz-donner-forms' ) . '</h1>';
+			echo '<p class="bdfrms-admin-empty">' . esc_html__( 'Eintrag nicht gefunden.', 'blitz-donner-forms' ) . '</p>';
+			echo '<p class="bdfrms-admin-back"><a href="' . esc_url( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) ) . '">&larr; ' . esc_html__( 'Zurück zur Übersicht', 'blitz-donner-forms' ) . '</a></p>';
+			echo '</div>';
+			return;
 		}
 
-		$payload = json_decode( (string) $row['payload'], true );
-		if ( ! is_array( $payload ) ) {
-			$payload = array();
+		$payload_raw = json_decode( (string) $row->payload, true );
+		if ( ! is_array( $payload_raw ) ) {
+			$payload_raw = array();
 		}
 
-		// Label-Snapshot vom Zeitpunkt des Absendens (Submit-Handler).
-		$labels = array();
-		if ( isset( $payload['_bdfrms_labels'] ) && is_array( $payload['_bdfrms_labels'] ) ) {
-			$labels = $payload['_bdfrms_labels'];
-			unset( $payload['_bdfrms_labels'] );
+		$labels_snapshot = isset( $payload_raw['_bdfrms_labels'] ) && is_array( $payload_raw['_bdfrms_labels'] ) ? $payload_raw['_bdfrms_labels'] : array();
+		$payload         = BDFRMS_Plugin::get_submission_payload_for_row( $row );
+		$labels          = self::field_labels_map( (int) $row->post_id, (string) $row->form_id );
+		foreach ( $labels_snapshot as $k => $v ) {
+			$labels[ $k ] = (string) $v;
 		}
 
-		$actions = array();
-		if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
-			$actions['export_zip'] = array(
-				'label' => __( 'Als ZIP herunterladen', 'blitz-donner-forms' ),
-				'url'   => wp_nonce_url(
-					admin_url( 'admin-post.php?action=bdfrms_export_zip&submission=' . (int) $submission_id ),
-					'bdfrms_export_zip_' . (int) $submission_id
+		$list_url   = add_query_arg(
+			array_merge(
+				array( 'page' => self::PAGE_SLUG ),
+				self::list_context_for_urls( self::parse_list_form_filter(), self::parse_list_sort() )
+			),
+			admin_url( 'admin.php' )
+		);
+		$post_title = get_the_title( (int) $row->post_id );
+		if ( '' === $post_title ) {
+			/* translators: %d: Beitrags-ID. */
+			$post_title = sprintf( __( 'Beitrag #%d (nicht mehr vorhanden)', 'blitz-donner-forms' ), (int) $row->post_id );
+		}
+
+		echo '<div class="wrap bdfrms-admin bdfrms-admin-submissions">';
+		echo '<h1>' . esc_html__( 'Eintrag', 'blitz-donner-forms' ) . ' #' . esc_html( (string) $row->id ) . '</h1>';
+		echo '<p class="bdfrms-admin-back"><a href="' . esc_url( $list_url ) . '">&larr; ' . esc_html__( 'Zurück zur Übersicht', 'blitz-donner-forms' ) . '</a></p>';
+
+		echo '<div class="bdfrms-admin-meta-card">';
+		echo '<h2 class="bdfrms-admin-meta-heading">' . esc_html__( 'Metadaten', 'blitz-donner-forms' ) . '</h2>';
+		echo '<dl class="bdfrms-admin-meta-grid">';
+		echo '<dt>' . esc_html__( 'Datum', 'blitz-donner-forms' ) . '</dt><dd>' . esc_html( self::format_datetime( $row->created_at ) ) . '</dd>';
+		echo '<dt>' . esc_html__( 'Seite / Beitrag', 'blitz-donner-forms' ) . '</dt><dd>' . esc_html( $post_title ) . '</dd>';
+		echo '<dt>' . esc_html__( 'Formular-ID', 'blitz-donner-forms' ) . '</dt><dd><code>' . esc_html( (string) $row->form_id ) . '</code></dd>';
+		$form_title_meta = isset( $row->form_title ) ? trim( (string) $row->form_title ) : '';
+		if ( '' !== $form_title_meta ) {
+			echo '<dt>' . esc_html__( 'Formularname', 'blitz-donner-forms' ) . '</dt><dd>' . esc_html( $form_title_meta ) . '</dd>';
+		}
+		echo '<dt>' . esc_html__( 'IP-Adresse', 'blitz-donner-forms' ) . '</dt><dd>' . esc_html( (string) $row->ip_address ) . '</dd>';
+		$ua = isset( $row->user_agent ) ? (string) $row->user_agent : '';
+		if ( '' !== $ua ) {
+			echo '<dt>' . esc_html__( 'User-Agent', 'blitz-donner-forms' ) . '</dt><dd>' . esc_html( $ua ) . '</dd>';
+		}
+		echo '</dl></div>';
+
+		echo '<h2 class="bdfrms-admin-fields-heading">' . esc_html__( 'Übermittelte Felder', 'blitz-donner-forms' ) . '</h2>';
+		echo '<div class="bdfrms-admin-field-list">';
+
+		$field_rows = array_filter(
+			array_keys( $payload ),
+			static function ( $key ) {
+				return '_bdfrms_labels' !== $key;
+			}
+		);
+
+		if ( empty( $field_rows ) ) {
+			echo '<p class="bdfrms-admin-empty">' . esc_html__( 'Keine Felddaten.', 'blitz-donner-forms' ) . '</p>';
+		} else {
+			$can_decrypt = (bool) apply_filters( 'bdfrms_can_decrypt', true );
+			$can_dl      = (bool) apply_filters( 'bdfrms_can_download_files', BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) );
+			$any_decrypt = false;
+			foreach ( $field_rows as $key ) {
+				$value = $payload[ $key ];
+				$label = isset( $labels[ $key ] ) ? $labels[ $key ] : $key;
+				echo '<div class="bdfrms-admin-field">';
+				echo '<div class="bdfrms-admin-field-label">' . esc_html( $label ) . '</div>';
+				echo '<div class="bdfrms-admin-field-value">' . self::format_field_value( $value, $key, $can_decrypt, $can_dl, $any_decrypt, (array) $row ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- format_field_value liefert escaped HTML.
+				echo '</div>';
+			}
+		}
+
+		echo '</div>';
+
+		$delete_url = wp_nonce_url(
+			add_query_arg(
+				array(
+					'page'       => self::PAGE_SLUG,
+					'action'     => 'delete',
+					'submission' => (int) $row->id,
 				),
-				'class' => 'button',
-			);
-		}
-		if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
-			$actions['delete'] = array(
-				'label' => __( 'Löschen', 'blitz-donner-forms' ),
-				'url'   => wp_nonce_url(
-					admin_url( 'admin-post.php?action=bdfrms_delete_submission&submission=' . (int) $submission_id ),
-					'bdfrms_delete_submission_' . (int) $submission_id
-				),
-				'class' => 'button button-link-delete',
-			);
+				admin_url( 'admin.php' )
+			),
+			'bdfrms_delete_' . (int) $row->id
+		);
+		echo '<div class="bdfrms-admin-actions">';
+
+		// Einzel-Download als ZIP: liefert entschlüsselte Anhänge – daher nur mit
+		// BEIDEN Rechten (Datei herunterladen UND entschlüsseln).
+		if ( (bool) apply_filters( 'bdfrms_can_download_files', BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) )
+			&& BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS )
+			&& class_exists( 'ZipArchive' ) ) {
+			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bdfrms-admin-single-export-form" style="display:inline-block;margin-right:12px;">';
+			wp_nonce_field( 'bdfrms_export_single_' . (int) $row->id, '_bdfrms_export_single_nonce' );
+			echo '<input type="hidden" name="action" value="bdfrms_export_single" />';
+			echo '<input type="hidden" name="bdfrms_submission_id" value="' . (int) $row->id . '" />';
+			if ( apply_filters( 'bdfrms_sensitive_ui_active', false ) && $can_decrypt ) {
+				echo '<label style="margin-right:8px;">';
+				echo '<input type="checkbox" name="bdfrms_export_decrypt" value="1" /> ';
+				echo esc_html__( 'Feldwerte entschlüsseln', 'blitz-donner-forms' );
+				echo ' <span class="bdfrms-admin-export-log-hint">(' . esc_html__( 'protokolliert', 'blitz-donner-forms' ) . ')</span>';
+				echo '</label>';
+			}
+			echo '<button type="submit" class="button button-secondary">' . esc_html__( 'Diese Einsendung herunterladen (ZIP)', 'blitz-donner-forms' ) . '</button>';
+			echo '</form>';
 		}
 
-		/**
-		 * Aktionsknöpfe der Einzelansicht erweitern.
-		 *
-		 * Jeder Eintrag: Aktions-ID => array{label:string,url:string,class:string}.
-		 * Add-ons ergänzen eigene Aktionen (z. B. «Entschlüsselt anzeigen»
-		 * im Security-Add-on) und prüfen ihre Capability selbst.
-		 *
-		 * @since 0.1.0
-		 *
-		 * @param array $actions Aktionen der Basis.
-		 * @param array $row     Zeile aus {prefix}bdfrms_submissions.
-		 */
-		$actions = apply_filters( 'bdfrms_submission_actions', $actions, $row );
-		?>
-		<div class="wrap">
-			<h1>
-				<?php
-				/* translators: %d: submission ID. */
-				echo esc_html( sprintf( __( 'Einsendung #%d', 'blitz-donner-forms' ), (int) $submission_id ) );
-				?>
-			</h1>
-			<p>
-				<a href="<?php echo esc_url( add_query_arg( 'page', self::MENU_SLUG, admin_url( 'admin.php' ) ) ); ?>">&larr; <?php esc_html_e( 'Zurück zur Liste', 'blitz-donner-forms' ); ?></a>
-			</p>
-			<table class="widefat striped" style="max-width:800px;">
-				<tbody>
-					<tr>
-						<th style="width:200px;"><?php esc_html_e( 'Eingang', 'blitz-donner-forms' ); ?></th>
-						<td><?php echo esc_html( (string) $row['created_at'] ); ?></td>
-					</tr>
-					<?php foreach ( $payload as $field_name => $value ) : ?>
-						<tr>
-							<th><?php echo esc_html( isset( $labels[ $field_name ] ) ? (string) $labels[ $field_name ] : (string) $field_name ); ?></th>
-							<td>
-								<?php
-								// Datei-Referenz: Download-Link statt Rohwert.
-								if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
-									$file_id      = (int) ( $value['file_id'] ?? 0 );
-									$download_url = wp_nonce_url(
-										admin_url( 'admin-post.php?action=bdfrms_download&file_id=' . $file_id ),
-										'bdfrms_download_' . $file_id
-									);
-									printf(
-										'<a href="%s">%s</a>',
-										esc_url( $download_url ),
-										/* translators: %d: file ID. */
-										esc_html( sprintf( __( 'Datei #%d herunterladen', 'blitz-donner-forms' ), $file_id ) )
-									);
-								} else {
-									$display = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+		echo '<a href="' . esc_url( $delete_url ) . '" class="button bdfrms-admin-btn-delete" onclick="return confirm(\'' . esc_js( __( 'Diesen Eintrag wirklich löschen?', 'blitz-donner-forms' ) ) . '\');">' . esc_html__( 'Eintrag löschen', 'blitz-donner-forms' ) . '</a></div>';
 
-									/**
-									 * Anzeige eines Feldwerts in der Einzelansicht.
-									 *
-									 * Das Security-Add-on maskiert hier verschlüsselte
-									 * Werte oder entschlüsselt sie Capability-abhängig.
-									 * Rückgabe: anzeigefertiger Klartext (wird escaped).
-									 *
-									 * @since 0.1.0
-									 *
-									 * @param string $display    Anzeigewert der Basis.
-									 * @param string $field_name Feldname.
-									 * @param mixed  $value      Gespeicherter Rohwert.
-									 * @param array  $row        Zeile aus {prefix}bdfrms_submissions.
-									 */
-									$display = apply_filters( 'bdfrms_render_field_value', $display, (string) $field_name, $value, $row );
-									echo esc_html( (string) $display );
-								}
-								?>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
-			<p>
-				<?php foreach ( $actions as $action ) : ?>
-					<a class="<?php echo esc_attr( isset( $action['class'] ) ? (string) $action['class'] : 'button' ); ?>" href="<?php echo esc_url( (string) $action['url'] ); ?>">
-						<?php echo esc_html( (string) $action['label'] ); ?>
-					</a>
-				<?php endforeach; ?>
-			</p>
-		</div>
-		<?php
+		echo '</div>';
 	}
 
 	/**
-	 * Einsendung löschen (admin_post_bdfrms_delete_submission).
-	 *
-	 * @return void
+	 * @param mixed  $value         Field value (kann Envelope-Array, File-Ref-Array oder String sein).
+	 * @param string $field_name    Feldname (für AAD beim Entschlüsseln).
+	 * @param bool   $can_decrypt   Darf entschlüsseln.
+	 * @param bool   $can_download  Darf Datei-Anhänge herunterladen.
+	 * @param bool   &$any_decrypt  Wird true gesetzt, sobald mindestens ein Wert entschlüsselt wurde (für Audit).
+	 * @return string HTML (escaped).
 	 */
-	public static function handle_delete() {
-		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_DELETE_SUBMISSIONS ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
-		}
-		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0;
-		check_admin_referer( 'bdfrms_delete_submission_' . $submission_id );
-
-		// Zuerst die abgelegten Dateien aufräumen, dann die Zeile löschen.
-		BDFRMS_File_Storage::delete_for_submission( $submission_id );
-
-		global $wpdb;
-		$wpdb->delete( self::table_name(), array( 'id' => $submission_id ), array( '%d' ) );
-
-		/**
-		 * Läuft nach dem Löschen einer Einsendung.
-		 *
-		 * Add-ons räumen hier ihre Begleitdaten auf (Dateien, Audit-Einträge,
-		 * CRM-Verknüpfungen).
-		 *
-		 * @since 0.1.0
-		 *
-		 * @param int $submission_id Gelöschte Zeilen-ID.
-		 */
-		do_action( 'bdfrms_submission_deleted', $submission_id );
-
-		wp_safe_redirect( add_query_arg( 'page', self::MENU_SLUG, admin_url( 'admin.php' ) ) );
-		exit;
-	}
-
-	/**
-	 * CSV-Export aller Einsendungen (admin_post_bdfrms_export_csv).
-	 *
-	 * @return void
-	 */
-	public static function handle_export_csv() {
-		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
-		}
-		check_admin_referer( 'bdfrms_export_csv' );
-
-		global $wpdb;
-		$table = self::table_name();
-		$rows  = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id ASC", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name(), keine Nutzereingabe.
-
-		nocache_headers();
-		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="bdfrms-einsendungen-' . gmdate( 'Y-m-d' ) . '.csv"' );
-
-		$out = fopen( 'php://output', 'w' );
-		// UTF-8-BOM, damit Excel Umlaute korrekt liest.
-		fwrite( $out, "\xEF\xBB\xBF" );
-
-		// Spalten: feste Metadaten + Vereinigungsmenge aller Payload-Felder.
-		$payloads = array();
-		foreach ( $rows as $row ) {
-			$payload = json_decode( (string) $row['payload'], true );
-			$payload = is_array( $payload ) ? $payload : array();
-			unset( $payload['_bdfrms_labels'] );
-			$payloads[ (int) $row['id'] ] = $payload;
-		}
-
-		$columns     = self::csv_columns( $rows );
-		$field_names = array_keys( $columns );
-
-		fputcsv( $out, array_merge( array( 'id', 'created_at', 'form_title' ), array_values( $columns ) ) );
-
-		foreach ( $rows as $row ) {
-			$line = array( (int) $row['id'], (string) $row['created_at'], (string) $row['form_title'] );
-			foreach ( $field_names as $field_name ) {
-				$value = isset( $payloads[ (int) $row['id'] ][ $field_name ] ) ? $payloads[ (int) $row['id'] ][ $field_name ] : '';
-				if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
-					$cell = 'Datei #' . (int) ( $value['file_id'] ?? 0 );
-				} else {
-					$cell = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
-				}
-
-				/**
-				 * Zellwert im CSV-Export.
-				 *
-				 * Das Security-Add-on erzwingt hier Berechtigungen und
-				 * liefert entschlüsselte oder maskierte Werte.
-				 *
-				 * @since 0.1.0
-				 *
-				 * @param string $cell       Zellwert der Basis.
-				 * @param string $field_name Feldname (Spalte).
-				 * @param array  $row        Zeile aus {prefix}bdfrms_submissions.
-				 */
-				$cell = apply_filters( 'bdfrms_export_cell', $cell, $field_name, $row );
-
-				// Schutz vor CSV-Injection in Tabellenkalkulationen.
-				if ( '' !== $cell && in_array( $cell[0], array( '=', '+', '-', '@' ), true ) ) {
-					$cell = "'" . $cell;
-				}
-				$line[] = $cell;
+	private static function format_field_value( $value, $field_name = '', $can_decrypt = false, $can_download = false, &$any_decrypt = false, $row_context = array() ) {
+		// 1) Datei-Referenz?
+		if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
+			$file_id = isset( $value['file_id'] ) ? (int) $value['file_id'] : (int) substr( $value['_ref'], strlen( 'bdfrms-file:' ) );
+			$file    = $file_id > 0 ? BDFRMS_File_Storage::get( $file_id ) : null;
+			if ( ! $file ) {
+				return '<em>' . esc_html__( '[Datei #', 'blitz-donner-forms' ) . esc_html( (string) $file_id ) . esc_html__( ' nicht gefunden]', 'blitz-donner-forms' ) . '</em>';
 			}
-			fputcsv( $out, $line );
-		}
-
-		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Stream-Export.
-		exit;
-	}
-
-	/**
-	 * Spalten für den CSV-Export: technischer Feldname => Anzeigetitel.
-	 *
-	 * Der Anzeigetitel ist das Label aus dem Snapshot der Einsendung
-	 * (_bdfrms_labels) – neuere Einsendungen gewinnen. Tragen zwei
-	 * verschiedene Felder dasselbe Label, wird der technische Name in
-	 * Klammern angehängt, damit die Spalten unterscheidbar bleiben.
-	 *
-	 * @param array<int,array<string,mixed>> $rows Zeilen aus {prefix}bdfrms_submissions.
-	 * @return array<string,string> Feldname => Spaltentitel.
-	 */
-	public static function csv_columns( array $rows ) {
-		$columns = array();
-		foreach ( $rows as $row ) {
-			$payload = json_decode( (string) $row['payload'], true );
-			$payload = is_array( $payload ) ? $payload : array();
-			$labels  = array();
-			if ( isset( $payload['_bdfrms_labels'] ) && is_array( $payload['_bdfrms_labels'] ) ) {
-				$labels = $payload['_bdfrms_labels'];
-			}
-			unset( $payload['_bdfrms_labels'] );
-			foreach ( array_keys( $payload ) as $field_name ) {
-				$label = isset( $labels[ $field_name ] ) ? trim( (string) $labels[ $field_name ] ) : '';
-				// Neuere Zeilen (später in $rows) überschreiben den Titel;
-				// leere Labels fallen auf den technischen Namen zurück.
-				$columns[ $field_name ] = '' !== $label ? $label : (string) $field_name;
-			}
-		}
-
-		// Gleiche Labels für verschiedene Felder unterscheidbar machen.
-		$counts = array_count_values( $columns );
-		foreach ( $columns as $field_name => $label ) {
-			if ( $counts[ $label ] > 1 && $label !== $field_name ) {
-				$columns[ $field_name ] = $label . ' (' . $field_name . ')';
-			}
-		}
-
-		return $columns;
-	}
-
-	/**
-	 * ZIP-Export einer einzelnen Einsendung (admin_post_bdfrms_export_zip):
-	 * eine Textdatei mit allen Feldern plus die abgelegten Datei-Anhänge.
-	 * Übernommen aus dem Bestand, ohne Verschlüsselungsbezug.
-	 *
-	 * @return void
-	 */
-	public static function handle_export_zip() {
-		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_EXPORT_SUBMISSIONS ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ), 403 );
-		}
-		$submission_id = isset( $_GET['submission'] ) ? absint( wp_unslash( $_GET['submission'] ) ) : 0;
-		check_admin_referer( 'bdfrms_export_zip_' . $submission_id );
-
-		if ( ! class_exists( 'ZipArchive' ) ) {
-			wp_die( esc_html__( 'ZIP-Export nicht verfügbar (PHP-Erweiterung zip fehlt).', 'blitz-donner-forms' ), 500 );
-		}
-
-		global $wpdb;
-		$table = self::table_name();
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $submission_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
-		if ( ! $row ) {
-			wp_die( esc_html__( 'Einsendung nicht gefunden.', 'blitz-donner-forms' ), 404 );
-		}
-
-		$payload = json_decode( (string) $row['payload'], true );
-		$payload = is_array( $payload ) ? $payload : array();
-		$labels  = array();
-		if ( isset( $payload['_bdfrms_labels'] ) && is_array( $payload['_bdfrms_labels'] ) ) {
-			$labels = $payload['_bdfrms_labels'];
-			unset( $payload['_bdfrms_labels'] );
-		}
-
-		// Feldliste als Textdatei.
-		$lines   = array();
-		$lines[] = 'Einsendung #' . (int) $row['id'];
-		$lines[] = 'Eingang: ' . (string) $row['created_at'];
-		$lines[] = 'Formular: ' . ( '' !== (string) $row['form_title'] ? (string) $row['form_title'] : (string) $row['form_id'] );
-		$lines[] = '';
-		foreach ( $payload as $field_name => $value ) {
-			$label = isset( $labels[ $field_name ] ) ? (string) $labels[ $field_name ] : (string) $field_name;
-			if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
-				$cell = '[Datei-Anhang, siehe ZIP]';
+			$meta = sprintf( '%s — %s — %s', $file->original_name, size_format( (int) $file->size_bytes ), $file->mime );
+			$out  = '<div class="bdfrms-admin-file">';
+			$out .= '<div><strong>' . esc_html( $file->original_name ) . '</strong>'
+				. ' <span class="bdfrms-admin-file-meta">(' . esc_html( $meta ) . ')</span></div>';
+			$out .= '<div class="bdfrms-admin-file-fingerprint"><code>sha256: ' . esc_html( $file->sha256 ) . '</code></div>';
+			// Klartext-Download ist eine Entschlüsselung: erfordert BEIDE Caps
+			// (Datei herunterladen UND entschlüsseln). Ohne Entschlüsselungs-Recht
+			// wird kein Klartext ausgegeben – auch nicht, wenn Download erlaubt ist.
+			if ( $can_download && $can_decrypt ) {
+				$out .= '<div><a class="button" href="' . esc_url( BDFRMS_File_Storage::download_url( $file_id ) ) . '">'
+					. esc_html__( 'Datei herunterladen (entschlüsselt)', 'blitz-donner-forms' )
+					. '</a></div>';
 			} else {
-				$cell = is_scalar( $value ) ? (string) $value : (string) wp_json_encode( $value );
+				$out .= '<div><em>' . esc_html__( 'Keine Berechtigung, diese Datei im Klartext herunterzuladen.', 'blitz-donner-forms' ) . '</em></div>';
 			}
-
-			/** Dokumentiert in handle_export_csv(). */
-			$cell    = apply_filters( 'bdfrms_export_cell', $cell, (string) $field_name, $row );
-			$lines[] = $label . ': ' . $cell;
+			$out .= '</div>';
+			return $out;
 		}
 
-		$tmp = wp_tempnam( 'bdfrms-export' );
-		$zip = new ZipArchive();
-		if ( true !== $zip->open( $tmp, ZipArchive::OVERWRITE ) ) {
-			wp_die( esc_html__( 'ZIP konnte nicht erstellt werden.', 'blitz-donner-forms' ), 500 );
+		// 2) Erweiterungs-Envelope (z. B. verschlüsselt durch ein Add-on)?
+		// Die Anzeige entscheidet der Render-Filter der Basis – ein Add-on
+		// maskiert oder entschlüsselt Cap-abhängig und auditiert selbst.
+		if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+			$display = (string) apply_filters(
+				'bdfrms_render_field_value',
+				__( '[verschlüsselt]', 'blitz-donner-forms' ),
+				(string) $field_name,
+				$value,
+				$row_context
+			);
+			return '<span class="bdfrms-admin-encrypted-value">' . nl2br( esc_html( $display ) ) . '</span>';
 		}
-		$zip->addFromString( 'einsendung-' . (int) $row['id'] . '.txt', implode( "\n", $lines ) . "\n" );
 
-		// Datei-Anhänge aus der Klartext-Ablage beilegen.
-		$files_table = BDFRMS_File_Storage::table_name();
-		$files       = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$files_table} WHERE submission_id = %d", $submission_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
-		foreach ( $files as $file_row ) {
-			$path = BDFRMS_File_Storage::storage_root() . '/' . basename( (string) $file_row['storage_id'] );
-			if ( ! is_readable( $path ) ) {
+		// 3) Plain-Array (Mehrfachauswahl etc.)
+		if ( is_array( $value ) ) {
+			return '<pre class="bdfrms-admin-pre">' . esc_html( wp_json_encode( $value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ) . '</pre>';
+		}
+
+		$s = (string) $value;
+		if ( preg_match( '#^https?://#i', $s ) ) {
+			return '<a href="' . esc_url( $s ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $s ) . '</a>';
+		}
+		return nl2br( esc_html( $s ) );
+	}
+
+	/**
+	 * @param int    $post_id Post id.
+	 * @param string $form_id Form id.
+	 * @return array<string,string> name => label
+	 */
+	private static function field_labels_map( $post_id, $form_id ) {
+		$schema = BDFRMS_Plugin::get_form_schema_from_post( $post_id, $form_id );
+		$out    = array();
+		foreach ( $schema as $field ) {
+			if ( ! empty( $field['name'] ) ) {
+				$out[ $field['name'] ] = isset( $field['label'] ) ? (string) $field['label'] : (string) $field['name'];
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * @param string|null $mysql_datetime From DB.
+	 * @return string
+	 */
+	private static function format_datetime( $mysql_datetime ) {
+		if ( ! $mysql_datetime ) {
+			return '';
+		}
+		$ts = strtotime( (string) $mysql_datetime );
+		if ( false === $ts ) {
+			return (string) $mysql_datetime;
+		}
+		return wp_date(
+			__( 'd.m.Y H:i', 'blitz-donner-forms' ),
+			$ts
+		);
+	}
+
+	/**
+	 * Sortierung der Eintragsliste (GET `bdfrms_sort`).
+	 *
+	 * @return string date_desc|date_asc|form_asc|form_desc
+	 */
+	private static function parse_list_sort() {
+		if ( ! isset( $_GET['bdfrms_sort'] ) ) {
+			return 'date_desc';
+		}
+		$s       = sanitize_key( wp_unslash( $_GET['bdfrms_sort'] ) );
+		$allowed = array( 'date_desc', 'date_asc', 'form_asc', 'form_desc' );
+		return in_array( $s, $allowed, true ) ? $s : 'date_desc';
+	}
+
+	/**
+	 * Filter nach Formular-ID (GET `bdfrms_filter_form_id`).
+	 *
+	 * @return string Leerstring = alle.
+	 */
+	private static function parse_list_form_filter() {
+		if ( ! isset( $_GET['bdfrms_filter_form_id'] ) ) {
+			return '';
+		}
+		return sanitize_key( wp_unslash( $_GET['bdfrms_filter_form_id'] ) );
+	}
+
+	/**
+	 * @param string $sort Wert von parse_list_sort().
+	 * @return string Nur aus Whitelist — für ORDER BY interpolierbar.
+	 */
+	private static function order_sql_for_list_sort( $sort ) {
+		switch ( $sort ) {
+			case 'date_asc':
+				return 'created_at ASC, id ASC';
+			case 'form_asc':
+				return 'form_title ASC, form_id ASC, created_at DESC, id DESC';
+			case 'form_desc':
+				return 'form_title DESC, form_id DESC, created_at DESC, id DESC';
+			case 'date_desc':
+			default:
+				return 'created_at DESC, id DESC';
+		}
+	}
+
+	/**
+	 * Query-Parameter für Links (Filter + Sortierung), ohne `page`.
+	 *
+	 * @param string $filter_form_id sanitize_key.
+	 * @param string $sort           parse_list_sort-Wert.
+	 * @return array<string,string>
+	 */
+	private static function list_context_for_urls( $filter_form_id, $sort ) {
+		$args = array();
+		if ( '' !== $filter_form_id ) {
+			$args['bdfrms_filter_form_id'] = $filter_form_id;
+		}
+		if ( 'date_desc' !== $sort ) {
+			$args['bdfrms_sort'] = $sort;
+		}
+		return $args;
+	}
+
+	/**
+	 * @return void
+	 */
+	private static function render_list() {
+		global $wpdb;
+
+		echo '<div class="wrap bdfrms-admin bdfrms-admin-submissions bdfrms-admin-list">';
+		echo '<h1>' . esc_html__( 'Formular-Einträge', 'blitz-donner-forms' ) . '</h1>';
+		echo '<p class="bdfrms-admin-lead">' . esc_html__(
+			'Hier erscheinen alle erfolgreich abgeschickten Formulare (serverseitig in der Datenbank gespeichert).',
+			'blitz-donner-forms'
+		) . '</p>';
+
+		if ( isset( $_GET['deleted'] ) && '1' === $_GET['deleted'] ) {
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Eintrag wurde gelöscht.', 'blitz-donner-forms' ) . '</p></div>';
+		}
+
+		if ( ! self::table_exists() ) {
+			self::render_missing_table_notice();
+			echo '</div>';
+			return;
+		}
+
+		$filter_form_id = self::parse_list_form_filter();
+		$sort           = self::parse_list_sort();
+		$order_sql      = self::order_sql_for_list_sort( $sort );
+
+		$per_page = 20;
+		$paged    = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$offset   = ( $paged - 1 ) * $per_page;
+
+		$table = self::table_name();
+
+		if ( '' !== $filter_form_id ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE form_id = %s", $filter_form_id ) );
+		} else {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+		}
+		$pages = max( 1, (int) ceil( $total / $per_page ) );
+		if ( $paged > $pages ) {
+			$paged  = $pages;
+			$offset = ( $paged - 1 ) * $per_page;
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$form_groups = $wpdb->get_results( "SELECT form_id, MAX(form_title) AS form_title FROM {$table} GROUP BY form_id ORDER BY form_title ASC, form_id ASC" );
+		if ( ! is_array( $form_groups ) ) {
+			$form_groups = array();
+		}
+
+		$sql = "SELECT id, created_at, post_id, form_id, form_title, payload FROM {$table}";
+		if ( '' !== $filter_form_id ) {
+			$sql .= ' WHERE form_id = %s';
+		}
+		$sql .= " ORDER BY {$order_sql} LIMIT %d OFFSET %d";
+
+		if ( '' !== $filter_form_id ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $order_sql nur aus Whitelist.
+			$rows = $wpdb->get_results( $wpdb->prepare( $sql, $filter_form_id, $per_page, $offset ) );
+		} else {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$rows = $wpdb->get_results( $wpdb->prepare( $sql, $per_page, $offset ) );
+		}
+
+		if ( ! is_array( $rows ) ) {
+			$rows = array();
+		}
+
+		$list_ctx = self::list_context_for_urls( $filter_form_id, $sort );
+
+		echo '<form method="get" class="bdfrms-admin-filters" action="' . esc_url( admin_url( 'admin.php' ) ) . '">';
+		echo '<input type="hidden" name="page" value="' . esc_attr( self::PAGE_SLUG ) . '" />';
+		echo '<label class="bdfrms-admin-filter-label"><span class="screen-reader-text">' . esc_html__( 'Formular', 'blitz-donner-forms' ) . '</span>';
+		echo '<select name="bdfrms_filter_form_id">';
+		echo '<option value="">' . esc_html__( 'Alle Formulare', 'blitz-donner-forms' ) . '</option>';
+		foreach ( $form_groups as $fg ) {
+			$fid = isset( $fg->form_id ) ? (string) $fg->form_id : '';
+			if ( '' === $fid ) {
 				continue;
 			}
-			$entry_name = (int) $file_row['id'] . '-' . sanitize_file_name( (string) $file_row['original_name'] );
-			$zip->addFile( $path, 'dateien/' . $entry_name );
+			$flabel = isset( $fg->form_title ) ? trim( (string) $fg->form_title ) : '';
+			$optext = '' !== $flabel ? $flabel . ' (' . $fid . ')' : $fid;
+			echo '<option value="' . esc_attr( $fid ) . '"' . selected( $filter_form_id, $fid, false ) . '>' . esc_html( $optext ) . '</option>';
 		}
+		echo '</select></label> ';
+		echo '<label class="bdfrms-admin-filter-label"><span class="screen-reader-text">' . esc_html__( 'Sortierung', 'blitz-donner-forms' ) . '</span>';
+		echo '<select name="bdfrms_sort">';
+		$sort_opts = array(
+			'date_desc' => __( 'Datum: neueste zuerst', 'blitz-donner-forms' ),
+			'date_asc'  => __( 'Datum: älteste zuerst', 'blitz-donner-forms' ),
+			'form_asc'  => __( 'Formular: Name A–Z', 'blitz-donner-forms' ),
+			'form_desc' => __( 'Formular: Name Z–A', 'blitz-donner-forms' ),
+		);
+		foreach ( $sort_opts as $val => $lab ) {
+			echo '<option value="' . esc_attr( $val ) . '"' . selected( $sort, $val, false ) . '>' . esc_html( $lab ) . '</option>';
+		}
+		echo '</select></label> ';
+		submit_button( __( 'Anwenden', 'blitz-donner-forms' ), 'secondary', 'submit', false );
+		echo '</form>';
+
+		// Export-Box (nur für Nutzer mit bdfrms_view_submissions; Kein-Formular-Hinweis wenn nötig).
+		if ( BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) ) {
+			self::render_export_box( $filter_form_id, $sort, $total );
+		}
+
+		if ( 0 === $total ) {
+			if ( '' !== $filter_form_id ) {
+				echo '<p class="bdfrms-admin-empty">' . esc_html__( 'Keine Einsendungen für dieses Formular.', 'blitz-donner-forms' ) . '</p>';
+			} else {
+				echo '<p class="bdfrms-admin-empty">' . esc_html__( 'Noch keine Einsendungen.', 'blitz-donner-forms' ) . '</p>';
+			}
+			echo '</div>';
+			return;
+		}
+
+		echo '<div class="bdfrms-admin-table-wrap">';
+		echo '<table class="wp-list-table widefat fixed striped bdfrms-admin-table">';
+		echo '<thead><tr>';
+		echo '<th scope="col" class="manage-column" style="width:5rem">' . esc_html__( 'ID', 'blitz-donner-forms' ) . '</th>';
+		echo '<th scope="col" class="manage-column">' . esc_html__( 'Datum', 'blitz-donner-forms' ) . '</th>';
+		echo '<th scope="col" class="manage-column">' . esc_html__( 'Seite', 'blitz-donner-forms' ) . '</th>';
+		echo '<th scope="col" class="manage-column">' . esc_html__( 'Formular', 'blitz-donner-forms' ) . '</th>';
+		echo '<th scope="col" class="manage-column">' . esc_html__( 'Absender', 'blitz-donner-forms' ) . '</th>';
+		echo '<th scope="col" class="manage-column" style="width:8rem">' . esc_html__( 'Aktionen', 'blitz-donner-forms' ) . '</th>';
+		echo '</tr></thead><tbody>';
+
+		foreach ( $rows as $row ) {
+			$detail_url = add_query_arg(
+				array_merge(
+					array(
+						'page'       => self::PAGE_SLUG,
+						'submission' => (int) $row->id,
+					),
+					$list_ctx
+				),
+				admin_url( 'admin.php' )
+			);
+			$post_title = get_the_title( (int) $row->post_id );
+			if ( '' === $post_title ) {
+				$post_title = '—';
+			}
+			$sender_cell = self::sender_column_from_payload( (string) $row->payload, (string) $row->form_id, (int) $row->post_id );
+			$row_title   = isset( $row->form_title ) ? trim( (string) $row->form_title ) : '';
+
+			echo '<tr>';
+			echo '<td>' . esc_html( (string) $row->id ) . '</td>';
+			echo '<td>' . esc_html( self::format_datetime( $row->created_at ) ) . '</td>';
+			echo '<td>' . esc_html( $post_title ) . '</td>';
+			echo '<td class="bdfrms-admin-cell-form">';
+			if ( '' !== $row_title ) {
+				echo esc_html( $row_title ) . '<br><small class="bdfrms-admin-form-id"><code>' . esc_html( (string) $row->form_id ) . '</code></small>';
+			} else {
+				echo '<code>' . esc_html( (string) $row->form_id ) . '</code>';
+			}
+			echo '</td>';
+			echo '<td class="bdfrms-admin-cell-sender">' . wp_kses_post( $sender_cell ) . '</td>';
+			echo '<td><a href="' . esc_url( $detail_url ) . '">' . esc_html__( 'Ansehen', 'blitz-donner-forms' ) . '</a></td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody></table>';
+		echo '</div>';
+
+		if ( $pages > 1 ) {
+			$pag_base_args = array_merge(
+				array(
+					'page'  => self::PAGE_SLUG,
+					'paged' => '%#%',
+				),
+				$list_ctx
+			);
+			$base          = add_query_arg( $pag_base_args, admin_url( 'admin.php' ) );
+			echo '<div class="tablenav"><div class="tablenav-pages">';
+			echo wp_kses_post(
+				paginate_links(
+					array(
+						'base'      => $base,
+						'format'    => '',
+						'current'   => $paged,
+						'total'     => $pages,
+						'prev_text' => '&laquo;',
+						'next_text' => '&raquo;',
+					)
+				)
+			);
+			echo '</div></div>';
+		}
+
+		echo '</div>';
+	}
+
+	/**
+	 * Technischer Feldname für Abgleich (Kleinschreibung, Bindestrich → Unterstrich).
+	 *
+	 * @param string $key Payload-Schlüssel.
+	 * @return string
+	 */
+	private static function normalize_payload_field_key( $key ) {
+		return strtolower( str_replace( array( '-', ' ' ), '_', (string) $key ) );
+	}
+
+	/**
+	 * Skalar aus Payload-Zelle; keine Arrays/Dateien/Envelopes.
+	 *
+	 * @param mixed $value Payload-Wert.
+	 * @return string Leer wenn nicht verwendbar.
+	 */
+	private static function scalar_payload_cell( $value ) {
+		if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+			return '';
+		}
+		if ( is_array( $value ) ) {
+			return '';
+		}
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$s = trim( wp_strip_all_tags( (string) $value ) );
+		return $s;
+	}
+
+	/**
+	 * E-Mail-Adresse aus Payload (heuristisch nach Feldnamen und Inhalt).
+	 *
+	 * @param array<string,mixed> $data Payload (ohne Meta).
+	 * @return array{0:string,1:string} Erkennungsart: 'plain'|'encrypted'|'none', Anzeigetext.
+	 */
+	private static function extract_sender_email_from_payload( array $data ) {
+		$exact_keys = array(
+			'email',
+			'e_mail',
+			'kontakt_email',
+			'kontakt_e_mail',
+			'absender',
+			'absender_email',
+			'contact_email',
+			'user_email',
+			'your_email',
+			'email_address',
+		);
+		foreach ( $data as $key => $value ) {
+			if ( '_bdfrms_labels' === $key ) {
+				continue;
+			}
+			$nk = self::normalize_payload_field_key( $key );
+			if ( ! in_array( $nk, $exact_keys, true ) && false === strpos( $nk, 'email' ) && 'mail' !== $nk ) {
+				continue;
+			}
+			if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+				return array( 'encrypted', __( '[E-Mail verschlüsselt]', 'blitz-donner-forms' ) );
+			}
+			$s = self::scalar_payload_cell( $value );
+			if ( '' !== $s && is_email( $s ) ) {
+				return array( 'plain', $s );
+			}
+		}
+		foreach ( $data as $key => $value ) {
+			if ( '_bdfrms_labels' === $key ) {
+				continue;
+			}
+			if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+				continue;
+			}
+			$s = self::scalar_payload_cell( $value );
+			if ( '' !== $s && is_email( $s ) ) {
+				return array( 'plain', $s );
+			}
+		}
+		return array( 'none', '' );
+	}
+
+	/**
+	 * Vor- und Nachname aus Payload (heuristisch nach Feldnamen).
+	 *
+	 * @param array<string,mixed> $data Payload.
+	 * @return string Anzeige „Vorname Nachname“ oder leer.
+	 */
+	private static function extract_sender_name_from_payload( array $data ) {
+		$first_keys = array( 'vorname', 'firstname', 'first_name', 'fname', 'givenname', 'given_name' );
+		$last_keys  = array( 'nachname', 'lastname', 'last_name', 'lname', 'surname', 'familyname', 'family_name' );
+		$full_keys  = array( 'name', 'fullname', 'full_name', 'vollname', 'display_name', 'absendername' );
+
+		$first = '';
+		$last  = '';
+		foreach ( $data as $key => $value ) {
+			if ( '_bdfrms_labels' === $key ) {
+				continue;
+			}
+			$nk = self::normalize_payload_field_key( $key );
+			if ( ! in_array( $nk, $first_keys, true ) ) {
+				continue;
+			}
+			if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+				return __( '[Name verschlüsselt]', 'blitz-donner-forms' );
+			}
+			$candidate = self::scalar_payload_cell( $value );
+			if ( '' !== $candidate ) {
+				$first = $candidate;
+				break;
+			}
+		}
+		foreach ( $data as $key => $value ) {
+			if ( '_bdfrms_labels' === $key ) {
+				continue;
+			}
+			$nk = self::normalize_payload_field_key( $key );
+			if ( ! in_array( $nk, $last_keys, true ) ) {
+				continue;
+			}
+			if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+				return __( '[Name verschlüsselt]', 'blitz-donner-forms' );
+			}
+			$candidate = self::scalar_payload_cell( $value );
+			if ( '' !== $candidate ) {
+				$last = $candidate;
+				break;
+			}
+		}
+		if ( '' !== $first || '' !== $last ) {
+			return trim( $first . ' ' . $last );
+		}
+		foreach ( $data as $key => $value ) {
+			if ( '_bdfrms_labels' === $key ) {
+				continue;
+			}
+			$nk = self::normalize_payload_field_key( $key );
+			if ( ! in_array( $nk, $full_keys, true ) ) {
+				continue;
+			}
+			if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+				return __( '[Name verschlüsselt]', 'blitz-donner-forms' );
+			}
+			return self::scalar_payload_cell( $value );
+		}
+		return '';
+	}
+
+	/**
+	 * Tabellenzelle „Absender“: E-Mail-Zeile + optional Name.
+	 *
+	 * @param string $json Payload JSON.
+	 * @return string Escaped HTML.
+	 */
+	private static function sender_column_from_payload( $json, $form_id = '', $post_id = 0 ) {
+		if ( '' !== $form_id ) {
+			$data = BDFRMS_Plugin::get_submission_payload_for_row(
+				array(
+					'form_id' => $form_id,
+					'post_id' => $post_id,
+					'payload' => (string) $json,
+				)
+			);
+		} else {
+			$data = json_decode( (string) $json, true );
+			if ( ! is_array( $data ) ) {
+				$data = array();
+			}
+			unset( $data['_bdfrms_labels'] );
+		}
+
+		list( , $email_disp ) = self::extract_sender_email_from_payload( $data );
+		$name_disp            = self::extract_sender_name_from_payload( $data );
+
+		if ( '' === $email_disp ) {
+			$email_disp = '—';
+		}
+		$email_disp = mb_strlen( $email_disp ) > 190 ? mb_substr( $email_disp, 0, 190 ) . '…' : $email_disp;
+		$name_disp  = mb_strlen( $name_disp ) > 190 ? mb_substr( $name_disp, 0, 190 ) . '…' : $name_disp;
+
+		$out = '<div class="bdfrms-admin-sender-email">' . esc_html( $email_disp ) . '</div>';
+		if ( '' !== trim( $name_disp ) ) {
+			$out .= '<div class="bdfrms-admin-sender-name">' . esc_html( $name_disp ) . '</div>';
+		}
+		return $out;
+	}
+
+	/**
+	 * @return void
+	 */
+	private static function render_missing_table_notice() {
+		echo '<div class="notice notice-warning"><p>';
+		echo esc_html__(
+			'Die Datenbanktabelle für Einsendungen fehlt. Bitte Plugin einmal deaktivieren und wieder aktivieren (oder die Aktivierung erneut ausführen), damit die Tabelle angelegt wird.',
+			'blitz-donner-forms'
+		);
+		echo '</p></div>';
+	}
+
+	/*
+	------------------------------------------------------------------ *
+	 * CSV-Export
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Rendert die Export-Box unter der Filter-Zeile.
+	 *
+	 * @param string $filter_form_id Aktiver Formular-Filter (leer = alle).
+	 * @param string $sort           Aktuelle Sortierung.
+	 * @param int    $total          Anzahl Einträge im aktuellen Filter.
+	 * @return void
+	 */
+	private static function render_export_box( $filter_form_id, $sort, $total ) {
+		$can_decrypt = (bool) apply_filters( 'bdfrms_can_decrypt', true );
+		$can_dl      = (bool) apply_filters( 'bdfrms_can_download_files', BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) );
+
+		echo '<div class="bdfrms-admin-export">';
+
+		if ( '' === $filter_form_id ) {
+			echo '<p class="bdfrms-admin-export-notice">'
+				. esc_html__( 'Bitte zuerst ein Formular auswählen, um einen CSV-Export zu starten.', 'blitz-donner-forms' )
+				. '</p>';
+			echo '</div>';
+			return;
+		}
+
+		// Form-Metadaten.
+		global $wpdb;
+		$table = self::table_name();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$form_title_db = (string) $wpdb->get_var( $wpdb->prepare( "SELECT MAX(form_title) FROM {$table} WHERE form_id = %s", $filter_form_id ) );
+		$form_label    = '' !== trim( $form_title_db ) ? trim( $form_title_db ) : $filter_form_id;
+
+		// Post-ID für Schema-Lookup aus jüngster Submission.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$post_id_for_box = (int) $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$table} WHERE form_id = %s ORDER BY id DESC LIMIT 1", $filter_form_id ) );
+
+		// Prüfe, ob das Formular Datei-Felder hat und ob ZipArchive verfügbar ist.
+		$has_file_fields = $post_id_for_box > 0 && self::form_has_file_field( $post_id_for_box, $filter_form_id );
+		$zip_available   = class_exists( 'ZipArchive' );
+		// ZIP enthält entschlüsselte Anhänge → nur mit Download- UND Entschlüsselungs-Recht.
+		$show_zip_btn = $has_file_fields && $can_dl && $can_decrypt && $zip_available;
+
+		$info_text = sprintf(
+			/* translators: 1: Formularname, 2: Anzahl Einträge, 3: Wort Eintrag/Einträge. */
+			esc_html__( 'CSV-Export · %1$s (%2$d %3$s)', 'blitz-donner-forms' ),
+			esc_html( $form_label ),
+			(int) $total,
+			1 === (int) $total
+				? esc_html__( 'Eintrag', 'blitz-donner-forms' )
+				: esc_html__( 'Einträge', 'blitz-donner-forms' )
+		);
+
+		// Ein einziges Form für beide Export-Varianten.
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="bdfrms-admin-export-form">';
+
+		echo '<div class="bdfrms-admin-export-info-group"><strong>' . $info_text . '</strong></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bestandteile einzeln escaped.
+
+		echo '<div class="bdfrms-admin-export-controls">';
+
+		wp_nonce_field( 'bdfrms_export', '_bdfrms_export_nonce' );
+		echo '<input type="hidden" name="action" value="bdfrms_export" />';
+		echo '<input type="hidden" name="bdfrms_export_form_id" value="' . esc_attr( $filter_form_id ) . '" />';
+		echo '<input type="hidden" name="bdfrms_export_sort" value="' . esc_attr( $sort ) . '" />';
+
+		if ( $can_decrypt && apply_filters( 'bdfrms_sensitive_ui_active', false ) ) {
+			echo '<label class="bdfrms-admin-export-decrypt-label">';
+			echo '<input type="checkbox" name="bdfrms_export_decrypt" value="1" /> ';
+			echo esc_html__( 'Felder entschlüsseln', 'blitz-donner-forms' );
+			echo ' <span class="bdfrms-admin-export-log-hint">(' . esc_html__( 'protokolliert', 'blitz-donner-forms' ) . ')</span>';
+			echo '</label>';
+		}
+
+		echo '<div class="bdfrms-admin-export-btn-group">';
+		echo '<button type="submit" name="bdfrms_export_kind" value="csv" class="button button-secondary">'
+			. esc_html__( 'Als CSV exportieren', 'blitz-donner-forms' )
+			. '</button>';
+
+		if ( $show_zip_btn ) {
+			echo '<button type="submit" name="bdfrms_export_kind" value="zip" class="button button-primary">'
+				. esc_html__( 'CSV + Dateien (ZIP)', 'blitz-donner-forms' )
+				. '</button>';
+		} elseif ( $has_file_fields && $can_dl && ! $zip_available ) {
+			echo '<span class="bdfrms-admin-export-zip-unavailable">'
+				. esc_html__( 'ZIP nicht verfügbar (PHP-ZipArchive fehlt)', 'blitz-donner-forms' )
+				. '</span>';
+		}
+
+		echo '</div>';
+
+		echo '</div>';
+		echo '</form>';
+
+		echo '</div>';
+	}
+
+	/**
+	 * admin_post-Handler für Export (CSV oder ZIP). Gemeinsame Prüfkette,
+	 * dann Verzweigung nach bdfrms_export_kind.
+	 *
+	 * Prüfreihenfolge: eingeloggt → bdfrms_view_submissions → Nonce → form_id → Tabelle.
+	 * ZIP: zusätzlich bdfrms_download_files + ZipArchive.
+	 *
+	 * @return void
+	 */
+	public static function handle_export() {
+		// 1) Eingeloggt?
+		if ( ! is_user_logged_in() ) {
+			do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', '', array( 'reason' => 'not_logged_in' ) );
+			wp_die(
+				esc_html__( 'Anmeldung erforderlich.', 'blitz-donner-forms' ),
+				esc_html__( 'Authentifizierung', 'blitz-donner-forms' ),
+				array( 'response' => 401 )
+			);
+		}
+
+		// 2) Cap bdfrms_view_submissions?
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) ) {
+			do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', '', array( 'reason' => 'capability' ) );
+			wp_die(
+				esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ),
+				esc_html__( 'Berechtigung', 'blitz-donner-forms' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		// 3) Nonce prüfen.
+		if ( ! check_admin_referer( 'bdfrms_export', '_bdfrms_export_nonce' ) ) {
+			do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', '', array( 'reason' => 'nonce' ) );
+			wp_die(
+				esc_html__( 'Sicherheitsprüfung fehlgeschlagen.', 'blitz-donner-forms' ),
+				esc_html__( 'Nonce', 'blitz-donner-forms' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		// 4) form_id aus POST lesen.
+		$form_id = isset( $_POST['bdfrms_export_form_id'] ) ? sanitize_key( wp_unslash( $_POST['bdfrms_export_form_id'] ) ) : '';
+		if ( '' === $form_id ) {
+			do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', '', array( 'reason' => 'no_form' ) );
+			wp_die(
+				esc_html__( 'Kein Formular gewählt.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 400 )
+			);
+		}
+
+		// 5) Tabelle muss existieren.
+		if ( ! self::table_exists() ) {
+			do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', $form_id, array( 'reason' => 'no_table' ) );
+			wp_die(
+				esc_html__( 'Datenbanktabelle nicht gefunden.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 500 )
+			);
+		}
+
+		// 6) Export-Art bestimmen.
+		$kind = sanitize_key( isset( $_POST['bdfrms_export_kind'] ) ? wp_unslash( $_POST['bdfrms_export_kind'] ) : 'csv' );
+		if ( ! in_array( $kind, array( 'csv', 'zip' ), true ) ) {
+			$kind = 'csv';
+		}
+
+		// 7) ZIP: zusätzliche Prüfungen. Das ZIP enthält entschlüsselte Anhänge –
+		// daher BEIDE Rechte nötig (Datei herunterladen UND entschlüsseln).
+		if ( 'zip' === $kind ) {
+			if ( ! (bool) apply_filters( 'bdfrms_can_download_files', BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) )
+				|| ! (bool) apply_filters( 'bdfrms_can_decrypt', true ) ) {
+				do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', $form_id, array( 'reason' => 'capability_download' ) );
+				wp_die(
+					esc_html__( 'Keine Berechtigung zum Datei-Download.', 'blitz-donner-forms' ),
+					esc_html__( 'Berechtigung', 'blitz-donner-forms' ),
+					array( 'response' => 403 )
+				);
+			}
+			if ( ! class_exists( 'ZipArchive' ) ) {
+				do_action( 'bdfrms_security_event', 'submission_export_denied', 'form', $form_id, array( 'reason' => 'no_ziparchive' ) );
+				wp_die(
+					esc_html__( 'ZIP-Export nicht verfügbar: PHP-ZipArchive fehlt auf diesem Server.', 'blitz-donner-forms' ),
+					esc_html__( 'Fehler', 'blitz-donner-forms' ),
+					array( 'response' => 500 )
+				);
+			}
+		}
+
+		// 8) Decrypt-Wunsch nur dann effektiv, wenn Cap bdfrms_decrypt_submissions vorhanden.
+		$decrypt_requested = isset( $_POST['bdfrms_export_decrypt'] ) && '1' === $_POST['bdfrms_export_decrypt'];
+		$can_decrypt       = (bool) apply_filters( 'bdfrms_can_decrypt', true );
+		if ( $decrypt_requested && ! $can_decrypt ) {
+			$decrypt_requested = false;
+		}
+
+		// Kein PHP-Timeout für grosse Exporte.
+		set_time_limit( 0 );
+
+		if ( 'zip' === $kind ) {
+			self::stream_zip( $form_id, $decrypt_requested, $can_decrypt );
+		} else {
+			self::stream_csv( $form_id, $decrypt_requested, $can_decrypt );
+		}
+	}
+
+	/**
+	 * Streamt einen CSV-Export direkt auf php://output.
+	 *
+	 * @param string $form_id           Formular-ID.
+	 * @param bool   $decrypt_requested Nutzer hat Decrypt-Option gewählt.
+	 * @param bool   $can_decrypt       Nutzer hat Cap bdfrms_decrypt_submissions.
+	 * @return void
+	 */
+	private static function stream_csv( $form_id, $decrypt_requested, $can_decrypt ) {
+		// Sortierung aus POST (Whitelist).
+		$sort_raw  = isset( $_POST['bdfrms_export_sort'] ) ? sanitize_key( wp_unslash( $_POST['bdfrms_export_sort'] ) ) : 'date_desc'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce prüft handle_export().
+		$allowed   = array( 'date_desc', 'date_asc', 'form_asc', 'form_desc' );
+		$sort      = in_array( $sort_raw, $allowed, true ) ? $sort_raw : 'date_desc';
+		$order_sql = self::order_sql_for_list_sort( $sort );
+
+		global $wpdb;
+		$table = self::table_name();
+
+		// Alle Datensätze des Formulars (kein LIMIT/OFFSET).
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE form_id = %s ORDER BY {$order_sql}", $form_id ) );
+		if ( ! is_array( $rows ) ) {
+			$rows = array();
+		}
+		$count = count( $rows );
+
+		// Spaltendefinition aus Schema ermitteln.
+		$post_id_for_schema = 0;
+		if ( ! empty( $rows ) ) {
+			$post_id_for_schema = (int) $rows[0]->post_id;
+		}
+
+		$schema_fields = array();
+		if ( $post_id_for_schema > 0 ) {
+			$schema = BDFRMS_Plugin::get_form_schema_from_post( $post_id_for_schema, $form_id );
+			foreach ( $schema as $field ) {
+				$n = isset( $field['name'] ) ? sanitize_key( (string) $field['name'] ) : '';
+				if ( '' !== $n ) {
+					$schema_fields[] = array(
+						'name'  => $n,
+						'label' => isset( $field['label'] ) && '' !== (string) $field['label'] ? (string) $field['label'] : $n,
+					);
+				}
+			}
+		}
+
+		// Fallback: Vereinigungsmenge aller Payload-Keys.
+		if ( empty( $schema_fields ) ) {
+			$union_keys = array();
+			foreach ( $rows as $row ) {
+				$payload = BDFRMS_Plugin::get_submission_payload_for_row( $row );
+				foreach ( array_keys( $payload ) as $k ) {
+					if ( ! isset( $union_keys[ $k ] ) ) {
+						$union_keys[ $k ] = true;
+						$schema_fields[]  = array(
+							'name'  => $k,
+							'label' => $k,
+						);
+					}
+				}
+			}
+		}
+
+		// Meta-Spalten.
+		$meta_cols = array(
+			array(
+				'name'  => 'id',
+				'label' => __( 'ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'created_at',
+				'label' => __( 'Datum', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'post_id',
+				'label' => __( 'Seiten-ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'form_id',
+				'label' => __( 'Formular-ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'form_title',
+				'label' => __( 'Formularname', 'blitz-donner-forms' ),
+			),
+		);
+		// $decrypt_mode: Berechtigung + Checkbox aktiv → IP-Spalte + Audit.
+		$decrypt_mode = ( $can_decrypt && $decrypt_requested );
+		if ( $decrypt_mode ) {
+			$meta_cols[] = array(
+				'name'  => 'ip_address',
+				'label' => __( 'IP-Adresse', 'blitz-donner-forms' ),
+			);
+		}
+
+		// Kopfzeile.
+		$header_row = array();
+		foreach ( $meta_cols as $col ) {
+			$header_row[] = self::csv_harden_cell( $col['label'] );
+		}
+		foreach ( $schema_fields as $col ) {
+			$header_row[] = self::csv_harden_cell( $col['label'] );
+		}
+
+		// Download-Header senden.
+		nocache_headers();
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		$ts       = current_time( 'Y-m-d-Hi' );
+		$filename = sanitize_file_name( 'bdfrms-export-' . $form_id . '-' . $ts . '.csv' );
+		$filename = str_replace( array( '"', "\r", "\n" ), '_', $filename );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'X-Content-Type-Options: nosniff' );
+
+		// Stream auf php://output.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$fh = fopen( 'php://output', 'w' );
+		if ( false === $fh ) {
+			exit;
+		}
+
+		// UTF-8-BOM.
+		fwrite( $fh, "\xEF\xBB\xBF" );
+
+		// Kopfzeile schreiben.
+		if ( PHP_VERSION_ID >= 80100 ) {
+			fputcsv( $fh, $header_row, ';', '"', '' );
+		} else {
+			fputcsv( $fh, $header_row, ';', '"' );
+		}
+
+		$fields_count = 0;
+
+		foreach ( $rows as $row ) {
+			self::$current_export_row = (array) $row;
+			$payload                  = BDFRMS_Plugin::get_submission_payload_for_row( $row );
+			$data_row                 = array();
+
+			$data_row[] = self::csv_harden_cell( (string) $row->id );
+			$data_row[] = self::csv_harden_cell( (string) $row->created_at );
+			$data_row[] = self::csv_harden_cell( (string) $row->post_id );
+			$data_row[] = self::csv_harden_cell( (string) $row->form_id );
+			$data_row[] = self::csv_harden_cell( isset( $row->form_title ) ? (string) $row->form_title : '' );
+			if ( $decrypt_mode ) {
+				$data_row[] = self::csv_harden_cell( isset( $row->ip_address ) ? (string) $row->ip_address : '' );
+			}
+
+			foreach ( $schema_fields as $col ) {
+				$field_name = $col['name'];
+				$value      = isset( $payload[ $field_name ] ) ? $payload[ $field_name ] : null;
+				$cell       = self::csv_cell_for_value( $value, $field_name, $can_decrypt, $decrypt_requested, $fields_count );
+				$data_row[] = self::csv_harden_cell( $cell );
+			}
+
+			if ( PHP_VERSION_ID >= 80100 ) {
+				fputcsv( $fh, $data_row, ';', '"', '' );
+			} else {
+				fputcsv( $fh, $data_row, ';', '"' );
+			}
+		}
+
+		// Audit-Einträge vor fclose/exit.
+		do_action(
+			'bdfrms_security_event',
+			'submission_exported',
+			'form',
+			$form_id,
+			array(
+				'count'            => $count,
+				'decrypt_mode'     => $decrypt_mode,
+				'fields_decrypted' => $fields_count,
+				'format'           => 'csv',
+			)
+		);
+
+		if ( $decrypt_mode ) {
+			do_action(
+				'bdfrms_security_event',
+				'submission_exported_decrypted',
+				'form',
+				$form_id,
+				array(
+					'fields_decrypted' => $fields_count,
+					'format'           => 'csv',
+				)
+			);
+		}
+
+		fclose( $fh );
+		exit;
+	}
+
+	/**
+	 * Erzeugt den Zellenwert für ein Formularfeld im CSV (reiner Text, kein HTML).
+	 *
+	 * @param mixed  $value             Feldwert aus dem Payload (null wenn Feld fehlt).
+	 * @param string $field_name        Feldname (für AAD beim Entschlüsseln).
+	 * @param bool   $can_decrypt       Nutzer hat Cap bdfrms_decrypt_submissions.
+	 * @param bool   $decrypt_requested Nutzer hat Decrypt-Option aktiviert.
+	 * @param int    &$fields_count     Zähler für tatsächlich entschlüsselte Felder.
+	 * @return string Zellenwert als reiner Text.
+	 */
+	private static function csv_cell_for_value( $value, $field_name, $can_decrypt, $decrypt_requested, &$fields_count ) {
+		// Leerer / fehlender Wert.
+		if ( null === $value || '' === $value ) {
+			return '';
+		}
+
+		// 1) Datei-Referenz (Array mit _ref = 'bdfrms-file:…').
+		if ( is_array( $value ) && isset( $value['_ref'] ) && 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' ) ) {
+			$file_id = isset( $value['file_id'] ) ? (int) $value['file_id'] : (int) substr( (string) $value['_ref'], strlen( 'bdfrms-file:' ) );
+			$file    = $file_id > 0 ? BDFRMS_File_Storage::get( $file_id ) : null;
+			if ( ! $file ) {
+				return '[Datei #' . $file_id . ' nicht gefunden]';
+			}
+			return $file->original_name . ' (' . size_format( (int) $file->size_bytes ) . ') sha256:' . $file->sha256;
+		}
+
+		// 2) Erweiterungs-Envelope: der Export-Filter der Basis entscheidet.
+		// Ohne «entschlüsseln»-Haken bleibt der Wert maskiert, auch wenn ein
+		// Add-on entschlüsseln könnte.
+		if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+			if ( ! $decrypt_requested || ! $can_decrypt ) {
+				return '[verschlüsselt]';
+			}
+			$cell = (string) apply_filters( 'bdfrms_export_cell', '[verschlüsselt]', (string) $field_name, self::$current_export_row );
+			if ( '[verschlüsselt]' !== $cell ) {
+				++$fields_count;
+			}
+			return wp_strip_all_tags( $cell );
+		}
+
+		// 3) Array (Mehrfachauswahl).
+		if ( is_array( $value ) ) {
+			return implode( ', ', array_map( 'strval', $value ) );
+		}
+
+		// 4) Skalar.
+		return wp_strip_all_tags( (string) $value );
+	}
+
+	/**
+	 * CSV-Injection-Schutz: Stellt einem gefährlichen Zellenwert ein einfaches Hochkomma voran.
+	 *
+	 * Schützt vor Formelinjektionen in Excel, LibreOffice usw. Beginnt der Wert mit
+	 * einem der Sonderzeichen = + - @ Tab oder Carriage-Return, wird ' vorangestellt.
+	 *
+	 * @param string $s Zellenwert als String.
+	 * @return string Gehärteter Zellenwert.
+	 */
+	private static function csv_harden_cell( $s ) {
+		if ( '' === $s ) {
+			return '';
+		}
+		$first = $s[0];
+		if ( '=' === $first || '+' === $first || '-' === $first || '@' === $first
+			|| "\t" === $first || "\r" === $first ) {
+			return "'" . $s;
+		}
+		return $s;
+	}
+
+	/*
+	------------------------------------------------------------------ *
+	 * ZIP-Export
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Prüft, ob mindestens ein Formular-Feld vom Typ «file» existiert.
+	 *
+	 * @param int    $post_id Post-ID (zum Auflösen des Schemas).
+	 * @param string $form_id Formular-ID.
+	 * @return bool
+	 */
+	private static function form_has_file_field( $post_id, $form_id ) {
+		$schema = BDFRMS_Plugin::get_form_schema_from_post( (int) $post_id, (string) $form_id );
+		foreach ( $schema as $field ) {
+			if ( isset( $field['type'] ) && 'file' === $field['type'] ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Bereinigt eine E-Mail-Adresse zu einem dateisystem-sicheren Ordnernamen.
+	 *
+	 * Erlaubt: A-Z a-z 0-9 . _ @ + -
+	 * Alles andere wird durch _ ersetzt. Führende Punkte, .. sowie / und \ werden entfernt.
+	 * Ergebnis wird auf 120 Zeichen begrenzt.
+	 *
+	 * @param string $email Roh-E-Mail.
+	 * @return string Bereinigter Ordnername (niemals leer, da Fallback vor Aufruf greift).
+	 */
+	private static function sanitize_folder_name_from_email( $email ) {
+		$name = preg_replace( '/[^A-Za-z0-9._@+\-]/', '_', (string) $email );
+		$name = str_replace( array( '..', '/', '\\' ), '_', $name );
+		$name = ltrim( $name, '.' );
+		$name = trim( $name );
+		if ( mb_strlen( $name ) > 120 ) {
+			$name = mb_substr( $name, 0, 120 );
+		}
+		return $name;
+	}
+
+	/**
+	 * Bestimmt den eindeutigen Ordnernamen für eine Einsendung im ZIP-Export.
+	 *
+	 * Logik:
+	 * 1. E-Mail aus Payload extrahieren. Bei decrypt_mode: verschlüsselte E-Mail-Felder
+	 *    entschlüsseln, bevor extract_sender_email_from_payload aufgerufen wird.
+	 * 2. Ordnername = bereinigte E-Mail. Fallback: eintrag-<id>.
+	 * 3. Eindeutigkeit im Export sicherstellen (Suffix -2, -3, …).
+	 *
+	 * @param array $payload           Einsendungs-Payload (Envelopes ggf. noch verschlüsselt).
+	 * @param int   $submission_id     Einsendungs-ID (Fallback).
+	 * @param bool  $decrypt_mode      Decrypt-Modus aktiv.
+	 * @param array &$used_folder_names Set bereits vergebener Ordnernamen (über alle Einsendungen).
+	 * @return string Eindeutiger Ordnername.
+	 */
+	private static function resolve_submission_folder_name( array $payload, $submission_id, $decrypt_mode, array &$used_folder_names ) {
+		$lookup_payload = $payload;
+
+		if ( $decrypt_mode ) {
+			foreach ( $lookup_payload as $key => $value ) {
+				if ( BDFRMS_Plugin::is_extension_envelope( $value ) ) {
+					$cell = (string) apply_filters( 'bdfrms_export_cell', '', (string) $key, self::$current_export_row );
+					if ( '' !== $cell && '[verschlüsselt]' !== $cell ) {
+						$lookup_payload[ $key ] = $cell;
+					}
+				}
+			}
+		}
+
+		list( $email_status, $email_raw ) = self::extract_sender_email_from_payload( $lookup_payload );
+
+		if ( 'plain' === $email_status && '' !== $email_raw ) {
+			$base = self::sanitize_folder_name_from_email( $email_raw );
+		} else {
+			$base = 'eintrag-' . (int) $submission_id;
+		}
+
+		if ( '' === $base ) {
+			$base = 'eintrag-' . (int) $submission_id;
+		}
+
+		// Eindeutigkeit sichern.
+		$candidate = $base;
+		if ( ! isset( $used_folder_names[ $candidate ] ) ) {
+			$used_folder_names[ $candidate ] = true;
+			return $candidate;
+		}
+
+		$counter = 2;
+		while ( true ) {
+			$candidate = $base . '-' . $counter;
+			if ( ! isset( $used_folder_names[ $candidate ] ) ) {
+				$used_folder_names[ $candidate ] = true;
+				return $candidate;
+			}
+			++$counter;
+		}
+	}
+
+	/**
+	 * Bestimmt den Dateinamen innerhalb des Einsendungs-Ordners im ZIP.
+	 *
+	 * Nur noch Originalname (kein Eintrag-/Feld-Präfix, da der Ordner die Einsendung
+	 * bereits eindeutig identifiziert). Kollisionen werden per Suffix aufgelöst.
+	 *
+	 * @param string $original_name Originalname der Datei.
+	 * @param int    $file_id       Datei-ID (für Fallback-Dateinamen).
+	 * @param array  &$used_file_names Set bereits vergebener Dateinamen im selben Ordner.
+	 * @return string Dateiname (ohne Ordnerpfad).
+	 */
+	private static function build_zip_file_name( $original_name, $file_id, array &$used_file_names ) {
+		// Originalnamen bereinigen.
+		$cleaned = sanitize_file_name( (string) $original_name );
+		$cleaned = str_replace( array( '/', '\\', '..' ), '', $cleaned );
+		$cleaned = trim( $cleaned );
+
+		if ( '' === $cleaned ) {
+			$cleaned = 'datei-' . (int) $file_id . '.bin';
+		} elseif ( mb_strlen( $cleaned ) > 80 ) {
+			// Länge auf 80 Zeichen begrenzen, Endung erhalten.
+				$ext     = pathinfo( $cleaned, PATHINFO_EXTENSION );
+				$base    = pathinfo( $cleaned, PATHINFO_FILENAME );
+				$max     = 80 - ( '' !== $ext ? mb_strlen( $ext ) + 1 : 0 );
+				$base    = mb_substr( $base, 0, max( 1, $max ) );
+				$cleaned = '' !== $ext ? $base . '.' . $ext : $base;
+		}
+
+		// Kollisionszähler innerhalb desselben Ordners.
+		if ( ! isset( $used_file_names[ $cleaned ] ) ) {
+			$used_file_names[ $cleaned ] = true;
+			return $cleaned;
+		}
+
+		$ext     = pathinfo( $cleaned, PATHINFO_EXTENSION );
+		$base    = pathinfo( $cleaned, PATHINFO_FILENAME );
+		$counter = 2;
+		while ( true ) {
+			$new_name = '' !== $ext ? $base . '-' . $counter . '.' . $ext : $base . '-' . $counter;
+			if ( ! isset( $used_file_names[ $new_name ] ) ) {
+				$used_file_names[ $new_name ] = true;
+				return $new_name;
+			}
+			++$counter;
+		}
+	}
+
+	/**
+	 * Erzeugt einen ZIP-Export (CSV + Dateien) und liefert ihn direkt aus.
+	 *
+	 * Wird von handle_export() aufgerufen; alle Berechtigungs- und ZipArchive-Prüfungen
+	 * sind dort bereits abgeschlossen.
+	 *
+	 * @param string $form_id           Formular-ID.
+	 * @param bool   $decrypt_requested Nutzer hat Decrypt-Option gewählt.
+	 * @param bool   $can_decrypt       Nutzer hat Cap bdfrms_decrypt_submissions.
+	 * @return void
+	 */
+	private static function stream_zip( $form_id, $decrypt_requested, $can_decrypt ) {
+		$decrypt_mode = ( $can_decrypt && $decrypt_requested );
+
+		// Sortierung aus POST (Whitelist).
+		$sort_raw  = isset( $_POST['bdfrms_export_sort'] ) ? sanitize_key( wp_unslash( $_POST['bdfrms_export_sort'] ) ) : 'date_desc'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce prüft handle_export().
+		$allowed   = array( 'date_desc', 'date_asc', 'form_asc', 'form_desc' );
+		$sort      = in_array( $sort_raw, $allowed, true ) ? $sort_raw : 'date_desc';
+		$order_sql = self::order_sql_for_list_sort( $sort );
+
+		global $wpdb;
+		$table = self::table_name();
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE form_id = %s ORDER BY {$order_sql}", $form_id ) );
+		if ( ! is_array( $rows ) ) {
+			$rows = array();
+		}
+		$count = count( $rows );
+
+		// Schema ermitteln (Spaltenreihenfolge, Labels, Typen).
+		$post_id_for_schema = 0;
+		if ( ! empty( $rows ) ) {
+			$post_id_for_schema = (int) $rows[0]->post_id;
+		}
+		$schema_fields = array();
+		if ( $post_id_for_schema > 0 ) {
+			$schema = BDFRMS_Plugin::get_form_schema_from_post( $post_id_for_schema, $form_id );
+			foreach ( $schema as $field ) {
+				$n = isset( $field['name'] ) ? sanitize_key( (string) $field['name'] ) : '';
+				if ( '' !== $n ) {
+					$schema_fields[] = array(
+						'name'  => $n,
+						'label' => isset( $field['label'] ) && '' !== (string) $field['label'] ? (string) $field['label'] : $n,
+						'type'  => isset( $field['type'] ) ? (string) $field['type'] : '',
+					);
+				}
+			}
+		}
+		if ( empty( $schema_fields ) ) {
+			$union_keys = array();
+			foreach ( $rows as $row ) {
+				$payload = BDFRMS_Plugin::get_submission_payload_for_row( $row );
+				foreach ( array_keys( $payload ) as $k ) {
+					if ( ! isset( $union_keys[ $k ] ) ) {
+						$union_keys[ $k ] = true;
+						$schema_fields[]  = array(
+							'name'  => $k,
+							'label' => $k,
+							'type'  => '',
+						);
+					}
+				}
+			}
+		}
+
+		// Meta-Spalten (wie CSV-Export).
+		$meta_cols = array(
+			array(
+				'name'  => 'id',
+				'label' => __( 'ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'created_at',
+				'label' => __( 'Datum', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'post_id',
+				'label' => __( 'Seiten-ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'form_id',
+				'label' => __( 'Formular-ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'form_title',
+				'label' => __( 'Formularname', 'blitz-donner-forms' ),
+			),
+		);
+		if ( $decrypt_mode ) {
+			$meta_cols[] = array(
+				'name'  => 'ip_address',
+				'label' => __( 'IP-Adresse', 'blitz-donner-forms' ),
+			);
+		}
+
+		// Temp-Verzeichnis für ZIP: im privaten Storage-Root, nicht web-erreichbar.
+		$tmp_dir = BDFRMS_File_Storage::storage_root() . '/.tmp-export';
+		wp_mkdir_p( $tmp_dir );
+		$tmp_zip = $tmp_dir . '/bdfrms-zip-' . $form_id . '-' . wp_generate_password( 12, false, false ) . '.zip';
+
+		// Aufräum-Funktion sofort nach Anlegen registrieren (auch bei Fatal/Timeout).
+		register_shutdown_function(
+			function () use ( $tmp_zip ) {
+				if ( file_exists( $tmp_zip ) ) {
+					@unlink( $tmp_zip );
+				}
+			}
+		);
+
+		// ZIP öffnen.
+		$zip        = new ZipArchive();
+		$zip_result = $zip->open( $tmp_zip, ZipArchive::CREATE | ZipArchive::OVERWRITE );
+		if ( true !== $zip_result ) {
+			do_action(
+				'bdfrms_security_event',
+				'submission_export_denied',
+				'form',
+				$form_id,
+				array(
+					'reason' => 'zip_open_failed',
+					'code'   => $zip_result,
+				)
+			);
+			wp_die(
+				esc_html__( 'ZIP-Datei konnte nicht erstellt werden.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 500 )
+			);
+		}
+		@chmod( $tmp_zip, 0600 );
+
+		// CSV-Puffer aufbauen (gleiche Logik wie CSV-Export).
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$csv_fh = fopen( 'php://temp', 'r+' );
+		if ( false === $csv_fh ) {
+			$zip->close();
+			wp_die( esc_html__( 'CSV-Puffer konnte nicht geöffnet werden.', 'blitz-donner-forms' ) );
+		}
+
+		// UTF-8-BOM.
+		fwrite( $csv_fh, "\xEF\xBB\xBF" );
+
+		// Kopfzeile (identisch zum CSV-Export).
+		$header_row = array();
+		foreach ( $meta_cols as $col ) {
+			$header_row[] = self::csv_harden_cell( $col['label'] );
+		}
+		foreach ( $schema_fields as $col ) {
+			$header_row[] = self::csv_harden_cell( $col['label'] );
+		}
+		if ( PHP_VERSION_ID >= 80100 ) {
+			fputcsv( $csv_fh, $header_row, ';', '"', '' );
+		} else {
+			fputcsv( $csv_fh, $header_row, ';', '"' );
+		}
+
+		// Zähler für Audit.
+		$fields_count      = 0;
+		$files_included    = 0;
+		$used_folder_names = array();
+
+		// Datenzeilen aufbauen; Dateien parallel ins ZIP schreiben.
+		foreach ( $rows as $row ) {
+			self::$current_export_row = (array) $row;
+			$payload                  = BDFRMS_Plugin::get_submission_payload_for_row( $row );
+			$submission_id            = (int) $row->id;
+			$data_row                 = array();
+
+			// Ordnername für Dateien dieser Einsendung bestimmen.
+			$folder_name     = self::resolve_submission_folder_name( $payload, $submission_id, $decrypt_mode, $used_folder_names );
+			$used_file_names = array();
+
+			// Meta-Spalten.
+			$data_row[] = self::csv_harden_cell( (string) $row->id );
+			$data_row[] = self::csv_harden_cell( (string) $row->created_at );
+			$data_row[] = self::csv_harden_cell( (string) $row->post_id );
+			$data_row[] = self::csv_harden_cell( (string) $row->form_id );
+			$data_row[] = self::csv_harden_cell( isset( $row->form_title ) ? (string) $row->form_title : '' );
+			if ( $decrypt_mode ) {
+				$data_row[] = self::csv_harden_cell( isset( $row->ip_address ) ? (string) $row->ip_address : '' );
+			}
+
+			// Schema-Felder.
+			foreach ( $schema_fields as $col ) {
+				$field_name = $col['name'];
+				$value      = isset( $payload[ $field_name ] ) ? $payload[ $field_name ] : null;
+
+				// Datei-Feld: im ZIP-Modus andere Zellen-Logik. Erkennung über die
+				// Datei-Referenz im Wert, NICHT über den Schema-Typ – sonst fällt die
+				// Datei durch, wenn das Formular geändert/gelöscht wurde und nur ein
+				// Ersatz-Schema ohne Feld-Typen vorliegt.
+				if ( is_array( $value )
+					&& isset( $value['_ref'] )
+					&& 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' )
+				) {
+					$file_id    = isset( $value['file_id'] ) ? (int) $value['file_id'] : (int) substr( (string) $value['_ref'], strlen( 'bdfrms-file:' ) );
+					$cell       = self::zip_cell_for_file( $file_id, $submission_id, $folder_name, $zip, $used_file_names, $files_included, $form_id );
+					$data_row[] = self::csv_harden_cell( $cell );
+					continue;
+				}
+
+				// Alle anderen Felder: reguläre CSV-Zellen-Logik.
+				$data_row[] = self::csv_harden_cell(
+					self::csv_cell_for_value( $value, $field_name, $can_decrypt, $decrypt_requested, $fields_count )
+				);
+			}
+
+			if ( PHP_VERSION_ID >= 80100 ) {
+				fputcsv( $csv_fh, $data_row, ';', '"', '' );
+			} else {
+				fputcsv( $csv_fh, $data_row, ';', '"' );
+			}
+		}
+
+		// CSV-String aus Puffer lesen und ins ZIP schreiben.
+		rewind( $csv_fh );
+		$csv_string = stream_get_contents( $csv_fh );
+		fclose( $csv_fh );
+		$zip->addFromString( 'eintraege.csv', false !== $csv_string ? $csv_string : '' );
+
 		$zip->close();
 
+		// Dateiname des ZIPs.
+		$form_title_db = (string) $wpdb->get_var( $wpdb->prepare( "SELECT MAX(form_title) FROM {$table} WHERE form_id = %s", $form_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Tabellenname aus table_name().
+		$form_slug     = '' !== trim( $form_title_db ) ? trim( $form_title_db ) : $form_id;
+		$ts            = current_time( 'Y-m-d-Hi' );
+		$zip_filename  = sanitize_file_name( 'export-' . $form_slug . '-' . $ts . '.zip' );
+		$zip_filename  = str_replace( array( '"', "\r", "\n" ), '_', $zip_filename );
+
+		// Audit-Einträge VOR Auslieferung schreiben.
+		do_action(
+			'bdfrms_security_event',
+			'submission_exported',
+			'form',
+			$form_id,
+			array(
+				'count'            => $count,
+				'files_included'   => $files_included,
+				'decrypt_mode'     => $decrypt_mode,
+				'fields_decrypted' => $fields_count,
+				'format'           => 'zip',
+			)
+		);
+		if ( $decrypt_mode ) {
+			do_action(
+				'bdfrms_security_event',
+				'submission_exported_decrypted',
+				'form',
+				$form_id,
+				array(
+					'fields_decrypted' => $fields_count,
+					'format'           => 'zip',
+				)
+			);
+		}
+
+		// ZIP ausliefern.
+		$zip_size = file_exists( $tmp_zip ) ? filesize( $tmp_zip ) : 0;
 		nocache_headers();
 		header( 'Content-Type: application/zip' );
-		header( 'Content-Disposition: attachment; filename="bdfrms-einsendung-' . (int) $row['id'] . '.zip"' );
-		header( 'Content-Length: ' . (string) filesize( $tmp ) );
-		readfile( $tmp );
-		wp_delete_file( $tmp );
+		header( 'X-Content-Type-Options: nosniff' );
+		header( 'Content-Disposition: attachment; filename="' . $zip_filename . '"' );
+		if ( $zip_size > 0 ) {
+			header( 'Content-Length: ' . (int) $zip_size );
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		readfile( $tmp_zip );
+
+		// Temp-Datei löschen (shutdown_function greift als Backup).
+		if ( file_exists( $tmp_zip ) ) {
+			@unlink( $tmp_zip );
+		}
+		exit;
+	}
+
+	/**
+	 * Entschlüsselt eine Datei-Referenz, schreibt sie ins ZIP und gibt den ZIP-Pfad zurück.
+	 *
+	 * Gibt [Datei nicht gefunden] oder [Entschluesselung fehlgeschlagen] zurück, wenn
+	 * etwas schief läuft. In beiden Fällen landet keine Datei im ZIP.
+	 *
+	 * @param int        $file_id         Datei-ID.
+	 * @param int        $submission_id   Submission-ID (nur für Audit).
+	 * @param string     $folder_name     Vorberechneter Ordnername dieser Einsendung.
+	 * @param ZipArchive $zip             Offenes ZipArchive-Objekt.
+	 * @param array      &$used_file_names Set bereits vergebener Dateinamen in diesem Ordner.
+	 * @param int        &$files_included Zähler erfolgreich hinzugefügter Dateien.
+	 * @param string     $form_id         Formular-ID (für Audit).
+	 * @return string Zellenwert für die CSV (relativer ZIP-Pfad oder Fehlertext).
+	 */
+	private static function zip_cell_for_file( $file_id, $submission_id, $folder_name, ZipArchive $zip, array &$used_file_names, &$files_included, $form_id ) {
+		$file_id = (int) $file_id;
+		if ( $file_id <= 0 ) {
+			return '[Datei nicht gefunden]';
+		}
+
+		$file = BDFRMS_File_Storage::get( $file_id );
+		if ( ! $file ) {
+			return '[Datei nicht gefunden]';
+		}
+
+		// Inhalt beschaffen: Klartext-Dateien liest die Basis selbst; für
+		// fremd verwaltete Ablagen (Add-on-Tresor) liefert der Filter
+		// bdfrms_zip_file_contents den Inhalt – oder null, wenn der
+		// aktuelle Nutzer dafür keine Berechtigung hat.
+		$plain = null;
+		if ( 'bdfsec-vault' !== (string) $file->storage_path && '' !== (string) $file->storage_id ) {
+			$abs = BDFRMS_File_Storage::storage_root() . '/' . basename( (string) $file->storage_id );
+			if ( is_readable( $abs ) ) {
+				$plain = file_get_contents( $abs ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- eigene Ablage.
+			}
+		} else {
+			/**
+			 * Datei-Inhalt für den ZIP-Export beschaffen.
+			 *
+			 * Ein Add-on, das die Ablage übernommen hat (bdfrms_store_file),
+			 * liefert hier den Klartext-Inhalt als String – oder null, wenn
+			 * der aktuelle Nutzer nicht berechtigt ist. null führt zu einem
+			 * Hinweis in der CSV statt einer Datei im ZIP.
+			 *
+			 * @since 0.8.0
+			 *
+			 * @param string|null $contents null = kein Zugriff/kein Inhalt.
+			 * @param array       $file     Zeile aus {prefix}bdfrms_files.
+			 */
+			$plain = apply_filters( 'bdfrms_zip_file_contents', null, (array) $file );
+		}
+		if ( ! is_string( $plain ) || '' === $plain ) {
+			return '[Datei nicht verfügbar – keine Berechtigung oder Inhalt fehlt]';
+		}
+
+		$file_name  = self::build_zip_file_name( (string) $file->original_name, $file_id, $used_file_names );
+		$entry_path = 'dateien/' . $folder_name . '/' . $file_name;
+
+		$zip->addFromString( $entry_path, $plain );
+
+		// Klartext sofort aus dem Speicher entfernen.
+		$plain = str_repeat( "\0", strlen( $plain ) );
+		unset( $plain );
+
+		// Audit-Eintrag pro Datei.
+		do_action(
+			'bdfrms_security_event',
+			'file_exported',
+			'file',
+			(string) $file_id,
+			array(
+				'sha256'        => (string) $file->sha256,
+				'form_id'       => $form_id,
+				'submission_id' => $submission_id,
+			)
+		);
+
+		++$files_included;
+		return $entry_path;
+	}
+
+	/*
+	------------------------------------------------------------------ *
+	 * Einzel-Export einer Einsendung (ZIP mit CSV + JSON + Anhängen)
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Handler für admin_post_bdfrms_export_single.
+	 *
+	 * Gleiche Prüfkette wie handle_export(), zusätzlich an die konkrete
+	 * Einsendungs-ID gebunden (Nonce pro ID). Liefert immer ein ZIP:
+	 * eintrag.csv (eine Datenzeile), eintrag.json, dateien/… (entschlüsselt;
+	 * Voraussetzung ist die Download-Berechtigung). Feldwerte werden nur mit
+	 * Cap bdfrms_decrypt_submissions und aktivierter Option entschlüsselt.
+	 *
+	 * @return void
+	 */
+	public static function handle_export_single() {
+		// 1) Eingeloggt?
+		if ( ! is_user_logged_in() ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', '', array( 'reason' => 'not_logged_in' ) );
+			wp_die(
+				esc_html__( 'Anmeldung erforderlich.', 'blitz-donner-forms' ),
+				esc_html__( 'Authentifizierung', 'blitz-donner-forms' ),
+				array( 'response' => 401 )
+			);
+		}
+
+		// 2) Einsendungs-ID lesen (vor Nonce-Prüfung, weil die Nonce ID-gebunden ist).
+		$submission_id = isset( $_POST['bdfrms_submission_id'] ) ? absint( $_POST['bdfrms_submission_id'] ) : 0;
+		if ( $submission_id <= 0 ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', '', array( 'reason' => 'no_id' ) );
+			wp_die(
+				esc_html__( 'Keine Einsendung gewählt.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 400 )
+			);
+		}
+
+		// 3) Caps: Einsendungen sehen, Dateien herunterladen UND entschlüsseln.
+		// Das ZIP enthält entschlüsselte Anhänge, daher ist die Entschlüsselungs-
+		// Berechtigung zwingend (Defense in Depth zum Engpass in zip_cell_for_file).
+		if ( ! BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS )
+			|| ! (bool) apply_filters( 'bdfrms_can_download_files', BDFRMS_Capabilities::user_can( BDFRMS_Capabilities::CAP_VIEW_SUBMISSIONS ) )
+			|| ! (bool) apply_filters( 'bdfrms_can_decrypt', true ) ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', (string) $submission_id, array( 'reason' => 'capability' ) );
+			wp_die(
+				esc_html__( 'Keine Berechtigung.', 'blitz-donner-forms' ),
+				esc_html__( 'Berechtigung', 'blitz-donner-forms' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		// 4) ID-gebundene Nonce prüfen (verhindert Auslösen für fremde IDs über abgeänderte Formulare).
+		if ( ! check_admin_referer( 'bdfrms_export_single_' . $submission_id, '_bdfrms_export_single_nonce' ) ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', (string) $submission_id, array( 'reason' => 'nonce' ) );
+			wp_die(
+				esc_html__( 'Sicherheitsprüfung fehlgeschlagen.', 'blitz-donner-forms' ),
+				esc_html__( 'Nonce', 'blitz-donner-forms' ),
+				array( 'response' => 403 )
+			);
+		}
+
+		// 5) ZipArchive verfügbar?
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', (string) $submission_id, array( 'reason' => 'no_ziparchive' ) );
+			wp_die(
+				esc_html__( 'ZIP-Export nicht verfügbar: PHP-ZipArchive fehlt auf diesem Server.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 500 )
+			);
+		}
+
+		// 6) Tabelle und Datensatz.
+		if ( ! self::table_exists() ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', (string) $submission_id, array( 'reason' => 'no_table' ) );
+			wp_die(
+				esc_html__( 'Datenbanktabelle nicht gefunden.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 500 )
+			);
+		}
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- Tabellenname aus table_name().
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table_name() . ' WHERE id = %d', $submission_id ) );
+		if ( ! $row ) {
+			do_action( 'bdfrms_security_event', 'submission_export_single_denied', 'submission', (string) $submission_id, array( 'reason' => 'not_found' ) );
+			wp_die(
+				esc_html__( 'Eintrag nicht gefunden.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 404 )
+			);
+		}
+
+		// 7) Decrypt-Wunsch nur mit Cap bdfrms_decrypt_submissions wirksam.
+		$decrypt_requested = isset( $_POST['bdfrms_export_decrypt'] ) && '1' === $_POST['bdfrms_export_decrypt'];
+		$can_decrypt       = (bool) apply_filters( 'bdfrms_can_decrypt', true );
+		if ( $decrypt_requested && ! $can_decrypt ) {
+			$decrypt_requested = false;
+		}
+
+		set_time_limit( 0 );
+		self::stream_zip_single( $row, $decrypt_requested, $can_decrypt );
+	}
+
+	/**
+	 * Erzeugt das ZIP-Paket für genau eine Einsendung und liefert es aus.
+	 *
+	 * Inhalt: eintrag.csv (Kopfzeile + eine Datenzeile, identische Spalten-Logik
+	 * wie der Formular-Export), eintrag.json (dieselben Werte maschinenlesbar),
+	 * dateien/… (Anhänge entschlüsselt, via zip_cell_for_file inkl. Audit pro Datei).
+	 *
+	 * @param object $row               Datenbank-Zeile der Einsendung.
+	 * @param bool   $decrypt_requested Nutzer hat Decrypt-Option gewählt (Cap bereits geprüft).
+	 * @param bool   $can_decrypt       Nutzer hat Cap bdfrms_decrypt_submissions.
+	 * @return void
+	 */
+	private static function stream_zip_single( $row, $decrypt_requested, $can_decrypt ) {
+		$decrypt_mode  = ( $can_decrypt && $decrypt_requested );
+		$submission_id = (int) $row->id;
+		$form_id       = (string) $row->form_id;
+		$payload       = BDFRMS_Plugin::get_submission_payload_for_row( $row );
+
+		// Schema ermitteln (Spaltenreihenfolge, Labels, Typen) – wie stream_zip, nur für diese Einsendung.
+		$schema_fields = array();
+		$schema        = BDFRMS_Plugin::get_form_schema_from_post( (int) $row->post_id, $form_id );
+		foreach ( $schema as $field ) {
+			$n = isset( $field['name'] ) ? sanitize_key( (string) $field['name'] ) : '';
+			if ( '' !== $n ) {
+				$schema_fields[] = array(
+					'name'  => $n,
+					'label' => isset( $field['label'] ) && '' !== (string) $field['label'] ? (string) $field['label'] : $n,
+					'type'  => isset( $field['type'] ) ? (string) $field['type'] : '',
+				);
+			}
+		}
+		if ( empty( $schema_fields ) ) {
+			foreach ( array_keys( $payload ) as $k ) {
+				if ( '_bdfrms_labels' === $k ) {
+					continue;
+				}
+				$schema_fields[] = array(
+					'name'  => $k,
+					'label' => $k,
+					'type'  => '',
+				);
+			}
+		}
+
+		// Meta-Spalten (wie Formular-Export; IP nur im Decrypt-Modus).
+		$meta_cols = array(
+			array(
+				'name'  => 'id',
+				'label' => __( 'ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'created_at',
+				'label' => __( 'Datum', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'post_id',
+				'label' => __( 'Seiten-ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'form_id',
+				'label' => __( 'Formular-ID', 'blitz-donner-forms' ),
+			),
+			array(
+				'name'  => 'form_title',
+				'label' => __( 'Formularname', 'blitz-donner-forms' ),
+			),
+		);
+		if ( $decrypt_mode ) {
+			$meta_cols[] = array(
+				'name'  => 'ip_address',
+				'label' => __( 'IP-Adresse', 'blitz-donner-forms' ),
+			);
+		}
+
+		// Temp-ZIP im privaten Storage-Root (nicht web-erreichbar), Aufräumen auch bei Abbruch.
+		$tmp_dir = BDFRMS_File_Storage::storage_root() . '/.tmp-export';
+		wp_mkdir_p( $tmp_dir );
+		$tmp_zip = $tmp_dir . '/bdfrms-zip-single-' . $submission_id . '-' . wp_generate_password( 12, false, false ) . '.zip';
+		register_shutdown_function(
+			function () use ( $tmp_zip ) {
+				if ( file_exists( $tmp_zip ) ) {
+					@unlink( $tmp_zip );
+				}
+			}
+		);
+
+		$zip        = new ZipArchive();
+		$zip_result = $zip->open( $tmp_zip, ZipArchive::CREATE | ZipArchive::OVERWRITE );
+		if ( true !== $zip_result ) {
+			do_action(
+				'bdfrms_security_event',
+				'submission_export_single_denied',
+				'submission',
+				(string) $submission_id,
+				array(
+					'reason' => 'zip_open_failed',
+					'code'   => $zip_result,
+				)
+			);
+			wp_die(
+				esc_html__( 'ZIP-Datei konnte nicht erstellt werden.', 'blitz-donner-forms' ),
+				esc_html__( 'Fehler', 'blitz-donner-forms' ),
+				array( 'response' => 500 )
+			);
+		}
+		@chmod( $tmp_zip, 0600 );
+
+		$fields_count      = 0;
+		$files_included    = 0;
+		$used_folder_names = array();
+		$used_file_names   = array();
+		$folder_name       = self::resolve_submission_folder_name( $payload, $submission_id, $decrypt_mode, $used_folder_names );
+
+		// Meta-Werte (für CSV und JSON identisch).
+		$meta_values = array(
+			'id'         => (string) $row->id,
+			'created_at' => (string) $row->created_at,
+			'post_id'    => (string) $row->post_id,
+			'form_id'    => $form_id,
+			'form_title' => isset( $row->form_title ) ? (string) $row->form_title : '',
+		);
+		if ( $decrypt_mode ) {
+			$meta_values['ip_address'] = isset( $row->ip_address ) ? (string) $row->ip_address : '';
+		}
+
+		// Feldwerte aufbauen: Datei-Felder wandern ins ZIP, alle anderen über die CSV-Zellen-Logik.
+		self::$current_export_row = (array) $row;
+		$field_values             = array();
+		foreach ( $schema_fields as $col ) {
+			$field_name = $col['name'];
+			$value      = isset( $payload[ $field_name ] ) ? $payload[ $field_name ] : null;
+
+			// Erkennung über die Datei-Referenz, nicht über den Schema-Typ (siehe
+			// stream_zip): so kommt die Datei auch dann ins ZIP, wenn das Formular
+			// geändert/gelöscht wurde und nur ein Ersatz-Schema ohne Typen vorliegt.
+			if ( is_array( $value )
+				&& isset( $value['_ref'] )
+				&& 0 === strpos( (string) $value['_ref'], 'bdfrms-file:' )
+			) {
+				$file_id = isset( $value['file_id'] ) ? (int) $value['file_id'] : (int) substr( (string) $value['_ref'], strlen( 'bdfrms-file:' ) );
+				$cell    = self::zip_cell_for_file( $file_id, $submission_id, $folder_name, $zip, $used_file_names, $files_included, $form_id );
+			} else {
+				$cell = self::csv_cell_for_value( $value, $field_name, $can_decrypt, $decrypt_requested, $fields_count );
+			}
+
+			$field_values[] = array(
+				'name'  => $field_name,
+				'label' => $col['label'],
+				'value' => $cell,
+			);
+		}
+
+		// eintrag.csv: Kopfzeile + eine Datenzeile (gleiche Härtung wie der Formular-Export).
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$csv_fh = fopen( 'php://temp', 'r+' );
+		if ( false !== $csv_fh ) {
+			fwrite( $csv_fh, "\xEF\xBB\xBF" );
+			$header_row = array();
+			$data_row   = array();
+			foreach ( $meta_cols as $col ) {
+				$header_row[] = self::csv_harden_cell( $col['label'] );
+				$data_row[]   = self::csv_harden_cell( $meta_values[ $col['name'] ] );
+			}
+			foreach ( $field_values as $fv ) {
+				$header_row[] = self::csv_harden_cell( $fv['label'] );
+				$data_row[]   = self::csv_harden_cell( $fv['value'] );
+			}
+			if ( PHP_VERSION_ID >= 80100 ) {
+				fputcsv( $csv_fh, $header_row, ';', '"', '' );
+				fputcsv( $csv_fh, $data_row, ';', '"', '' );
+			} else {
+				fputcsv( $csv_fh, $header_row, ';', '"' );
+				fputcsv( $csv_fh, $data_row, ';', '"' );
+			}
+			rewind( $csv_fh );
+			$csv_string = stream_get_contents( $csv_fh );
+			fclose( $csv_fh );
+			$zip->addFromString( 'eintrag.csv', false !== $csv_string ? $csv_string : '' );
+		}
+
+		// eintrag.json: dieselben Werte maschinenlesbar.
+		$json_fields = array();
+		foreach ( $field_values as $fv ) {
+			$json_fields[ $fv['name'] ] = array(
+				'label' => $fv['label'],
+				'value' => $fv['value'],
+			);
+		}
+		$json_data = array(
+			'meta'   => $meta_values,
+			'fields' => $json_fields,
+		);
+		$zip->addFromString( 'eintrag.json', (string) wp_json_encode( $json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
+
+		$zip->close();
+
+		// Dateiname des ZIPs.
+		$form_slug    = isset( $row->form_title ) && '' !== trim( (string) $row->form_title ) ? trim( (string) $row->form_title ) : $form_id;
+		$ts           = current_time( 'Y-m-d-Hi' );
+		$zip_filename = sanitize_file_name( 'einsendung-' . $submission_id . '-' . $form_slug . '-' . $ts . '.zip' );
+		$zip_filename = str_replace( array( '"', "\r", "\n" ), '_', $zip_filename );
+
+		// Audit VOR Auslieferung.
+		do_action(
+			'bdfrms_security_event',
+			'submission_export_single',
+			'submission',
+			(string) $submission_id,
+			array(
+				'form_id'          => $form_id,
+				'files_included'   => $files_included,
+				'decrypt_mode'     => $decrypt_mode,
+				'fields_decrypted' => $fields_count,
+				'format'           => 'zip',
+			)
+		);
+		if ( $decrypt_mode ) {
+			do_action(
+				'bdfrms_security_event',
+				'submission_exported_decrypted',
+				'submission',
+				(string) $submission_id,
+				array(
+					'fields_decrypted' => $fields_count,
+					'format'           => 'zip',
+				)
+			);
+		}
+
+		// ZIP ausliefern.
+		$zip_size = file_exists( $tmp_zip ) ? filesize( $tmp_zip ) : 0;
+		nocache_headers();
+		header( 'Content-Type: application/zip' );
+		header( 'X-Content-Type-Options: nosniff' );
+		header( 'Content-Disposition: attachment; filename="' . $zip_filename . '"' );
+		if ( $zip_size > 0 ) {
+			header( 'Content-Length: ' . (int) $zip_size );
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		readfile( $tmp_zip );
+
+		if ( file_exists( $tmp_zip ) ) {
+			@unlink( $tmp_zip );
+		}
 		exit;
 	}
 }

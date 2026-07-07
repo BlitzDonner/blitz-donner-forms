@@ -122,11 +122,29 @@ Schaltet die Vertraulich-Oberfläche frei. Die Basis speichert Klartext; darum z
 
 Signatur: `apply_filters( 'bdfrms_sensitive_ui_active', false )` in `BDFRMS_Plugin::sensitive_ui_active()`.
 
+### `bdfrms_can_decrypt` (Filter)
+
+Darf der aktuelle Nutzer Erweiterungs-Envelopes entschlüsselt sehen? Die Basis (Klartext) liefert `true`; das Security-Add-on bindet das an sein Entschlüsselungs-Recht. Steuert die Entschlüsseln-Optionen in Detailansicht und Exporten.
+
+Signatur: `apply_filters( 'bdfrms_can_decrypt', true )` in `BDFRMS_Admin_Submissions`.
+
+### `bdfrms_can_download_files` (Filter)
+
+Darf der aktuelle Nutzer Datei-Anhänge herunterladen? Basis-Default ist das Einsendungen-Sehen-Recht; das Security-Add-on ersetzt es durch sein Download-Recht.
+
+Signatur: `apply_filters( 'bdfrms_can_download_files', bool $default )` in `BDFRMS_Admin_Submissions`.
+
+### `bdfrms_zip_file_contents` (Filter)
+
+Datei-Inhalt für ZIP-Exporte, wenn ein Add-on die Ablage übernommen hat (`bdfrms_store_file`). Rückgabe: Klartext-Inhalt als String oder `null` (kein Zugriff/kein Inhalt – die CSV erhält dann einen Hinweis statt der Datei).
+
+Signatur: `apply_filters( 'bdfrms_zip_file_contents', null, array $file_row )` in `BDFRMS_Admin_Submissions::zip_cell_for_file()`.
+
 ### `bdfrms_security_event` (Action)
 
 Zentrales Sicherheits-Ereignis (jeder `BDFRMS_Security::log_event()`-Aufruf: Nonce-/Token-Fehler, Honeypot-Treffer, Rate-Limit, Captcha-Ergebnisse, Datei-Ablehnungen, `submission_insert`). Das Security-Add-on speist daraus sein tamper-evidentes Audit-Log.
 
-Signatur: `do_action( 'bdfrms_security_event', string $type, array $context )` in `BDFRMS_Security::log_event()`.
+Signatur: `do_action( 'bdfrms_security_event', string $event, string $target_type, string $target_id, array $context )` – gefeuert von `BDFRMS_Security::log_event()` und den Backend-Pfaden (Löschen, Exporte, Downloads). Das Security-Add-on schreibt jedes Ereignis in sein Audit-Log.
 
 ## Weitere Hooks aus dem Bestand
 

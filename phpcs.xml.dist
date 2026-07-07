@@ -19,6 +19,18 @@
 	<!-- Warnungen anzeigen, aber nicht als CI-Fehler werten. -->
 	<config name="ignore_warnings_on_exit" value="1"/>
 
+	<!-- 1:1 portiertes, auditiertes Bestands-Backend (gutenberg-formbuilder):
+	     Kommentar-/Stil-Sniffs greifen dort nicht. Sicherheits-Sniffs laufen. -->
+	<rule ref="Squiz.Commenting">
+		<exclude-pattern>*/includes/class-bdfrms-admin-submissions\.php</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting">
+		<exclude-pattern>*/includes/class-bdfrms-admin-submissions\.php</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Strings.UnnecessaryStringConcat">
+		<exclude-pattern>*/includes/class-bdfrms-admin-submissions\.php</exclude-pattern>
+	</rule>
+
 	<!-- Submit-Endpoint: Die Nonce-Prüfung ist die erste Stufe der Abwehrkette
 	     in handle(); der Sniff erkennt die Kette nicht. Die Frontend-
 	     Statusparameter (GET) sind reine Anzeige und werden sanitisiert. -->

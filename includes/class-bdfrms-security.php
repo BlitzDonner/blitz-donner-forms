@@ -62,7 +62,7 @@ class BDFRMS_Security {
 		 * @param string              $type    Event slug.
 		 * @param array<string,mixed> $context Sanitized context.
 		 */
-		do_action( 'bdfrms_security_event', $type, $context );
+		do_action( 'bdfrms_security_event', $type, 'security', '', $context );
 	}
 
 	// Abschnitt: Client-IP / Rate-Limit-Helfer.
@@ -466,7 +466,8 @@ class BDFRMS_Security {
 
 		// Doppel-Endungs-/Polyglot-Schutz: jedes verbotene Token irgendwo in den Endungs-Segmenten.
 		$segments = explode( '.', $lower );
-		array_shift( $segments ); // Erstes Element ist der Basisname ohne Endung.
+		array_shift( $segments );
+		// Erstes Element ist der Basisname ohne Endung.
 		$blocked = self::blocked_extension_tokens();
 		foreach ( $segments as $seg ) {
 			if ( in_array( $seg, $blocked, true ) ) {
@@ -573,7 +574,7 @@ class BDFRMS_Security {
 			if ( $mime === $p ) {
 				return true;
 			}
-		}
+		}//end foreach
 		return false;
 	}
 
@@ -747,8 +748,8 @@ class BDFRMS_Security {
 					'item_id'     => 'bdfrms-submission-' . (int) $row->id,
 					'data'        => $items,
 				);
-			}
-		}
+			}//end foreach
+		}//end if
 
 		return array(
 			'data' => $data,
