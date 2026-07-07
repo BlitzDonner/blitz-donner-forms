@@ -208,6 +208,10 @@ class BDFRMS_Admin_Settings {
 	 * Updates statt verstreuter eigener Karten. Jeder Eintrag:
 	 * Slug => array{
 	 *   name:string, version:string,
+	 *   description:string           Nutzenversprechen (ein bis zwei Sätze),
+	 *   features:array<int,string>   Kurze Feature-Punkte (Chips),
+	 *   license_note:string          Warum es eine Lizenz braucht (ein Satz),
+	 *   url:string                   Produktseite,
 	 *   license:callable|null        Status-Etikette {state,text},
 	 *   render_license:callable|null Formularteil (z. B. Token-Feld),
 	 *   save:callable|null           POST-Verarbeitung beim zentralen Speichern
@@ -448,28 +452,51 @@ class BDFRMS_Admin_Settings {
 		}
 
 		foreach ( $extensions as $slug => $ext ) {
-			$name    = isset( $ext['name'] ) ? (string) $ext['name'] : (string) $slug;
-			$version = isset( $ext['version'] ) ? (string) $ext['version'] : '';
-			$license = isset( $ext['license'] ) && is_callable( $ext['license'] ) ? call_user_func( $ext['license'] ) : null;
+			$name         = isset( $ext['name'] ) ? (string) $ext['name'] : (string) $slug;
+			$version      = isset( $ext['version'] ) ? (string) $ext['version'] : '';
+			$description  = isset( $ext['description'] ) ? (string) $ext['description'] : '';
+			$features     = isset( $ext['features'] ) && is_array( $ext['features'] ) ? $ext['features'] : array();
+			$license_note = isset( $ext['license_note'] ) ? (string) $ext['license_note'] : '';
+			$url          = isset( $ext['url'] ) ? (string) $ext['url'] : '';
+			$license      = isset( $ext['license'] ) && is_callable( $ext['license'] ) ? call_user_func( $ext['license'] ) : null;
 
-			echo '<div class="bdfrms-admin-extension" style="padding:0.6rem 0;border-bottom:1px solid #eee;">';
-			echo '<div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">';
-			echo '<strong>' . esc_html( $name ) . '</strong>';
+			echo '<div class="bdfrms-ext-card">';
+			echo '<div class="bdfrms-ext-card-head">';
+			echo '<span class="bdfrms-ext-card-bolt" aria-hidden="true">&#9889;</span>';
+			echo '<h3 class="bdfrms-ext-card-title">' . esc_html( $name ) . '</h3>';
 			if ( '' !== $version ) {
-				echo '<code style="font-size:11px;">v' . esc_html( $version ) . '</code>';
+				echo '<span class="bdfrms-ext-chip bdfrms-ext-chip-version">v' . esc_html( $version ) . '</span>';
 			}
 			if ( is_array( $license ) && isset( $license['state'], $license['text'] ) ) {
-				echo self::summary_badge( (string) $license['state'], (string) $license['text'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- summary_badge escaped.
+				echo '<span class="bdfrms-ext-chip bdfrms-ext-chip-license bdfrms-ext-chip-license--' . esc_attr( (string) $license['state'] ) . '">' . esc_html( (string) $license['text'] ) . '</span>';
 			}
 			echo '</div>';
+			if ( '' !== $description ) {
+				echo '<p class="bdfrms-ext-card-desc">' . esc_html( $description ) . '</p>';
+			}
+			if ( ! empty( $features ) ) {
+				echo '<div class="bdfrms-ext-card-features">';
+				foreach ( $features as $feature ) {
+					echo '<span class="bdfrms-ext-feature">' . esc_html( (string) $feature ) . '</span>';
+				}
+				echo '</div>';
+			}
+			echo '<div class="bdfrms-ext-card-license">';
+			if ( '' !== $license_note ) {
+				echo '<p class="bdfrms-ext-card-license-note">' . esc_html( $license_note ) . '</p>';
+			}
 			if ( isset( $ext['render_license'] ) && is_callable( $ext['render_license'] ) ) {
 				call_user_func( $ext['render_license'] );
 			}
 			echo '</div>';
+			if ( '' !== $url ) {
+				echo '<a class="bdfrms-ext-card-link" href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Produktseite', 'blitz-donner-forms' ) . ' &rarr;</a>';
+			}
+			echo '</div>';
 		}
 		?>
-		<p class="description" style="margin-top:0.6rem;">
-			<a href="https://plugins.blitzdonner.ch" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Weitere Add-ons', 'blitz-donner-forms' ); ?></a>
+		<p class="bdfrms-ext-more">
+			<a href="https://plugins.blitzdonner.ch" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Alle Add-ons entdecken', 'blitz-donner-forms' ); ?> &rarr;</a>
 		</p>
 		<?php
 	}
